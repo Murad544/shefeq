@@ -1,0 +1,164 @@
+import { useEffect, useState } from "react";
+import { apiClient } from "../services/api/apiClient";
+import { endpoints } from "../services/api/endpoints";
+import { formatDate, formatPhoneNumberForDisplay } from "../utils/formatters";
+
+export const useProfileData = () => {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const R2_BASE_URL = process.env.REACT_APP_R2_BASE_URL;
+  const screenshot1 = `${R2_BASE_URL}/photos/screenshot_1.png`;
+  const screenshot2 = `${R2_BASE_URL}/photos/screenshot_2.png`;
+  const screenshot3 = `${R2_BASE_URL}/photos/screenshot_3.png`;
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        const data = await apiClient.get(endpoints.profile());
+
+        const user = data?.user || {};
+        const application = data?.application || {};
+
+        const fullName = `${application.name || ""} ${
+          application.surname || ""
+        }`.trim();
+
+        // Fetch and process game sessions
+        const gameSessionsResponse = await apiClient.get(
+          endpoints.gameSessions(),
+        );
+        const sessions = gameSessionsResponse?.sessions || [];
+
+        // Calculate total play time from all completed sessions
+        const totalSeconds = sessions.reduce((acc, session) => {
+          return acc + (session.duration_seconds || 0);
+        }, 0);
+
+        const totalHours = Math.floor(totalSeconds / 3600);
+        const totalMinutes = Math.floor((totalSeconds % 3600) / 60);
+
+        // Format sessions for display (show only completed sessions with end time)
+        const formattedSessions = sessions
+          .filter((session) => session.session_ended_at)
+          .sort(
+            (a, b) =>
+              new Date(b.session_started_at) - new Date(a.session_started_at),
+          )
+          .map((session) => {
+            const durationSeconds = session.duration_seconds || 0;
+            const durationHours = Math.floor(durationSeconds / 3600);
+            const durationMinutes = Math.floor((durationSeconds % 3600) / 60);
+
+            let durationText = "";
+            if (durationHours > 0) {
+              durationText = `${durationHours} s ${durationMinutes} dəq`;
+            } else {
+              durationText = `${durationMinutes} dəq`;
+            }
+
+            return {
+              id: session.id,
+              date: formatDate(session.session_started_at, "DD MMMM, YYYY"),
+              login: formatDate(session.session_started_at, "HH:mm"),
+              logout: session.session_ended_at
+                ? formatDate(session.session_ended_at, "HH:mm")
+                : "-",
+              duration: durationText,
+            };
+          });
+
+        const mapped = {
+          fullName: fullName || user.email || "-",
+          role: "Müraciətçi",
+          institution: "PUA Mütəxəssisi Namizədi",
+          avatar: null,
+          personalInfo: {
+            name: fullName || "",
+            dateOfBirth: application.date_of_birth
+              ? formatDate(application.date_of_birth, "DD-MM-YYYY")
+              : "",
+            birthPlace: application.place_of_birth || "",
+            gender: application.gender || "",
+            fin: application.national_id_num || "",
+            idSeries: application.id_series || "",
+            educationLevel: application.education_level || "",
+            profession: application.profession || "",
+            university: application.university || "",
+            skills: application.skills || "",
+          },
+          contactInfo: {
+            email: application.email || user.email || "",
+            emailVerified: !!user.activated_at,
+            phone: formatPhoneNumberForDisplay(application.phone_number || ""),
+          },
+          applicationStatus: {
+            current: user.is_active ? "Təsdiqlənib" : "Gözləyir",
+            applicationDate: application.created_at
+              ? formatDate(application.created_at, "DD-MM-YYYY")
+              : "",
+            confirmationDate: user.created_at
+              ? formatDate(user.created_at, "DD-MM-YYYY")
+              : "",
+            compliance: user.is_active ? "Təsdiqlənib" : "Yoxlanılır",
+          },
+          gameAccount: {
+            status: sessions.length > 0 ? "AKTİV" : "PASSIV",
+            userId: user.id || "N/A",
+            totalPlayTime: {
+              hours: totalHours,
+              minutes: totalMinutes,
+            },
+            sessions: formattedSessions,
+          },
+          gameInstallation: {
+            downloadLink: "/downloads/PUA_Simulator.exe",
+            instructions: [
+              "Simulyatorun son versiyasını aşağıdakı düymədan yükləyin.",
+              "Yüklənmiş .zip arxivini istənilən qovluğa çıxarın.",
+              "'PUA_Sim.exe' faylını admin hüquqları ilə başladın.",
+              "Oyuna giriş məlumatlarınızı daxil edin və 'Daxil ol' düyməsini basın. Giriş məlumatlarınız web saytındakı hesab məlumatlarınızla eynidir.",
+              "Oyun içi təlimatlara əməl edərək simulyasiyaya başlayın.",
+            ],
+            screenshots: [
+              {
+                id: 1,
+                url: screenshot1,
+                alt: "Oyun ekran görüntüsü 1",
+              },
+              {
+                id: 2,
+                url: screenshot2,
+                alt: "Oyun ekran görüntüsü 2",
+              },
+              {
+                id: 3,
+                url: screenshot3,
+                alt: "Oyun ekran görüntüsü 3",
+              },
+            ],
+          },
+          documents: [
+            { id: 1, name: "Diplom.pdf", type: "pdf" },
+            { id: 2, name: "CV_Filankesov.pdf", type: "pdf" },
+          ],
+        };
+
+        if (!mounted) return;
+        setProfile(mapped);
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    fetchProfile();
+    return () => (mounted = false);
+  }, []);
+
+  return { profile, loading };
+};

@@ -1,0 +1,42 @@
+{
+  "name": "semadaki-gozler",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "npm run check:deps && node start-dev.js",
+    "prod": "npm run check:deps && node start-prod.js",
+    "start:prod": "npm run check:deps && node start-prod.js",
+    "dev:backend": "cd packages/backend && npm run dev",
+    "dev:user": "cd packages/user-app && npm run react-start",
+    "dev:admin": "cd packages/admin-app && npm run react-start",
+    "dev:all": "concurrently \"npm run dev:backend\" \"npm run dev:user\" \"npm run dev:admin\"",
+    "build:user": "cd packages/user-app && npm run build",
+    "build:admin": "cd packages/admin-app && npm run build",
+    "build:all": "npm run build:user && npm run build:admin",
+    "deploy:user": "cd packages/user-app && npm run build && npx vercel --prod ./build --name semadaki-gozler-user",
+    "deploy:admin": "cd packages/admin-app && npm run build && npx vercel --prod ./build --name semadaki-gozler-admin",
+    "deploy:all": "npm run deploy:user && npm run deploy:admin",
+    "setup": "npm install && npm run install:all",
+    "install:all": "npm run install:backend && npm run install:user && npm run install:admin",
+    "install:backend": "cd packages/backend && npm install",
+    "install:user": "cd packages/user-app && npm install",
+    "install:admin": "cd packages/admin-app && npm install",
+    "check:deps": "node check-dependencies.js",
+    "clean": "rimraf packages/user-app/build packages/admin-app/build packages/user-app/node_modules/.cache packages/admin-app/node_modules/.cache",
+    "clean:all": "rimraf packages/backend/node_modules packages/user-app/node_modules packages/admin-app/node_modules packages/user-app/build packages/admin-app/build",
+    "pre-prod": "npm run clean && npm run install:all && npm run build:all",
+    "vercel:login": "npx vercel login",
+    "vercel:status": "npx vercel whoami",
+    "health": "npm run health:backend && npm run health:user && npm run health:admin",
+    "health:backend": "cd packages/backend && npm ls --depth=0",
+    "health:user": "cd packages/user-app && npm ls --depth=0",
+    "health:admin": "cd packages/admin-app && npm ls --depth=0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5"
+  },
+  "dependencies": {
+    "nodemailer": "^8.0.1",
+    "resend": "^6.9.3"
+  }
+}

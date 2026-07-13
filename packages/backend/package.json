@@ -1,0 +1,168 @@
+{
+  "name": "backend",
+  "version": "2.1.0",
+  "description": "Semadaki Gozler Backend - Secure File Upload System",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "migrate": "node -e \"require('./src/database/connection').runMigrations()\"",
+    "test": "jest --coverage --testTimeout=30000",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/ --ext .js --fix",
+    "lint:check": "eslint src/ --ext .js",
+    "format": "prettier --write src/",
+    "format:check": "prettier --check src/",
+    "db:test": "node -e \"require('./src/database/connection').testConnection()\"",
+    "db:migrate": "npm run migrate",
+    "audit:security": "npm audit --audit-level moderate",
+    "clean": "rm -rf node_modules package-lock.json && npm install"
+  },
+  "keywords": [
+    "backend",
+    "secure",
+    "file-upload",
+    "express",
+    "postgresql",
+    "security"
+  ],
+  "author": "Semadaki Gozler Team",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.955.0",
+    "@aws-sdk/s3-request-presigner": "^3.955.0",
+    "bcrypt": "^5.1.1",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "file-type": "^18.7.0",
+    "helmet": "^7.1.0",
+    "ioredis": "^5.7.0",
+    "jsonwebtoken": "^9.0.2",
+    "micromatch": "^4.0.8",
+    "morgan": "^1.10.1",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^7.0.12",
+    "pg": "^8.11.3",
+    "resend": "^6.9.3",
+    "validator": "^13.15.15",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.8",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-security": "^1.7.1",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "prettier": "^3.6.2",
+    "supertest": "^6.3.4"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "lcov"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/test/**",
+      "!src/database/migrations/**",
+      "!src/utils/logger.js"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/?(*.)+(spec|test).js"
+    ],
+    "testTimeout": 30000,
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/test/setup.js"
+    ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "airbnb-base",
+      "plugin:security/recommended"
+    ],
+    "env": {
+      "node": true,
+      "jest": true
+    },
+    "rules": {
+      "linebreak-style": [
+        "error",
+        "windows"
+      ],
+      "no-console": "off",
+      "max-len": [
+        "error",
+        {
+          "code": 100
+        }
+      ],
+      "security/detect-object-injection": "off",
+      "security/detect-non-literal-fs-filename": "off",
+      "import/no-extraneous-dependencies": [
+        "error",
+        {
+          "devDependencies": [
+            "**/*.test.js",
+            "**/*.spec.js",
+            "**/test/**/*.js",
+            "jest.config.js"
+          ]
+        }
+      ]
+    }
+  },
+  "prettier": {
+    "semi": true,
+    "trailingComma": "es5",
+    "singleQuote": true,
+    "printWidth": 100,
+    "tabWidth": 2,
+    "useTabs": false
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src/"
+    ],
+    "ext": "js,json",
+    "ignore": [
+      "src/test/",
+      "node_modules/",
+      "coverage/",
+      "logs/"
+    ],
+    "env": {
+      "NODE_ENV": "development"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/semadaki-gozler/backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/semadaki-gozler/backend/issues"
+  },
+  "homepage": "https://github.com/semadaki-gozler/backend#readme",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "security": {
+    "advisories": {
+      "ignore": []
+    }
+  }
+}

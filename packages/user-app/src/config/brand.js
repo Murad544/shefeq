@@ -1,0 +1,9 @@
+import { STRINGS } from './constants';
+
+const PROJECT_NAME = process.env.REACT_APP_PROJECT_NAME || STRINGS.DEFAULT_PROJECT_NAME;
+const COURSE_NAME = process.env.REACT_APP_COURSE_NAME || STRINGS.DEFAULT_COURSE_NAME;
+
+export const BRAND = {
+  PROJECT_NAME,
+  COURSE_NAME,
+};
