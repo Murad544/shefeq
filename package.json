@@ -2,6 +2,8 @@
   "name": "semadaki-gozler",
   "version": "1.0.0",
   "scripts": {
+    "build": "npm run build:user",
+    "build:admin-app": "npm run build:admin",
     "dev": "npm run check:deps && node start-dev.js",
     "prod": "npm run check:deps && node start-prod.js",
     "start:prod": "npm run check:deps && node start-prod.js",
