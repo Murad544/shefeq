@@ -98,7 +98,7 @@ const ResultDialog = ({ open, type, message, onClose }) => {
 
       {config.allowClose && (
         <DialogActions sx={{ justifyContent: "center", pb: 3 }}>
-          <Button onClick={onClose} variant="outlined" sx={{ minWidth: 120 }}>
+          <Button onClick={onClose} variant="outlined" sx={{ minWidth: 121 }}>
             {STRINGS.CLOSE}
           </Button>
         </DialogActions>
