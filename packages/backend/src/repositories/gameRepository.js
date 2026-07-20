@@ -15,7 +15,7 @@ class GameRepository {
         end_reason = $2
     WHERE
         id = $1 AND session_ended_at IS NULL
-    RETURNING id, duration_seconds`;
+    RETURNING id, user_id, duration_seconds`;
     const { rows } = await db.query(sql, [sessionId, endReason]);
     return rows[0] || null;
   }

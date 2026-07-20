@@ -14,6 +14,7 @@ export const useProfileData = () => {
 
   useEffect(() => {
     let mounted = true;
+    let eventSource = null;
 
     const fetchProfile = async () => {
       try {
@@ -27,49 +28,57 @@ export const useProfileData = () => {
           application.surname || ""
         }`.trim();
 
-        // Fetch and process game sessions
+        // Helper function to format sessions and calculate play time
+        const formatSessionsData = (sessions) => {
+          const totalSeconds = sessions.reduce((acc, session) => {
+            return acc + (session.duration_seconds || 0);
+          }, 0);
+
+          const totalHours = Math.floor(totalSeconds / 3600);
+          const totalMinutes = Math.floor((totalSeconds % 3600) / 60);
+
+          const formattedSessions = sessions
+            .filter((session) => session.session_ended_at)
+            .sort(
+              (a, b) =>
+                new Date(b.session_started_at) - new Date(a.session_started_at),
+            )
+            .map((session) => {
+              const durationSeconds = session.duration_seconds || 0;
+              const durationHours = Math.floor(durationSeconds / 3600);
+              const durationMinutes = Math.floor((durationSeconds % 3600) / 60);
+
+              let durationText = "";
+              if (durationHours > 0) {
+                durationText = `${durationHours} s ${durationMinutes} dəq`;
+              } else {
+                durationText = `${durationMinutes} dəq`;
+              }
+
+              return {
+                id: session.id,
+                date: formatDate(session.session_started_at, "DD MMMM, YYYY"),
+                login: formatDate(session.session_started_at, "HH:mm"),
+                logout: session.session_ended_at
+                  ? formatDate(session.session_ended_at, "HH:mm")
+                  : "-",
+                duration: durationText,
+              };
+            });
+
+          return { totalHours, totalMinutes, formattedSessions };
+        };
+
+        // Fetch initial game sessions
         const gameSessionsResponse = await apiClient.get(
           endpoints.gameSessions(),
         );
-        const sessions = gameSessionsResponse?.sessions || [];
-
-        // Calculate total play time from all completed sessions
-        const totalSeconds = sessions.reduce((acc, session) => {
-          return acc + (session.duration_seconds || 0);
-        }, 0);
-
-        const totalHours = Math.floor(totalSeconds / 3600);
-        const totalMinutes = Math.floor((totalSeconds % 3600) / 60);
-
-        // Format sessions for display (show only completed sessions with end time)
-        const formattedSessions = sessions
-          .filter((session) => session.session_ended_at)
-          .sort(
-            (a, b) =>
-              new Date(b.session_started_at) - new Date(a.session_started_at),
-          )
-          .map((session) => {
-            const durationSeconds = session.duration_seconds || 0;
-            const durationHours = Math.floor(durationSeconds / 3600);
-            const durationMinutes = Math.floor((durationSeconds % 3600) / 60);
-
-            let durationText = "";
-            if (durationHours > 0) {
-              durationText = `${durationHours} s ${durationMinutes} dəq`;
-            } else {
-              durationText = `${durationMinutes} dəq`;
-            }
-
-            return {
-              id: session.id,
-              date: formatDate(session.session_started_at, "DD MMMM, YYYY"),
-              login: formatDate(session.session_started_at, "HH:mm"),
-              logout: session.session_ended_at
-                ? formatDate(session.session_ended_at, "HH:mm")
-                : "-",
-              duration: durationText,
-            };
-          });
+        const initialSessions = gameSessionsResponse?.sessions || [];
+        const {
+          totalHours: initHours,
+          totalMinutes: initMinutes,
+          formattedSessions: initFormatted,
+        } = formatSessionsData(initialSessions);
 
         const mapped = {
           fullName: fullName || user.email || "-",
@@ -106,13 +115,13 @@ export const useProfileData = () => {
             compliance: user.is_active ? "Təsdiqlənib" : "Yoxlanılır",
           },
           gameAccount: {
-            status: sessions.length > 0 ? "AKTİV" : "PASSIV",
+            status: initialSessions.length > 0 ? "AKTİV" : "PASSIV",
             userId: user.id || "N/A",
             totalPlayTime: {
-              hours: totalHours,
-              minutes: totalMinutes,
+              hours: initHours,
+              minutes: initMinutes,
             },
-            sessions: formattedSessions,
+            sessions: initFormatted,
           },
           gameInstallation: {
             downloadLink: "/downloads/PUA_Simulator.exe",
@@ -147,8 +156,60 @@ export const useProfileData = () => {
           ],
         };
 
-        if (!mounted) return;
-        setProfile(mapped);
+        if (mounted) {
+          setProfile(mapped);
+        }
+
+        // Establish SSE connection for real-time game sessions updates
+        const API_URL = process.env.REACT_APP_API_URL || "http://localhost:4000";
+        const token = localStorage.getItem("auth_token");
+        if (token) {
+          const sseUrl = `${API_URL}${endpoints.gameSessions()}?token=${token}`;
+          console.log("[SSE] Connecting to real-time game sessions at:", sseUrl);
+          eventSource = new EventSource(sseUrl);
+
+          eventSource.onopen = () => {
+            console.log("[SSE] Connection established successfully to game sessions stream");
+          };
+
+          eventSource.onmessage = (event) => {
+            console.log("[SSE] Received real-time sessions data event:", event);
+            try {
+              const dataParsed = JSON.parse(event.data);
+              const sessionsParsed = dataParsed.sessions || [];
+              const {
+                totalHours: updatedHours,
+                totalMinutes: updatedMinutes,
+                formattedSessions: updatedFormatted,
+              } = formatSessionsData(sessionsParsed);
+
+              if (mounted) {
+                setProfile((prevProfile) => {
+                  if (!prevProfile) return prevProfile;
+                  console.log("[SSE] Updating profile state with", sessionsParsed.length, "sessions");
+                  return {
+                    ...prevProfile,
+                    gameAccount: {
+                      ...prevProfile.gameAccount,
+                      status: sessionsParsed.length > 0 ? "AKTİV" : "PASSIV",
+                      totalPlayTime: {
+                        hours: updatedHours,
+                        minutes: updatedMinutes,
+                      },
+                      sessions: updatedFormatted,
+                    },
+                  };
+                });
+              }
+            } catch (sseError) {
+              console.error("[SSE] Failed to parse real-time game sessions:", sseError);
+            }
+          };
+
+          eventSource.onerror = (err) => {
+            console.error("[SSE] Real-time game sessions SSE connection error:", err);
+          };
+        }
       } catch (error) {
         console.error("Failed to fetch profile:", error);
       } finally {
@@ -157,7 +218,12 @@ export const useProfileData = () => {
     };
 
     fetchProfile();
-    return () => (mounted = false);
+    return () => {
+      mounted = false;
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
   }, []);
 
   return { profile, loading };

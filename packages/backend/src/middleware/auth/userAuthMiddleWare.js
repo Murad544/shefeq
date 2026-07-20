@@ -83,6 +83,11 @@ class UserAuthMiddleware {
       return cookieToken;
     }
 
+    const queryToken = req.query?.token;
+    if (queryToken && this.isValidTokenFormat(queryToken)) {
+      return queryToken;
+    }
+
     return null;
   }
 
