@@ -27,7 +27,7 @@ export default function StatusChip({
       ...colorMap,
     };
 
-    return defaultColors[statusLower] || "default";
+    return defaultColors[statusLower] || "error";
   };
 
   const getStatusLabel = (status) => {

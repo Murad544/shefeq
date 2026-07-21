@@ -23,6 +23,7 @@ import AnswersInfo from "./AnswersInfo";
 import FilesInfo from "./FilesInfo";
 import ActionButtons from "./ActionButtons";
 import GameAccountInfo from "./GameAccountInfo";
+import StatusChip from "../../../ui/Display/StatusChip";
 
 import { useApplicantDetail } from "../../../../hooks/data/useApplicantDetail";
 import { useApplicantActions } from "../../../../hooks/data/useApplicantActions";
@@ -55,7 +56,7 @@ function MobileHandle() {
   );
 }
 
-function DrawerHeader({ isMobile, user, id, onClose }) {
+function DrawerHeader({ isMobile, user, id, onClose, isOnline }) {
   return (
     <Box
       sx={{
@@ -92,17 +93,21 @@ function DrawerHeader({ isMobile, user, id, onClose }) {
           </Grid>
 
           <Grid item xs>
-            <Typography
-              variant={isMobile ? "h6" : "h5"}
-              sx={{
-                fontWeight: 700,
-                color: "primary.main",
-                fontSize: { xs: "1.1rem", md: "1.3rem" },
-                mb: 0.5,
-              }}
-            >
-              Müraciət #{user?.id ?? id}
-            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 0.5 }}>
+              <Typography
+                variant={isMobile ? "h6" : "h5"}
+                sx={{
+                  fontWeight: 700,
+                  color: "primary.main",
+                  fontSize: { xs: "1.1rem", md: "1.3rem" },
+                }}
+              >
+                Müraciət #{user?.id ?? id}
+              </Typography>
+              {isOnline !== null && (
+                <StatusChip status={isOnline} />
+              )}
+            </Box>
             <Typography
               variant="body2"
               sx={{
@@ -220,6 +225,9 @@ function useApplicantDrawerData(applicant) {
   const files = data?.files ?? [];
   const gameAccount = data?.gameAccount ?? null;
   const hasGameSessions = (gameAccount?.sessions?.length ?? 0) > 0;
+  const isOnline = hasGameSessions
+    ? gameAccount.sessions[0].logout === null
+    : null;
 
   return {
     id,
@@ -237,6 +245,7 @@ function useApplicantDrawerData(applicant) {
     files,
     gameAccount,
     hasGameSessions,
+    isOnline,
   };
 }
 
@@ -336,13 +345,14 @@ export default function ApplicantDrawer({
     files,
     gameAccount,
     hasGameSessions,
+    isOnline,
   } = useApplicantDrawerData(applicant);
 
   return (
     <DrawerComponent {...drawerProps}>
       {isMobile && <MobileHandle />}
 
-      <DrawerHeader isMobile={isMobile} user={user} id={id} onClose={onClose} />
+      <DrawerHeader isMobile={isMobile} user={user} id={id} onClose={onClose} isOnline={isOnline} />
 
       <ActionButtons applicant={applicant} {...applicantActions} />
 
