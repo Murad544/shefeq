@@ -20,7 +20,18 @@ class ApplicationApprovalRepository {
   }
 
   async getAllApprovals() {
-    const sql = 'SELECT * FROM application_approvals_details ORDER BY accepted_at DESC';
+    const sql = `
+      SELECT aad.*,
+        COALESCE((
+          SELECT gs.session_ended_at IS NULL
+          FROM game_sessions gs
+          WHERE gs.user_id = aad.user_id
+          ORDER BY gs.session_started_at DESC
+          LIMIT 1
+        ), false) AS is_online
+      FROM application_approvals_details aad
+      ORDER BY aad.accepted_at DESC
+    `;
     const { rows } = await db.query(sql);
     return rows;
   }
@@ -38,9 +49,17 @@ class ApplicationApprovalRepository {
 
     const term = `%${searchTerm}%`;
     const sql = `
-      SELECT * FROM application_approvals_details 
-      WHERE name ILIKE $1 OR surname ILIKE $1 OR father_name ILIKE $1
-      ORDER BY accepted_at DESC
+      SELECT aad.*,
+        COALESCE((
+          SELECT gs.session_ended_at IS NULL
+          FROM game_sessions gs
+          WHERE gs.user_id = aad.user_id
+          ORDER BY gs.session_started_at DESC
+          LIMIT 1
+        ), false) AS is_online
+      FROM application_approvals_details aad
+      WHERE aad.name ILIKE $1 OR aad.surname ILIKE $1 OR aad.father_name ILIKE $1
+      ORDER BY aad.accepted_at DESC
     `;
     const { rows } = await db.query(sql, [term]);
     return rows;

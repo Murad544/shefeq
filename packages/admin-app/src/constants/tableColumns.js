@@ -20,6 +20,7 @@ export const APPLICANTS_COLUMNS = [
 
 export const ACCEPTED_APPLICANTS_COLUMNS = [
   { key: "status", label: "Status", minWidth: 140 },
+  { key: "is_online", label: "Onlayn", minWidth: 100 },
   { key: "name", label: "Ad", minWidth: 120 },
   { key: "surname", label: "Soyad", minWidth: 120 },
   { key: "father_name", label: "Ata adı", minWidth: 120 },

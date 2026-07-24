@@ -7,6 +7,7 @@ import {
   Box,
   Stack,
   Chip,
+  Typography,
 } from "@mui/material";
 import { MdOpenInNew, MdEdit } from "react-icons/md";
 import DataTable from "../../ui/Table/DataTable";
@@ -130,6 +131,48 @@ export default function AcceptedApplicantsView() {
               sx={{ fontWeight: 600, minWidth: 100 }}
             />
           )}
+        </TableCell>
+        <TableCell align="center">
+          <Box
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.75,
+            }}
+          >
+            <Box
+              sx={{
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                bgcolor: user.is_online ? "#22c55e" : "grey.400",
+                boxShadow: user.is_online
+                  ? "0 0 0 3px rgba(34, 197, 94, 0.25)"
+                  : "none",
+                animation: user.is_online
+                  ? "pulse-online 2s ease-in-out infinite"
+                  : "none",
+                "@keyframes pulse-online": {
+                  "0%, 100%": {
+                    boxShadow: "0 0 0 0 rgba(34, 197, 94, 0.4)",
+                  },
+                  "50%": {
+                    boxShadow: "0 0 0 6px rgba(34, 197, 94, 0)",
+                  },
+                },
+              }}
+            />
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 600,
+                color: user.is_online ? "#16a34a" : "text.disabled",
+                fontSize: "0.75rem",
+              }}
+            >
+              {user.is_online ? "Onlayn" : "Oflayn"}
+            </Typography>
+          </Box>
         </TableCell>
         <TableCell sx={{ fontWeight: 500 }}>{name}</TableCell>
         <TableCell sx={{ fontWeight: 500 }}>{surname}</TableCell>
