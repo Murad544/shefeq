@@ -17,6 +17,8 @@ function getClientIp(req) {
   return ip ? ip.replace(/^::ffff:/, '') : null;
 }
 
+const adminService = require('../services/adminService');
+
 class GameController {
   startGameSession = ErrorHandler.asyncWrapper(async (req, res) => {
     const clientIp = getClientIp(req);
@@ -28,6 +30,8 @@ class GameController {
     try {
       const sessions = await gameService.listGameSessions({ userId });
       realtimeManager.broadcastSessions(userId, sessions);
+      const approvedApplications = await adminService.searchApprovals('');
+      realtimeManager.broadcastApprovedApplications(approvedApplications);
     } catch (broadcastError) {
       console.error('Failed to broadcast session start update:', broadcastError);
     }
@@ -45,6 +49,8 @@ class GameController {
       try {
         const sessions = await gameService.listGameSessions({ userId: session.user_id });
         realtimeManager.broadcastSessions(session.user_id, sessions);
+        const approvedApplications = await adminService.searchApprovals('');
+        realtimeManager.broadcastApprovedApplications(approvedApplications);
       } catch (broadcastError) {
         console.error('Failed to broadcast session end update:', broadcastError);
       }

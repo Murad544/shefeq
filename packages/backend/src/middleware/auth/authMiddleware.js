@@ -86,6 +86,11 @@ class AuthMiddleware {
       }
     }
 
+    const queryToken = req.query?.token;
+    if (queryToken && this.isValidTokenFormat(queryToken)) {
+      return queryToken;
+    }
+
     const cookieToken = req.cookies?.admin_session;
     if (cookieToken && this.isValidTokenFormat(cookieToken)) {
       return cookieToken;

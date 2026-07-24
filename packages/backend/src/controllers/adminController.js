@@ -2,6 +2,7 @@ const adminService = require('../services/adminService');
 const fileService = require('../services/fileService');
 const { sendSuccess } = require('../utils/responseHelper');
 const { ErrorHandler, AppError } = require('../middleware/error/errorMiddleware');
+const realtimeManager = require('../utils/realtime');
 
 class AdminController {
   listAdmins = ErrorHandler.asyncWrapper(async (req, res) => {
@@ -51,7 +52,41 @@ class AdminController {
   });
 
   getApprovedApplications = ErrorHandler.asyncWrapper(async (req, res) => {
-    const { search } = req.query;
+    const { search, stream } = req.query;
+
+    if (req.headers.accept === 'text/event-stream' || stream === 'true') {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache, no-transform');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no');
+      res.setHeader('x-no-compression', 'true');
+      res.flushHeaders();
+
+      // Send initial data immediately
+      const approvedApplications = await adminService.searchApprovals(search);
+      res.write(`data: ${JSON.stringify({ approvedApplications })}\n\n`);
+      if (typeof res.flush === 'function') {
+        res.flush();
+      }
+
+      // Add to realtime manager
+      realtimeManager.addAdminApprovedClient(res);
+
+      // Keep connection alive with heartbeat
+      const keepAlive = setInterval(() => {
+        res.write(': ping\n\n');
+        if (typeof res.flush === 'function') {
+          res.flush();
+        }
+      }, 30000);
+
+      req.on('close', () => {
+        clearInterval(keepAlive);
+        realtimeManager.removeAdminApprovedClient(res);
+      });
+      return;
+    }
+
     const approvedApplications = await adminService.searchApprovals(search);
     sendSuccess(res, { approvedApplications }, 'Approved applications retrieved successfully');
   });
@@ -72,6 +107,14 @@ class AdminController {
     const { id } = req.params;
     const adminId = req.user?.id; // Assuming admin ID is in req.user from auth middleware
     const approval = await adminService.approveApplication(id, adminId);
+
+    try {
+      const approvedApplications = await adminService.searchApprovals('');
+      realtimeManager.broadcastApprovedApplications(approvedApplications);
+    } catch (broadcastError) {
+      console.error('Failed to broadcast approved applications on approve:', broadcastError);
+    }
+
     sendSuccess(res, { approval }, 'Application approved successfully');
   });
 
@@ -85,6 +128,14 @@ class AdminController {
   rejectApplication = ErrorHandler.asyncWrapper(async (req, res) => {
     const { id } = req.params;
     await adminService.rejectApplication(id);
+
+    try {
+      const approvedApplications = await adminService.searchApprovals('');
+      realtimeManager.broadcastApprovedApplications(approvedApplications);
+    } catch (broadcastError) {
+      console.error('Failed to broadcast approved applications on reject:', broadcastError);
+    }
+
     sendSuccess(res, null, 'Application approval removed successfully');
   });
 

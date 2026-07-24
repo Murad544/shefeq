@@ -1,6 +1,7 @@
 class RealtimeManager {
   constructor() {
     this.clients = new Map(); // userId -> Set of res objects
+    this.adminApprovedClients = new Set(); // Set of admin res objects subscribed to approved applications
   }
 
   addClient(userId, res) {
@@ -48,6 +49,42 @@ class RealtimeManager {
         } catch (error) {
           console.error(
             `[Realtime] Failed to send update to user ${stringId}:`,
+            error,
+          );
+        }
+      });
+    }
+  }
+
+  addAdminApprovedClient(res) {
+    this.adminApprovedClients.add(res);
+    console.log(
+      `[Realtime] Admin approved client added. Total: ${this.adminApprovedClients.size}`,
+    );
+  }
+
+  removeAdminApprovedClient(res) {
+    this.adminApprovedClients.delete(res);
+    console.log(
+      `[Realtime] Admin approved client removed. Remaining: ${this.adminApprovedClients.size}`,
+    );
+  }
+
+  broadcastApprovedApplications(approvedApplications) {
+    if (this.adminApprovedClients.size > 0) {
+      const payload = `data: ${JSON.stringify({ approvedApplications })}\n\n`;
+      console.log(
+        `[Realtime] Broadcasting approved applications update to ${this.adminApprovedClients.size} admin clients`,
+      );
+      this.adminApprovedClients.forEach((res) => {
+        try {
+          res.write(payload);
+          if (typeof res.flush === 'function') {
+            res.flush();
+          }
+        } catch (error) {
+          console.error(
+            '[Realtime] Failed to send approved applications update:',
             error,
           );
         }
