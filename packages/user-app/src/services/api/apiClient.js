@@ -101,7 +101,7 @@ class ApiClient {
       }
 
       if (!response.ok) {
-        await this.handleErrorResponse(response, responseData, isJSON);
+        await this.handleErrorResponse(response, responseData, isJSON, endpoint);
       }
 
       if (isJSON && responseData && typeof responseData === "object") {
@@ -124,7 +124,7 @@ class ApiClient {
     }
   }
 
-  async handleErrorResponse(response, responseData, isJSON) {
+  async handleErrorResponse(response, responseData, isJSON, endpoint = "") {
     let errorMessage;
 
     if (isJSON && responseData && typeof responseData === "object") {
@@ -154,8 +154,10 @@ class ApiClient {
     const error = new Error(errorMessage);
     error.status = response.status;
 
-    // 401 Unauthorized — token invalid or expired
-    if (response.status === 401) {
+    // 401 Unauthorized — only redirect for protected routes.
+    // Public endpoints like login should stay on the current page and show the error.
+    const isPublic = PUBLIC_ENDPOINTS.some((pub) => endpoint.startsWith(pub));
+    if (response.status === 401 && !isPublic) {
       redirectToHome();
     }
 

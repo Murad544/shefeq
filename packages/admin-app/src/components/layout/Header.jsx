@@ -99,10 +99,10 @@ export default function Header() {
                     {isSmall
                       ? BRAND.PROJECT_NAME
                       : isMobile
-                      ? `${BRAND.PROJECT_NAME} Admin`
-                      : `${BRAND.PROJECT_NAME} — ${
-                          BRAND.ADMIN_NAME || "İdarəetmə"
-                        }`}
+                        ? `${BRAND.PROJECT_NAME} Admin`
+                        : `${BRAND.PROJECT_NAME} — ${
+                            BRAND.ADMIN_NAME || "İdarəetmə"
+                          }`}
                   </Typography>
 
                   {/* Subtitle for larger screens */}
