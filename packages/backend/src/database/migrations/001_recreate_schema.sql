@@ -46,7 +46,37 @@ CREATE TABLE questions (
     active BOOLEAN DEFAULT TRUE
 );
 
--- Step 6: Create Applications table (users apply via form)
+-- Step 6: Create Training modules and lessons tables
+CREATE TABLE training_modules (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
+);
+
+CREATE TABLE training_lessons (
+    id SERIAL PRIMARY KEY,
+    module_id INTEGER NOT NULL REFERENCES training_modules(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    type TEXT NOT NULL,
+    link TEXT,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
+);
+
+CREATE TABLE user_training_progress (
+    id SERIAL PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    lesson_id INTEGER NOT NULL REFERENCES training_lessons(id) ON DELETE CASCADE,
+    completed BOOLEAN NOT NULL DEFAULT TRUE,
+    completed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    UNIQUE (user_id, lesson_id)
+);
+
+-- Step 7: Create Applications table (users apply via form)
 -- Using UUID for privacy/security (user-facing data)
 CREATE TABLE applications (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
