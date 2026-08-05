@@ -7,6 +7,7 @@ const activationRoutes = require('./activationRoutes');
 const applicationRoutes = require('./applicationRoutes');
 const gameRoutes = require('./gameRoutes');
 const syncRoutes = require('./syncRoutes');
+const trainingRoutes = require('./trainingRoutes');
 
 const router = express.Router();
 
@@ -17,6 +18,7 @@ router.use('/applications', applicationRoutes);
 router.use('/activate', activationRoutes);
 router.use('/game', gameRoutes);
 router.use('/sync', syncRoutes);
+router.use('/training', trainingRoutes);
 router.use('/questions', questionRoutes);
 
 module.exports = router;

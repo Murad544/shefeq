@@ -10,6 +10,11 @@ export const endpoints = {
   mapStats: () => "/api/game/stats/maps",
   leaderboard: () => "/api/game/leaderboard",
   streak: () => "/api/game/streak",
+
+  // Training
+  trainingModules: () => "/api/training/modules",
+  setLessonProgress: (lessonId) => `/api/training/progress/lessons/${lessonId}`,
+
   // Activation
   checkActivation: (token) => `/api/activate/${token}`,
   activate: (token) => `/api/activate/${token}`,
