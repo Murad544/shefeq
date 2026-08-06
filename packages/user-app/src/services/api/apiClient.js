@@ -133,10 +133,11 @@ class ApiClient {
           responseData.message ||
           `HTTP ${response.status}: ${response.statusText}`;
 
-        // Handle validation errors
-        if (responseData.errors) {
+        // Handle validation errors (support `errors` or `details` from backend)
+        const validationPayload = responseData.errors || responseData.details;
+        if (validationPayload) {
           const validationError = new Error(errorMessage);
-          validationError.validationErrors = responseData.errors;
+          validationError.validationErrors = validationPayload;
           validationError.status = response.status;
           throw validationError;
         }

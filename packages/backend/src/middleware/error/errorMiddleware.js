@@ -1,8 +1,9 @@
 class AppError extends Error {
-  constructor(message, statusCode = 500, code = null) {
+  constructor(message, statusCode = 500, code = null, details = null) {
     super(message);
     this.statusCode = statusCode;
     this.code = code;
+    this.details = details || null;
     this.isOperational = true;
   }
 
@@ -41,12 +42,18 @@ class ErrorHandler {
       error = AppError.internal(error.message);
     }
 
-    res.status(error.statusCode).json({
+    const payload = {
       success: false,
       message: error.message,
       code: error.code,
       timestamp: new Date().toISOString(),
-    });
+    };
+
+    if (error.details) {
+      payload.details = error.details;
+    }
+
+    res.status(error.statusCode).json(payload);
   }
 
   static asyncWrapper(fn) {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import dayjs from "dayjs";
 import { useErrorHandler } from "./useErrorHandler";
 import { apiClient } from "../services/api/apiClient";
 import { API_ENDPOINTS } from "../config/constants";
@@ -196,9 +197,39 @@ export const useRegistrationForm = () => {
     ];
 
     textFields.forEach((field) => {
-      if (form[field]) {
-        formData.append(field, form[field]);
+      if (!form[field]) return;
+
+      // Convert dateOfBirth to ISO format expected by backend (YYYY-MM-DD)
+      if (field === "dateOfBirth") {
+        // Try parsing known frontend formats first
+        let isoDate = null;
+        const raw = form.dateOfBirth;
+        const tryFormats = ["DD-MM-YYYY", "DD/MM/YYYY", "YYYY-MM-DD"];
+        for (const fmt of tryFormats) {
+          const parsed = dayjs(raw, fmt, true);
+          if (parsed.isValid()) {
+            isoDate = parsed.format("YYYY-MM-DD");
+            break;
+          }
+        }
+
+        // Fallback: attempt generic parse
+        if (!isoDate) {
+          const parsed = dayjs(raw);
+          if (parsed.isValid()) isoDate = parsed.format("YYYY-MM-DD");
+        }
+
+        if (isoDate) {
+          formData.append(field, isoDate);
+        } else {
+          // If parsing failed, still append raw value to let backend validate
+          formData.append(field, raw);
+        }
+
+        return;
       }
+
+      formData.append(field, form[field]);
     });
 
     if (form.phoneNumber) {
@@ -250,7 +281,7 @@ export const useRegistrationForm = () => {
       if (openDialog) {
         openDialog(
           "success",
-          "Müraciətiniz komandamız tərəfindən qiymətləndiriləcək və növbəti mərhələ üçün sizinlə əlaqə saxlanılacaq. Məlumatlarınız yalnız seçim prosesi üçün istifadə olunur və üçüncü tərəflərlə paylaşılmır."
+          "Müraciətiniz komandamız tərəfindən qiymətləndiriləcək və növbəti mərhələ üçün sizinlə əlaqə saxlanılacaq. Məlumatlarınız yalnız seçim prosesi üçün istifadə olunur və üçüncü tərəflərlə paylaşılmır.",
         );
       }
 
@@ -260,7 +291,12 @@ export const useRegistrationForm = () => {
 
       return result;
     } catch (error) {
-      const errorMessage = handleError(error, "Qeydiyyat");
+      const result = handleError(error, "Qeydiyyat");
+      const errorMessage = result?.message || (typeof result === 'string' ? result : "Xəta baş verdi");
+
+      if (result?.fieldErrors) {
+        setErrors(result.fieldErrors);
+      }
 
       if (openDialog) {
         openDialog("error", errorMessage);

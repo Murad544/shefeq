@@ -9,7 +9,13 @@ class ValidationMiddleware {
         next();
       } catch (error) {
         if (error instanceof ZodError) {
-          throw AppError.validationError('Validation failed', error.errors);
+          // Map Zod errors to friendly shape: { path: string, message: string }
+          const details = error.errors.map((e) => ({
+            path: Array.isArray(e.path) ? e.path.join('.') : String(e.path),
+            message: e.message,
+          }));
+
+          throw AppError.validationError('Validation failed', details);
         }
         next(error);
       }

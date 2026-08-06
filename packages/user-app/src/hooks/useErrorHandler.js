@@ -30,22 +30,40 @@ export const useErrorHandler = () => {
     }
 
     // Handle validation errors from backend
+    let returnedFieldErrors = null;
     if (error?.validationErrors) {
       const backendErrors = {};
 
-      if (error.validationErrors.fieldErrors) {
+      // If validationErrors is an array of { path, message }
+      if (Array.isArray(error.validationErrors)) {
+        const detailMsgs = [];
+        error.validationErrors.forEach((d) => {
+          const path = d.path || d.field || "";
+          const msg = d.message || d.msg || JSON.stringify(d);
+          if (path) backendErrors[path] = msg;
+          detailMsgs.push(path ? `${path}: ${msg}` : msg);
+        });
+
+        setErrors(backendErrors);
+        returnedFieldErrors = backendErrors;
+
+        // Append details to modal error message
+        if (detailMsgs.length) {
+          errorMessage = `${errorMessage}. ${detailMsgs.join("; ")}`;
+        }
+      } else if (error.validationErrors.fieldErrors) {
         Object.keys(error.validationErrors.fieldErrors).forEach((field) => {
           const fieldErrors = error.validationErrors.fieldErrors[field];
           if (Array.isArray(fieldErrors) && fieldErrors.length > 0) {
             backendErrors[field] = fieldErrors[0];
           }
         });
+        setErrors(backendErrors);
+        returnedFieldErrors = backendErrors;
       }
-
-      setErrors(backendErrors);
     }
 
-    return errorMessage;
+    return { message: errorMessage, fieldErrors: returnedFieldErrors };
   }, []);
 
   const clearErrors = useCallback(() => {

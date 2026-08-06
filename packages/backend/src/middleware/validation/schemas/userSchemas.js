@@ -4,7 +4,8 @@ const registerSchema = z.object({
   name: z.string().trim().min(1).max(100),
   surname: z.string().trim().min(1).max(100),
   fatherName: z.string().trim().min(1).max(100),
-  dateOfBirth: z.string().regex(/^\d{2}-\d{2}-\d{4}$/),
+  // Accept DD-MM-YYYY or YYYY-MM-DD (frontend may send ISO)
+  dateOfBirth: z.string().regex(/^(?:\d{2}-\d{2}-\d{4}|\d{4}-\d{2}-\d{2})$/),
   sex: z.enum(['male', 'female', 'other']),
   placeOfBirth: z.string().trim().min(1).max(100),
   nationalSerialNumber: z.string().trim().min(7).max(20),

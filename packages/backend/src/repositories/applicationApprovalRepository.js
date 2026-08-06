@@ -21,16 +21,26 @@ class ApplicationApprovalRepository {
 
   async getAllApprovals() {
     const sql = `
-      SELECT aad.*,
+      SELECT
+        aad.*,
+        -- most recent session start time for user
+        (
+          SELECT gs.session_started_at
+          FROM game_sessions gs
+          WHERE gs.user_id = aad.user_id
+          ORDER BY gs.session_started_at DESC
+          LIMIT 1
+        ) AS last_session_started_at,
+        -- whether user's last session is still open (online)
         COALESCE((
-          SELECT gs.session_ended_at IS NULL
+          SELECT (gs.session_ended_at IS NULL)
           FROM game_sessions gs
           WHERE gs.user_id = aad.user_id
           ORDER BY gs.session_started_at DESC
           LIMIT 1
         ), false) AS is_online
       FROM application_approvals_details aad
-      ORDER BY aad.accepted_at DESC
+      ORDER BY is_online DESC, last_session_started_at DESC NULLS LAST, aad.accepted_at DESC
     `;
     const { rows } = await db.query(sql);
     return rows;
@@ -49,9 +59,17 @@ class ApplicationApprovalRepository {
 
     const term = `%${searchTerm}%`;
     const sql = `
-      SELECT aad.*,
+      SELECT
+        aad.*,
+        (
+          SELECT gs.session_started_at
+          FROM game_sessions gs
+          WHERE gs.user_id = aad.user_id
+          ORDER BY gs.session_started_at DESC
+          LIMIT 1
+        ) AS last_session_started_at,
         COALESCE((
-          SELECT gs.session_ended_at IS NULL
+          SELECT (gs.session_ended_at IS NULL)
           FROM game_sessions gs
           WHERE gs.user_id = aad.user_id
           ORDER BY gs.session_started_at DESC
@@ -59,7 +77,7 @@ class ApplicationApprovalRepository {
         ), false) AS is_online
       FROM application_approvals_details aad
       WHERE aad.name ILIKE $1 OR aad.surname ILIKE $1 OR aad.father_name ILIKE $1
-      ORDER BY aad.accepted_at DESC
+      ORDER BY is_online DESC, last_session_started_at DESC NULLS LAST, aad.accepted_at DESC
     `;
     const { rows } = await db.query(sql, [term]);
     return rows;
