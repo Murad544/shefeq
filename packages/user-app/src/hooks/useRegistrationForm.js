@@ -292,7 +292,9 @@ export const useRegistrationForm = () => {
       return result;
     } catch (error) {
       const result = handleError(error, "Qeydiyyat");
-      const errorMessage = result?.message || (typeof result === 'string' ? result : "Xəta baş verdi");
+      const errorMessage =
+        result?.message ||
+        (typeof result === "string" ? result : "Xəta baş verdi");
 
       if (result?.fieldErrors) {
         setErrors(result.fieldErrors);

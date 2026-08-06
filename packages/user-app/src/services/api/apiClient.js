@@ -101,7 +101,12 @@ class ApiClient {
       }
 
       if (!response.ok) {
-        await this.handleErrorResponse(response, responseData, isJSON, endpoint);
+        await this.handleErrorResponse(
+          response,
+          responseData,
+          isJSON,
+          endpoint,
+        );
       }
 
       if (isJSON && responseData && typeof responseData === "object") {
