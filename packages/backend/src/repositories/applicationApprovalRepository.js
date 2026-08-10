@@ -33,7 +33,8 @@ class ApplicationApprovalRepository {
         ) AS last_session_started_at,
         -- whether user's last session is still open (online)
         COALESCE((
-          SELECT (gs.session_ended_at IS NULL)
+          SELECT (gs.session_ended_at IS NULL
+            AND gs.last_heartbeat_at >= NOW() - INTERVAL '2 minutes')
           FROM game_sessions gs
           WHERE gs.user_id = aad.user_id
           ORDER BY gs.session_started_at DESC
@@ -69,7 +70,8 @@ class ApplicationApprovalRepository {
           LIMIT 1
         ) AS last_session_started_at,
         COALESCE((
-          SELECT (gs.session_ended_at IS NULL)
+          SELECT (gs.session_ended_at IS NULL
+            AND gs.last_heartbeat_at >= NOW() - INTERVAL '2 minutes')
           FROM game_sessions gs
           WHERE gs.user_id = aad.user_id
           ORDER BY gs.session_started_at DESC

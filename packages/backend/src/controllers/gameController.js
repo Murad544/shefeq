@@ -59,6 +59,17 @@ class GameController {
     sendSuccess(res, { session }, 'Game session ended successfully');
   });
 
+  heartbeatGameSession = ErrorHandler.asyncWrapper(async (req, res) => {
+    const { sessionId } = req.body;
+    const session = await gameService.updateHeartbeat({ sessionId });
+
+    if (!session) {
+      throw new Error('Session not found or already ended');
+    }
+
+    sendSuccess(res, { session }, 'Game session heartbeat updated successfully');
+  });
+
   listGameSessions = ErrorHandler.asyncWrapper(async (req, res) => {
     const userId = req.user.id;
 
