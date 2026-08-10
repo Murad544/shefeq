@@ -16,6 +16,16 @@ class GameService {
     return session;
   }
 
+  async updateHeartbeat({ sessionId }) {
+    const session = await gameRepository.updateHeartbeat({ sessionId });
+
+    if (!session) {
+      throw AppError.notFound('Session not found or already ended', 'SESSION_NOT_FOUND');
+    }
+
+    return session;
+  }
+
   async listGameSessions({ userId }) {
     const sessions = await gameRepository.listGameSessions({ userId });
     return sessions;
@@ -29,9 +39,9 @@ class GameService {
   async getLeaderboard() {
     const topLeaders = await gameRepository.getTopLeaders(3);
     const mapLeaders = await gameRepository.getAllMapsWithLeaders(5);
-    
+
     return {
-      topLeaders: topLeaders.map(leader => ({
+      topLeaders: topLeaders.map((leader) => ({
         id: leader.user_id,
         name: leader.name,
         time: this.formatSeconds(leader.best_time_seconds),
@@ -40,11 +50,11 @@ class GameService {
         totalRuns: leader.total_runs,
         completedRuns: leader.completed_runs,
       })),
-      mapLeaders: mapLeaders.map(map => ({
+      mapLeaders: mapLeaders.map((map) => ({
         map: map.map_name,
         mapId: map.map_id,
         mapCode: map.map_code,
-        leaders: (map.leaders || []).map(leader => ({
+        leaders: (map.leaders || []).map((leader) => ({
           id: leader.user_id,
           name: leader.name,
           time: this.formatSeconds(leader.time_seconds),

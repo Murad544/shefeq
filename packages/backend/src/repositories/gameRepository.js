@@ -7,6 +7,15 @@ class GameRepository {
     return rows[0] || null;
   }
 
+  async updateHeartbeat({ sessionId }) {
+    const sql = `UPDATE game_sessions
+      SET last_heartbeat_at = NOW()
+      WHERE id = $1 AND session_ended_at IS NULL
+      RETURNING id, user_id, session_started_at, session_ended_at, duration_seconds, end_reason, created_at`;
+    const { rows } = await db.query(sql, [sessionId]);
+    return rows[0] || null;
+  }
+
   async endSession({ sessionId, endReason }) {
     const sql = `UPDATE game_sessions
     SET 
@@ -21,9 +30,10 @@ class GameRepository {
   }
 
   async listGameSessions({ userId }) {
-    const sql = `SELECT id, session_started_at, session_ended_at, duration_seconds, end_reason, created_at
+    const sql = `SELECT id, session_started_at, session_ended_at, last_heartbeat_at, duration_seconds, end_reason, created_at
                  FROM game_sessions gs
-                 WHERE  gs.user_id = $1`;
+                 WHERE gs.user_id = $1
+                 ORDER BY session_started_at DESC`;
     const { rows } = await db.query(sql, [userId]);
     return rows || null;
   }
@@ -113,12 +123,12 @@ class GameRepository {
         LIMIT $2
       `;
       const { rows: leaders } = await db.query(leadersSQL, [map.id, limit]);
-      
+
       result.push({
         map_id: map.id,
         map_name: map.name,
         map_code: map.code,
-        leaders: leaders || []
+        leaders: leaders || [],
       });
     }
 
@@ -134,15 +144,15 @@ class GameRepository {
       WHERE user_id = $1 AND completed = true AND run_ended_at IS NOT NULL
       ORDER BY play_date DESC
     `;
-    
+
     const { rows: dates } = await db.query(datesSQL, [userId]);
-    
+
     if (dates.length === 0) {
       return {
         current_streak: 0,
         best_streak: 0,
         last_play_date: null,
-        note: "Hələ oynama yoxdur"
+        note: 'Hələ oynama yoxdur',
       };
     }
 
@@ -154,10 +164,10 @@ class GameRepository {
     for (let i = 0; i < dates.length; i++) {
       const playDate = new Date(dates[i].play_date);
       playDate.setUTCHours(0, 0, 0, 0);
-      
+
       const expectedDate = new Date(today);
       expectedDate.setDate(expectedDate.getDate() - i);
-      
+
       if (playDate.getTime() === expectedDate.getTime()) {
         currentStreak++;
       } else {
@@ -168,17 +178,17 @@ class GameRepository {
     // Calculate best streak
     let bestStreak = 1;
     let tempStreak = 1;
-    
+
     for (let i = 1; i < dates.length; i++) {
       const currentDate = new Date(dates[i - 1].play_date);
       const prevDate = new Date(dates[i].play_date);
-      
+
       currentDate.setUTCHours(0, 0, 0, 0);
       prevDate.setUTCHours(0, 0, 0, 0);
-      
+
       const diffTime = currentDate.getTime() - prevDate.getTime();
       const diffDays = diffTime / (1000 * 60 * 60 * 24);
-      
+
       if (diffDays === 1) {
         tempStreak++;
         bestStreak = Math.max(bestStreak, tempStreak);
@@ -189,12 +199,12 @@ class GameRepository {
 
     const lastPlayDate = dates[0].play_date;
     const lastPlayString = new Date(lastPlayDate).toLocaleDateString('az-AZ');
-    
+
     let note = '';
     if (currentStreak === 0) {
       note = `Axırıncı oyun: ${lastPlayString}`;
     } else if (currentStreak === 1) {
-      note = "Bugün oynamısız";
+      note = 'Bugün oynamısız';
     } else {
       note = `Son ${currentStreak} gündür ardıcıl oynama`;
     }
@@ -203,13 +213,13 @@ class GameRepository {
       current_streak: currentStreak,
       best_streak: bestStreak,
       last_play_date: lastPlayDate,
-      note
+      note,
     };
   }
   // Fetch game account data by application ID (user_id)
   async getGameAccountByApplicationId(applicationId) {
     const sql = `
-      SELECT gs.id, gs.session_started_at, gs.session_ended_at, gs.duration_seconds, gs.end_reason, gs.created_at
+      SELECT gs.id, gs.session_started_at, gs.session_ended_at, gs.last_heartbeat_at, gs.duration_seconds, gs.end_reason, gs.created_at
       FROM game_sessions gs
       INNER JOIN application_approvals aa ON aa.user_id = gs.user_id
       WHERE aa.application_id = $1

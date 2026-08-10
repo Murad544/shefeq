@@ -5,4 +5,8 @@ const stopGameSessionSchema = z.object({
   endReason: z.string().min(1).max(255),
 });
 
-module.exports = { stopGameSessionSchema };
+const heartbeatGameSessionSchema = z.object({
+  sessionId: z.string().uuid(),
+});
+
+module.exports = { stopGameSessionSchema, heartbeatGameSessionSchema };
