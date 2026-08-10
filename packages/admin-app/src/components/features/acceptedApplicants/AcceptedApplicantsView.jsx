@@ -90,23 +90,9 @@ export default function AcceptedApplicantsView() {
     const userId = readField(user, "user_id");
     const name = readField(user, "name");
     const surname = readField(user, "surname");
-    const fatherName = readField(user, "father_name");
-    const dob = formatDate(readField(user, "date_of_birth"));
-    const sex = readField(user, "sex");
-    const pob = readField(user, "place_of_birth");
     const serial = readField(user, "national_serial_num");
     const natId = readField(user, "national_id_num");
-    const phone = readField(user, "phone_number");
     const email = readField(user, "email");
-    const edu = formatEducationLevel(readField(user, "education_level"));
-    const uni = readField(user, "university");
-    const profession = formatProfession(readField(user, "profession"));
-    const secret = readField(user, "secret_key");
-    const acceptedAt = formatDate(readField(user, "accepted_at"));
-
-    const totalSeconds = user?.total_duration_seconds || 0;
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
 
     return (
       <TableRow
@@ -132,7 +118,7 @@ export default function AcceptedApplicantsView() {
             />
           )}
         </TableCell>
-        <TableCell align="center">
+        <TableCell align="left">
           <Box
             sx={{
               display: "inline-flex",
@@ -176,28 +162,11 @@ export default function AcceptedApplicantsView() {
         </TableCell>
         <TableCell sx={{ fontWeight: 500 }}>{name}</TableCell>
         <TableCell sx={{ fontWeight: 500 }}>{surname}</TableCell>
-        <TableCell>{fatherName}</TableCell>
-        <TableCell>{dob}</TableCell>
-        <TableCell>{sex}</TableCell>
-        <TableCell>{pob}</TableCell>
-        <TableCell>{serial}</TableCell>
-        <TableCell>{natId}</TableCell>
-        <TableCell>{phone}</TableCell>
         <TableCell
           sx={{ maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis" }}
         >
           {email}
         </TableCell>
-        <TableCell>{edu}</TableCell>
-        <TableCell>{uni}</TableCell>
-        <TableCell>{profession}</TableCell>
-        <TableCell sx={{ minWidth: 200 }} className="secret-key-cell">
-          <SecretKeyCell value={secret} />
-        </TableCell>
-        <TableCell align="center">
-          {hours} saat {minutes} dəq
-        </TableCell>
-        <TableCell sx={{ fontSize: "0.75rem" }}>{acceptedAt}</TableCell>
         <TableCell>
           <Stack direction="row" spacing={1}>
             <Tooltip title="Ətrafli məlumat">

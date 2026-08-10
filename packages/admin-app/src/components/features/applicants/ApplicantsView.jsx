@@ -1,21 +1,19 @@
 import React from "react";
-import {
-  TableRow,
-  TableCell,
-  IconButton,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import { MdCheck, MdClose, MdOpenInNew } from "react-icons/md";
+import { TableRow, TableCell, IconButton, Tooltip } from "@mui/material";
+import { MdOpenInNew } from "react-icons/md";
 import DataTable from "../../ui/Table/DataTable";
 import TableSearch from "../../ui/Table/TableSearch";
 import ApplicantCard from "./ApplicantCard";
 import ApplicantDrawer from "./ApplicantDetails/ApplicantDrawer";
 import SkillsChips from "../../ui/Display/SkillsChips";
-import SecretKeyCell from "../../ui/Display/SecretKeyCell";
 import { useApplicants } from "../../../hooks/data/useApplicants";
 import { useTableConfig } from "../../../hooks/utils/useTableConfig";
-import { readField, formatDate, formatEducationLevel, formatProfession } from "../../../utils/formatters";
+import {
+  readField,
+  formatDate,
+  formatEducationLevel,
+  formatProfession,
+} from "../../../utils/formatters";
 import {
   createHoverRowStyles,
   createActionButtonStyles,
@@ -55,15 +53,12 @@ export default function ApplicantsView() {
     const surname = readField(user, "surname");
     const fatherName = readField(user, "father_name", "fatherName");
     const dob = formatDate(readField(user, "date_of_birth", "dateOfBirth"));
-    const sex = readField(user, "sex");
-    const pob = readField(user, "place_of_birth", "placeOfBirth");
     const serial = readField(
       user,
       "national_serial_num",
       "nationalSerialNumber",
     );
     const natId = readField(user, "national_id_num", "nationalIdNumber");
-    const phone = readField(user, "phone_number", "phoneNumber");
     const email = readField(user, "email");
     const edu = formatEducationLevel(
       readField(user, "education_level", "educationLevel"),
@@ -71,10 +66,6 @@ export default function ApplicantsView() {
     const uni = readField(user, "university");
     const profession = formatProfession(readField(user, "profession"));
     const skills = readField(user, "skills");
-    const secret = readField(user, "secret_key", "secretKey");
-    const totalSeconds = user?.total_duration_seconds || 0;
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
 
     return (
       <TableRow
@@ -85,16 +76,7 @@ export default function ApplicantsView() {
         <TableCell sx={{ fontWeight: 500 }}>{surname}</TableCell>
         <TableCell>{fatherName}</TableCell>
         <TableCell>{dob}</TableCell>
-        <TableCell>{sex}</TableCell>
-        <TableCell>{pob}</TableCell>
-        <TableCell>{serial}</TableCell>
-        <TableCell>{natId}</TableCell>
-        <TableCell>{phone}</TableCell>
-        <TableCell
-          sx={{ maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis" }}
-        >
-          {email}
-        </TableCell>
+
         <TableCell>{edu}</TableCell>
         <TableCell>{uni}</TableCell>
         <TableCell>{profession}</TableCell>
@@ -106,14 +88,6 @@ export default function ApplicantsView() {
           />
         </TableCell>
 
-        <TableCell sx={{ minWidth: 200 }} className="secret-key-cell">
-          <SecretKeyCell value={secret} />
-        </TableCell>
-        <TableCell align="center">
-          <Typography variant="body2">
-            {hours} saat {minutes} dəq
-          </Typography>
-        </TableCell>
         <TableCell>
           <Tooltip title="Ətraflı məlumat">
             <IconButton
