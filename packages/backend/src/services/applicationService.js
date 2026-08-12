@@ -57,7 +57,11 @@ class ApplicationService {
         id: result.id,
       };
     } catch (error) {
-      logger.error('User registration failed:', error);
+      logger.error('User registration failed:', {
+        error,
+        constraint: error.constraint,
+        code: error.code,
+      });
 
       if (movedFiles) {
         await fileService.cleanupMovedFiles(movedFiles);
