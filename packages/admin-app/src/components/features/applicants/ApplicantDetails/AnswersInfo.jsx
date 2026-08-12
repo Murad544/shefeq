@@ -3,9 +3,9 @@ import { MdQuestionAnswer } from "react-icons/md";
 import InfoCard from "../../../ui/Display/InfoCard";
 
 function AnswerItem({ answer, qmap }) {
-  const qid = answer.question_id ?? answer.questionId ?? answer.qid;
+  const qid = answer?.question_id ?? answer.questionId ?? answer.qid;
   const qtext = qmap.get(Number(qid)) || `Sual #${qid}`;
-  const answerText = answer.answer ?? answer.value ?? answer.text ?? "";
+  const answerText = answer?.answer ?? answer.value ?? answer.text ?? "";
 
   return (
     <Paper

@@ -1,9 +1,10 @@
 const userRepository = require('../repositories/userRepository');
+const fileRepository = require('../repositories/fileRepository');
 
 class UserService {
   /**
    * Return structured profile data for the given userId including
-   * linked application and approval (when present).
+   * linked application, approval (when present), and uploaded files.
    */
   async profileWithApplication(userId) {
     const row = await userRepository.findUserWithApplicationById(userId);
@@ -17,17 +18,28 @@ class UserService {
       if (key.startsWith('application_')) {
         application[key.replace('application_', '')] = row[key];
       } else {
-        // other keys ignored
-
         user[key] = row[key];
       }
+    }
+
+    // Fetch uploaded files linked to the application if application exists
+    let files = [];
+    if (application.id) {
+      const rawFiles = await fileRepository.getFilesByApplicationId(application.id);
+      files = (rawFiles || []).map((f) => ({
+        id: f.id,
+        name: f.original_name,
+        storedName: f.stored_name,
+        type: f.file_type,
+        size: f.file_size,
+        uploadedAt: f.uploaded_at,
+      }));
     }
 
     // Fetch real game account data safely
     const gameData = await require('../repositories/gameRepository').getGameAccountByApplicationId(
       user.id
     );
-    console.log(user.id);
     const sessionsArray = gameData && Array.isArray(gameData.sessions) ? gameData.sessions : [];
     const totalSeconds = sessionsArray.reduce((acc, s) => acc + (s.duration_seconds || 0), 0);
     const totalHours = Math.floor(totalSeconds / 3600);
@@ -46,6 +58,7 @@ class UserService {
     return {
       user,
       application: Object.keys(application).length ? application : null,
+      files,
       gameAccount,
     };
   }

@@ -150,10 +150,17 @@ export const useProfileData = () => {
               },
             ],
           },
-          documents: [
-            { id: 1, name: "Diplom.pdf", type: "pdf" },
-            { id: 2, name: "CV_Filankesov.pdf", type: "pdf" },
-          ],
+          documents: Array.isArray(data?.files) && data.files.length > 0
+            ? data.files.map((file) => ({
+                id: file.id,
+                name: file.name,
+                storedName: file.storedName,
+                type: file.type,
+                size: file.size,
+                uploadedAt: file.uploadedAt,
+                url: file.storedName ? `${R2_BASE_URL}/${file.storedName}` : null,
+              }))
+            : [],
         };
 
         if (mounted) {
