@@ -240,7 +240,11 @@ const TrainingProgressSection = () => {
     }
   };
 
-  const handleToggleLessonCompletion = async (moduleId, lessonId, currentCompleted) => {
+  const handleToggleLessonCompletion = async (
+    moduleId,
+    lessonId,
+    currentCompleted,
+  ) => {
     if (submitting) return;
 
     // keep previous state for rollback
@@ -252,7 +256,7 @@ const TrainingProgressSection = () => {
       return {
         ...m,
         lessons: m.lessons.map((l) =>
-          l.id === lessonId ? { ...l, completed: !currentCompleted } : l
+          l.id === lessonId ? { ...l, completed: !currentCompleted } : l,
         ),
       };
     });
