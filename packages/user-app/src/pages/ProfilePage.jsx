@@ -21,7 +21,13 @@ const ProfilePage = () => {
   const [activeSection, setActiveSection] = useState('profile');
 
   const handleDownloadDocument = (doc) => {
-    console.log("Download:", doc.name);
+    const r2BaseUrl = process.env.REACT_APP_R2_BASE_URL || "https://pub-05d3c9c914034a949c2227d5db6227cd.r2.dev";
+    const fileUrl = doc.url || (doc.storedName ? `${r2BaseUrl}/${doc.storedName}` : null);
+    if (fileUrl) {
+      window.open(fileUrl, "_blank", "noopener,noreferrer");
+    } else {
+      console.warn("File URL not available for document:", doc);
+    }
   };
 
   const handleDownloadGame = () => {
