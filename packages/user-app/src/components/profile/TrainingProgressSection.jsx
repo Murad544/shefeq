@@ -3,6 +3,7 @@ import {
   Card,
   Typography,
   LinearProgress,
+  CircularProgress,
   Chip,
   Grid,
   List,
@@ -54,7 +55,12 @@ const getContentTypeLabel = (type) => {
 };
 
 // Single module card
-const ModuleItem = ({ module, onToggleLessonCompletion }) => {
+const ModuleItem = ({
+  module,
+  onToggleLessonCompletion,
+  submitting,
+  submittingLessonId,
+}) => {
   const [expanded, setExpanded] = useState(module.isExpanded);
   const completedCount = module.lessons.filter((l) => l.completed).length;
   const totalCount = module.lessons.length;
@@ -140,10 +146,22 @@ const ModuleItem = ({ module, onToggleLessonCompletion }) => {
               }}
             >
               <ListItemIcon
-                sx={{ minWidth: 32, cursor: "pointer" }}
-                onClick={() => onToggleLessonCompletion(module.id, lesson.id)}
+                sx={{
+                  minWidth: 32,
+                  cursor: submitting ? "default" : "pointer",
+                }}
+                onClick={() =>
+                  !submitting &&
+                  onToggleLessonCompletion(
+                    module.id,
+                    lesson.id,
+                    lesson.completed,
+                  )
+                }
               >
-                {lesson.completed ? (
+                {submitting && submittingLessonId === lesson.id ? (
+                  <CircularProgress size={20} />
+                ) : lesson.completed ? (
                   <CheckCircleIcon
                     sx={{ color: "#5b7c99", fontSize: "1.5rem" }}
                   />
@@ -207,6 +225,8 @@ const TrainingProgressSection = () => {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submittingLessonId, setSubmittingLessonId] = useState(null);
 
   const fetchModules = async () => {
     try {
@@ -220,22 +240,41 @@ const TrainingProgressSection = () => {
     }
   };
 
-  const handleToggleLessonCompletion = async (
-    moduleId,
-    lessonId,
-    currentCompleted,
-  ) => {
-    try {
-      const response = await apiClient.post(
-        endpoints.setLessonProgress(lessonId),
-        {
-          completed: !currentCompleted,
-        },
-      );
+  const handleToggleLessonCompletion = async (moduleId, lessonId, currentCompleted) => {
+    if (submitting) return;
 
+    // keep previous state for rollback
+    const prevModules = modules;
+
+    // optimistic update
+    const newModules = modules.map((m) => {
+      if (m.id !== moduleId) return m;
+      return {
+        ...m,
+        lessons: m.lessons.map((l) =>
+          l.id === lessonId ? { ...l, completed: !currentCompleted } : l
+        ),
+      };
+    });
+
+    setModules(newModules);
+    setSubmitting(true);
+    setSubmittingLessonId(lessonId);
+
+    try {
+      await apiClient.post(endpoints.setLessonProgress(lessonId), {
+        completed: !currentCompleted,
+      });
+
+      // keep optimistic UI but sync with server to ensure consistency
       await fetchModules();
     } catch (err) {
       console.error("Failed to update lesson progress:", err);
+      // rollback optimistic update
+      setModules(prevModules);
+    } finally {
+      setSubmitting(false);
+      setSubmittingLessonId(null);
     }
   };
 
@@ -332,6 +371,8 @@ const TrainingProgressSection = () => {
             key={module.id}
             module={module}
             onToggleLessonCompletion={handleToggleLessonCompletion}
+            submitting={submitting}
+            submittingLessonId={submittingLessonId}
           />
         ))}
       </Box>
