@@ -31,14 +31,18 @@ const getMapDisplayName = (mapCode) => {
   return MAP_NAMES[mapCode?.toLowerCase?.()] || mapCode;
 };
 
-const LeaderboardSection = () => {
+const LeaderboardSection = ({ userRole }) => {
   const [leaderboardData, setLeaderboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (userRole === 'trainer') {
+      setLoading(false);
+      return;
+    }
     fetchLeaderboard();
-  }, []);
+  }, [userRole]);
 
   const fetchLeaderboard = async () => {
     try {

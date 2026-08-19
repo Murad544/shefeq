@@ -19,6 +19,8 @@ export const personalInfoSchema = Yup.object({
 
   sex: Yup.string().required(STRINGS.REQUIRED_FIELD),
 
+  role: Yup.string().oneOf(["trainee", "trainer"]).required(STRINGS.REQUIRED_FIELD),
+
   dateOfBirth: Yup.string().required(STRINGS.REQUIRED_FIELD),
 
   placeOfBirth: Yup.string().required(STRINGS.REQUIRED_FIELD),

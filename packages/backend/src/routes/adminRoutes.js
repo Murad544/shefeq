@@ -19,19 +19,19 @@ router.get('/questions', adminController.listQuestions);
 router.get(
   '/applications/:id',
   ValidationMiddleware.validateParams(idSchema),
-  adminController.getApplicationById
+  adminController.getApplicationById,
 );
 
 router.get(
   '/applications/:id/full',
   ValidationMiddleware.validateParams(idSchema),
-  adminController.getApplicationFull
+  adminController.getApplicationFull,
 );
 
 router.get(
   '/files/:fileId/download',
   ValidationMiddleware.validateParams(fileIdSchema),
-  adminController.downloadFile
+  adminController.downloadFile,
 );
 
 router.get('/approved-applications', adminController.getApprovedApplications);
@@ -39,38 +39,38 @@ router.get('/approved-applications', adminController.getApprovedApplications);
 router.get(
   '/users/:id/edit-data',
   ValidationMiddleware.validateParams(idSchema),
-  adminController.getUserEditData
+  adminController.getUserEditData,
 );
 
 router.patch(
   '/users/:id/edit',
   ValidationMiddleware.validateParams(idSchema),
   ValidationMiddleware.validate(adminUserEditSchema),
-  adminController.updateUserData
+  adminController.updateUserData,
 );
 
 router.post(
   '/applications/:id/approve',
   ValidationMiddleware.validateParams(idSchema),
-  adminController.approveApplication
+  adminController.approveApplication,
 );
 
 router.post(
   '/applications/:id/resend-activation',
   ValidationMiddleware.validateParams(idSchema),
-  adminController.resendActivation
+  adminController.resendActivation,
 );
 
 router.post(
   '/applications/:id/reject',
   ValidationMiddleware.validateParams(idSchema),
-  adminController.rejectApplication
+  adminController.rejectApplication,
 );
 
 router.get(
   '/applications/:id/approved',
   ValidationMiddleware.validateParams(idSchema),
-  adminController.checkIfApplicationApproved
+  adminController.checkIfApplicationApproved,
 );
 
 module.exports = router;

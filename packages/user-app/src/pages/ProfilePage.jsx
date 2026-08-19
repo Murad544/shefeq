@@ -48,6 +48,11 @@ const ProfilePage = () => {
     );
   }
 
+  const isTrainer = profile?.userRole === 'trainer';
+  const effectiveSection = isTrainer && !['profile', 'training'].includes(activeSection)
+    ? 'profile'
+    : activeSection;
+
   return (
     <ResponsiveContainer>
       <Box
@@ -66,12 +71,12 @@ const ProfilePage = () => {
           <Grid container spacing={3}>
             {/* Sidebar */}
             <Grid item xs={12} md={3}>
-              <Sidebar active={activeSection} onSelect={setActiveSection} />
+              <Sidebar active={effectiveSection} onSelect={setActiveSection} userRole={profile?.userRole} />
             </Grid>
 
             {/* Main Content */}
             <Grid item xs={12} md={9}>
-              {activeSection === 'profile' && (
+              {effectiveSection === 'profile' && (
                 <>
                   <Typography variant="h6" sx={{ mb: 1 }}>Profil məlumatları</Typography>
                   <PersonalInfoSection personalInfo={profile.personalInfo} />
@@ -86,31 +91,22 @@ const ProfilePage = () => {
                     documents={profile.documents}
                     onDownloadDocument={handleDownloadDocument}
                   />
-
-                  {/* <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>Oyun hesabı</Typography>
-                  <GameAccountSection gameAccount={profile.gameAccount} />
-
-                  <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>Oyun yükləmə</Typography> */}
-                  {/* <GameInstallationSection
-                    gameInstallation={profile.gameInstallation}
-                    onDownloadGame={handleDownloadGame}
-                  /> */}
                 </>
               )}
 
-              {activeSection === 'training' && (
+              {effectiveSection === 'training' && (
                 <TrainingProgressSection />
               )}
 
-              {activeSection === 'levels' && (
-                <LevelsSection />
+              {!isTrainer && effectiveSection === 'levels' && (
+                <LevelsSection userRole={profile?.userRole} />
               )}
 
-              {activeSection === 'leaderboard' && (
-                <LeaderboardSection />
+              {!isTrainer && effectiveSection === 'leaderboard' && (
+                <LeaderboardSection userRole={profile?.userRole} />
               )}
 
-              {activeSection === 'download' && (
+              {!isTrainer && effectiveSection === 'download' && (
                 <>
                   <Typography variant="h6" sx={{ mb: 2 }}>
                     Oyun yükləmə
@@ -122,20 +118,13 @@ const ProfilePage = () => {
                 </>
               )}
 
-              {activeSection === 'stats' && (
+              {!isTrainer && effectiveSection === 'stats' && (
                 <>
                   <Typography variant="h6" sx={{ mb: 2 }}>
                     Oyun Statistikası
                   </Typography>
                   <GameAccountSection gameAccount={profile.gameAccount} />
-                  <FlightActivitySection sessions={profile.gameAccount.sessions} />
-                  {/* <ApplicationStatusCard
-                    applicationStatus={profile.applicationStatus}
-                  />
-                  <DocumentsCard
-                    documents={profile.documents}
-                    onDownloadDocument={handleDownloadDocument}
-                  /> */}
+                  <FlightActivitySection sessions={profile.gameAccount?.sessions} />
                 </>
               )}
             </Grid>

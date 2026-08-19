@@ -11,7 +11,7 @@ router.get(
   UserAuthMiddleware.ensureUser({
     allowedClientTypes: [CLIENT_TYPES.WEB],
   }),
-  trainingController.getTrainingModules
+  trainingController.getTrainingModules,
 );
 
 router.post(
@@ -19,7 +19,7 @@ router.post(
   UserAuthMiddleware.ensureUser({
     allowedClientTypes: [CLIENT_TYPES.WEB],
   }),
-  trainingController.setLessonProgress
+  trainingController.setLessonProgress,
 );
 
 module.exports = router;

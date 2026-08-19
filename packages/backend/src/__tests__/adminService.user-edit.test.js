@@ -26,7 +26,7 @@ describe('adminService.updateUserDataForAdmin', () => {
     await expect(
       adminService.updateUserDataForAdmin({ role: 'admin', id: 'admin-1' }, 'user-1', {
         name: 'Ali',
-      })
+      }),
     ).rejects.toMatchObject({ statusCode: 403 });
 
     expect(applicationRepository.updateApplication).not.toHaveBeenCalled();
@@ -47,7 +47,7 @@ describe('adminService.updateUserDataForAdmin', () => {
         surname: 'Hüseynov',
         phoneNumber: '+994501234567',
         password: 'new-password-123',
-      }
+      },
     );
 
     expect(applicationRepository.updateApplication).toHaveBeenCalledWith('application-1', {

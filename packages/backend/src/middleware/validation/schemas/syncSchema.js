@@ -21,16 +21,15 @@ const finishLevelRunSchema = z
     endReason: z.string().max(255).nullable().optional(),
   })
   .refine(
-    (data) =>
-      data.objectiveTimeSeconds !== undefined ||
-      data.collectedOrbs !== undefined ||
-      data.completed !== undefined ||
-      data.endReason !== undefined ||
-      data.gameSessionId !== undefined,
+    (data) => data.objectiveTimeSeconds !== undefined
+      || data.collectedOrbs !== undefined
+      || data.completed !== undefined
+      || data.endReason !== undefined
+      || data.gameSessionId !== undefined,
     {
       message: 'At least one field besides runId must be provided to finish the map run',
       path: ['runId'],
-    }
+    },
   );
 
 module.exports = { startLevelRunSchema, finishLevelRunSchema };

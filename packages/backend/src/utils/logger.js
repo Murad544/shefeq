@@ -6,7 +6,7 @@ class Logger {
         message,
         timestamp: new Date().toISOString(),
         ...meta,
-      })
+      }),
     );
   }
 
@@ -17,7 +17,7 @@ class Logger {
         message,
         timestamp: new Date().toISOString(),
         ...meta,
-      })
+      }),
     );
   }
 
@@ -28,7 +28,7 @@ class Logger {
         message,
         timestamp: new Date().toISOString(),
         ...meta,
-      })
+      }),
     );
   }
 }

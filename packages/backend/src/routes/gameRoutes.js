@@ -1,4 +1,5 @@
 const express = require('express');
+
 const router = express.Router();
 
 const gameController = require('../controllers/gameController');
@@ -17,7 +18,7 @@ router.post(
   UserAuthMiddleware.ensureUser({
     allowedClientTypes: [CLIENT_TYPES.GAME],
   }),
-  gameController.startGameSession
+  gameController.startGameSession,
 );
 router.post(
   '/session/heartbeat',
@@ -25,7 +26,7 @@ router.post(
     allowedClientTypes: [CLIENT_TYPES.GAME],
   }),
   ValidationMiddleware.validate(heartbeatGameSessionSchema),
-  gameController.heartbeatGameSession
+  gameController.heartbeatGameSession,
 );
 router.post(
   '/session/end',
@@ -33,33 +34,43 @@ router.post(
     allowedClientTypes: [CLIENT_TYPES.GAME],
   }),
   ValidationMiddleware.validate(stopGameSessionSchema),
-  gameController.endGameSession
+  gameController.endGameSession,
 );
 
 router.get(
   '/session/list',
   UserAuthMiddleware.ensureUser({
     allowedClientTypes: [CLIENT_TYPES.WEB],
+    disallowedRoles: ['trainer'],
   }),
-  gameController.listGameSessions
+  gameController.listGameSessions,
 );
 
 router.get(
   '/stats/maps',
   UserAuthMiddleware.ensureUser({
     allowedClientTypes: [CLIENT_TYPES.WEB],
+    disallowedRoles: ['trainer'],
   }),
-  gameController.getMapStats
+  gameController.getMapStats,
 );
 
-router.get('/leaderboard', gameController.getLeaderboard);
+router.get(
+  '/leaderboard',
+  UserAuthMiddleware.ensureUser({
+    allowedClientTypes: [CLIENT_TYPES.WEB],
+    disallowedRoles: ['trainer'],
+  }),
+  gameController.getLeaderboard,
+);
 
 router.get(
   '/streak',
   UserAuthMiddleware.ensureUser({
     allowedClientTypes: [CLIENT_TYPES.WEB],
+    disallowedRoles: ['trainer'],
   }),
-  gameController.getUserStreak
+  gameController.getUserStreak,
 );
 
 module.exports = router;

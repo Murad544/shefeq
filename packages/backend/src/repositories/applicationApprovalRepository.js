@@ -91,7 +91,7 @@ class ApplicationApprovalRepository {
     secretKey,
     notes = null,
     activationTokenHash = null,
-    activationExpiresAt = null
+    activationExpiresAt = null,
   ) {
     const applicationCheckSql = 'SELECT id FROM applications WHERE id = $1 AND deleted_at IS NULL';
     const { rows: applicationRows } = await db.query(applicationCheckSql, [applicationId]);

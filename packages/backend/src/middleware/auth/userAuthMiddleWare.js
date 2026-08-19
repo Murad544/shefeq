@@ -6,6 +6,8 @@ class UserAuthMiddleware {
   static ensureUser(options = {}) {
     const {
       allowedClientTypes = null, // ['web', 'game']
+      allowedRoles = null,       // ['trainee', 'trainer']
+      disallowedRoles = null,    // ['trainer']
     } = options;
     return async (req, res, next) => {
       try {
@@ -24,7 +26,27 @@ class UserAuthMiddleware {
           );
         }
 
-        req.user = validation.user;
+        const userRole = validation.user?.role || validation.token?.role || 'trainee';
+
+        // 🔐 Role enforcement
+        if (allowedRoles && !allowedRoles.includes(userRole)) {
+          throw AppError.forbidden(
+            'User role is not allowed to access this endpoint',
+            'ROLE_NOT_ALLOWED'
+          );
+        }
+
+        if (disallowedRoles && disallowedRoles.includes(userRole)) {
+          throw AppError.forbidden(
+            'User role is not allowed to access this endpoint',
+            'ROLE_NOT_ALLOWED'
+          );
+        }
+
+        req.user = {
+          ...validation.user,
+          role: userRole,
+        };
         req.token = token;
         req.tokenData = validation.token || validation;
 

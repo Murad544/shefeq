@@ -27,9 +27,12 @@ class UserAuthService {
       throw AppError.unauthorized('Invalid credentials', 'INVALID_CREDENTIALS');
     }
 
+    const userRole = user.role || 'trainee';
+
     const tokenPayload = {
       id: user.id,
       email: user.email,
+      role: userRole,
       client_type: clientType,
       iat: Math.floor(Date.now() / 1000),
     };
@@ -40,6 +43,7 @@ class UserAuthService {
       user: {
         id: user.id,
         email: user.email,
+        role: userRole,
         client_type: clientType,
         is_active: user.is_active,
         created_at: user.created_at,
@@ -69,7 +73,7 @@ class UserAuthService {
 
     const passwordMatches = await encryptionService.verifyPassword(
       currentPassword,
-      user.password_hash
+      user.password_hash,
     );
     if (!passwordMatches) {
       throw AppError.unauthorized('Invalid current password', 'INVALID_CURRENT_PASSWORD');
@@ -110,13 +114,19 @@ class UserAuthService {
       throw AppError.unauthorized('User account is inactive', 'USER_INACTIVE');
     }
 
+    const role = user.role || decoded.role || 'trainee';
+
     return {
       user: {
         id: user.id,
         email: user.email,
+        role,
         is_active: user.is_active,
       },
-      token: decoded,
+      token: {
+        ...decoded,
+        role,
+      },
     };
   }
 }

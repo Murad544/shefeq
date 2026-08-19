@@ -29,6 +29,7 @@ import {
 } from "@mui/icons-material";
 import {
   sexOptions,
+  roleOptions,
   placeOfBirthOptions,
   educationLevelOptions,
   universityOptions,
@@ -48,6 +49,11 @@ const ReviewStep = ({ form, questions }) => {
     {
       label: "Cinsi",
       value: getOptionLabel(sexOptions, form.sex),
+      icon: <Badge fontSize="small" />,
+    },
+    {
+      label: "Rolu",
+      value: getOptionLabel(roleOptions, form.role),
       icon: <Badge fontSize="small" />,
     },
     {

@@ -5,6 +5,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import FormField from "../../common/FormField";
 import { sexOptions } from "../../../constants/options/sexOptions";
+import { roleOptions } from "../../../constants/options/roleOptions";
 import { placeOfBirthOptions } from "../../../constants/options/placeOfBirthOptions";
 
 const PersonalInfoStep = ({ values, onChange, errors = {} }) => {
@@ -70,6 +71,21 @@ const PersonalInfoStep = ({ values, onChange, errors = {} }) => {
             options={sexOptions}
             error={!!errors.sex}
             helperText={errors.sex}
+            placeholder="Seçin"
+            required
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <FormField
+            type="select"
+            name="role"
+            label="Rolu"
+            value={values.role || "trainee"}
+            onChange={onChange}
+            options={roleOptions}
+            error={!!errors.role}
+            helperText={errors.role}
             placeholder="Seçin"
             required
           />

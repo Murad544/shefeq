@@ -11,7 +11,7 @@ router.post(
   '/login',
   UserAuthMiddleware.checkIfAlreadyAuthenticated(),
   // ValidationMiddleware.validate(ValidationMiddleware.schemas?.login || {}),
-  userController.login
+  userController.login,
 );
 
 router.get('/me', userController.me);
@@ -20,7 +20,7 @@ router.get(
   UserAuthMiddleware.ensureUser({
     allowedClientTypes: [CLIENT_TYPES.WEB],
   }),
-  userController.profile
+  userController.profile,
 );
 
 router.patch(
@@ -29,7 +29,7 @@ router.patch(
     allowedClientTypes: [CLIENT_TYPES.WEB],
   }),
   ValidationMiddleware.validate(passwordChangeSchema),
-  userController.changePassword
+  userController.changePassword,
 );
 
 module.exports = router;

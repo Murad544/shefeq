@@ -13,12 +13,18 @@ const createAdminSchema = z.object({
 });
 
 const adminUserEditSchema = z.object({
-  name: z.string().trim().min(1).max(100).optional(),
-  surname: z.string().trim().min(1).max(100).optional(),
-  fatherName: z.string().trim().min(1).max(100).optional(),
-  educationLevel: z.string().trim().min(1).max(50).optional(),
-  university: z.string().trim().min(1).max(100).optional(),
-  profession: z.string().trim().min(1).max(100).optional(),
+  name: z.string().trim().min(1).max(100)
+    .optional(),
+  surname: z.string().trim().min(1).max(100)
+    .optional(),
+  fatherName: z.string().trim().min(1).max(100)
+    .optional(),
+  educationLevel: z.string().trim().min(1).max(50)
+    .optional(),
+  university: z.string().trim().min(1).max(100)
+    .optional(),
+  profession: z.string().trim().min(1).max(100)
+    .optional(),
   phoneNumber: z
     .string()
     .regex(/^\+994\d{9}$/)

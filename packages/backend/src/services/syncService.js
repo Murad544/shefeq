@@ -25,12 +25,12 @@ class SyncService {
     if (payload.gameSessionId) {
       const session = await syncRepository.findGameSessionByIdForUser(
         payload.gameSessionId,
-        userId
+        userId,
       );
       if (!session) {
         throw AppError.badRequest(
           'Invalid or unauthorized gameSessionId',
-          'INVALID_GAME_SESSION_ID'
+          'INVALID_GAME_SESSION_ID',
         );
       }
     }
@@ -48,12 +48,12 @@ class SyncService {
     if (payload.gameSessionId) {
       const session = await syncRepository.findGameSessionByIdForUser(
         payload.gameSessionId,
-        userId
+        userId,
       );
       if (!session) {
         throw AppError.badRequest(
           'Invalid or unauthorized gameSessionId',
-          'INVALID_GAME_SESSION_ID'
+          'INVALID_GAME_SESSION_ID',
         );
       }
     }

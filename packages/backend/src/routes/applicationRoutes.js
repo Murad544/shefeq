@@ -17,7 +17,7 @@ router.post(
   UploadMiddleware.parseJsonFields,
   SecurityMiddleware.sanitizeInput,
   ValidationMiddleware.validate(registerSchema),
-  applicationController.registerApplication
+  applicationController.registerApplication,
 );
 
 module.exports = router;

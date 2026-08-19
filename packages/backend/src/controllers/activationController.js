@@ -67,6 +67,7 @@ class ActivationController {
     const createdUser = await userRepository.createUser({
       email: application.email,
       password_hash: passwordHash,
+      role: application.role || 'trainee',
     });
 
     // Link user to application approval and mark activation used

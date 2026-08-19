@@ -69,11 +69,22 @@ export const useProfileData = () => {
           return { totalHours, totalMinutes, formattedSessions };
         };
 
-        // Fetch initial game sessions
-        const gameSessionsResponse = await apiClient.get(
-          endpoints.gameSessions(),
-        );
-        const initialSessions = gameSessionsResponse?.sessions || [];
+        const userRole = user.role || application.role || "trainee";
+        const isTrainer = userRole === "trainer";
+
+        // Fetch initial game sessions ONLY if user is NOT a trainer
+        let initialSessions = [];
+        if (!isTrainer) {
+          try {
+            const gameSessionsResponse = await apiClient.get(
+              endpoints.gameSessions(),
+            );
+            initialSessions = gameSessionsResponse?.sessions || [];
+          } catch (err) {
+            console.error("Failed to fetch game sessions:", err);
+          }
+        }
+
         const {
           totalHours: initHours,
           totalMinutes: initMinutes,
@@ -82,7 +93,8 @@ export const useProfileData = () => {
 
         const mapped = {
           fullName: fullName || user.email || "-",
-          role: "Müraciətçi",
+          role: isTrainer ? "Təlimçi" : "Təlim alan",
+          userRole: userRole,
           institution: "PUA Mütəxəssisi Namizədi",
           avatar: null,
           personalInfo: {
@@ -167,10 +179,10 @@ export const useProfileData = () => {
           setProfile(mapped);
         }
 
-        // Establish SSE connection for real-time game sessions updates
+        // Establish SSE connection for real-time game sessions updates ONLY for non-trainers
         const API_URL = process.env.REACT_APP_API_URL || "http://localhost:4000";
         const token = localStorage.getItem("auth_token");
-        if (token) {
+        if (token && !isTrainer) {
           const sseUrl = `${API_URL}${endpoints.gameSessions()}?token=${token}`;
           console.log("[SSE] Connecting to real-time game sessions at:", sseUrl);
           eventSource = new EventSource(sseUrl);

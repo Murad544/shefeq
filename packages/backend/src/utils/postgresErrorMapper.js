@@ -10,7 +10,7 @@ function mapPostgresError(error) {
       case 'applications_national_serial_num_key':
         return AppError.conflict(
           'National serial number already exists',
-          'NATIONAL_SERIAL_ALREADY_EXISTS'
+          'NATIONAL_SERIAL_ALREADY_EXISTS',
         );
 
       case 'applications_email_key':
