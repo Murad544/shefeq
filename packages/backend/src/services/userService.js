@@ -38,7 +38,7 @@ class UserService {
 
     // Fetch real game account data safely
     const gameData = await require('../repositories/gameRepository').getGameAccountByApplicationId(
-      user.id
+      user.id,
     );
     const sessionsArray = gameData && Array.isArray(gameData.sessions) ? gameData.sessions : [];
     const totalSeconds = sessionsArray.reduce((acc, s) => acc + (s.duration_seconds || 0), 0);

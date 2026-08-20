@@ -317,11 +317,13 @@ const LevelCard = ({ level }) => {
 };
 
 // Main Levels Section
-const LevelsSection = () => {
+const LevelsSection = ({ userRole }) => {
   const [levelsData, setLevelsData] = useState(INITIAL_LEVELS_DATA);
   const [streak, setStreak] = useState(STREAK);
 
   useEffect(() => {
+    if (userRole === 'trainer') return;
+
     const fetchMapStats = async () => {
       try {
         const response = await apiClient.get(endpoints.mapStats());
@@ -361,9 +363,11 @@ const LevelsSection = () => {
     };
 
     fetchMapStats();
-  }, []);
+  }, [userRole]);
 
   useEffect(() => {
+    if (userRole === 'trainer') return;
+
     const fetchStreak = async () => {
       try {
         const response = await apiClient.get(endpoints.streak());
@@ -381,7 +385,7 @@ const LevelsSection = () => {
     };
 
     fetchStreak();
-  }, []);
+  }, [userRole]);
 
   const completedLevels = levelsData.filter((l) => l.completed).length;
   const totalLevels = levelsData.length;

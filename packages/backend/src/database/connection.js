@@ -1,9 +1,9 @@
 // Load environment variables before requiring database config
 require('dotenv').config();
 
-const db = require('../config/database');
 const fs = require('fs');
 const path = require('path');
+const db = require('../config/database');
 
 class DatabaseConnection {
   async testConnection() {
@@ -33,7 +33,7 @@ class DatabaseConnection {
     try {
       await this.ensureMigrationsTable(client);
       const { rows } = await client.query(
-        'SELECT migration_name FROM schema_migrations ORDER BY id'
+        'SELECT migration_name FROM schema_migrations ORDER BY id',
       );
       return rows.map((row) => row.migration_name);
     } finally {
@@ -58,7 +58,7 @@ class DatabaseConnection {
 
       const executedMigrations = await this.getExecutedMigrations();
       const pendingMigrations = files.filter(
-        (file) => !executedMigrations.includes(file)
+        (file) => !executedMigrations.includes(file),
       );
 
       if (pendingMigrations.length === 0) {
@@ -82,7 +82,7 @@ class DatabaseConnection {
           await client.query(sql);
           await client.query(
             'INSERT INTO schema_migrations (migration_name) VALUES ($1) ON CONFLICT (migration_name) DO NOTHING',
-            [file]
+            [file],
           );
           await client.query('COMMIT');
 

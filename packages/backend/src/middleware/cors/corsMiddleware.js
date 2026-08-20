@@ -22,8 +22,8 @@ function getDynamicCorsOrigins() {
 
   return process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',')
-        .map((url) => url.trim())
-        .filter(Boolean)
+      .map((url) => url.trim())
+      .filter(Boolean)
     : [];
 }
 

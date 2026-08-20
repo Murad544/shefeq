@@ -137,8 +137,7 @@ class AdminService {
     if (payload.name !== undefined) updatePayload.name = payload.name;
     if (payload.surname !== undefined) updatePayload.surname = payload.surname;
     if (payload.fatherName !== undefined) updatePayload.father_name = payload.fatherName;
-    if (payload.educationLevel !== undefined)
-      updatePayload.education_level = payload.educationLevel;
+    if (payload.educationLevel !== undefined) { updatePayload.education_level = payload.educationLevel; }
     if (payload.university !== undefined) updatePayload.university = payload.university;
     if (payload.profession !== undefined) updatePayload.profession = payload.profession;
     if (payload.phoneNumber !== undefined) updatePayload.phone_number = payload.phoneNumber;
@@ -189,7 +188,7 @@ class AdminService {
       secretKey,
       null, // notes
       activationTokenHash,
-      activationExpiresAt
+      activationExpiresAt,
     );
     if (!approval) {
       throw AppError.internal('Application could not be approved');
@@ -197,8 +196,7 @@ class AdminService {
 
     // Build activation URL and send email
     const emailService = require('../utils/emailService');
-    const frontendBase =
-      process.env.FRONTEND_BASE_URL || process.env.BACKEND_PUBLIC_URL || 'http://localhost:3000';
+    const frontendBase = process.env.FRONTEND_BASE_URL || process.env.BACKEND_PUBLIC_URL || 'http://localhost:3000';
     const activationUrl = `${frontendBase.replace(/\/$/, '')}/activate/${activationToken}`;
 
     try {
@@ -273,7 +271,7 @@ class AdminService {
     const updated = await applicationApprovalRepository.resendActivation(
       applicationId,
       activationTokenHash,
-      activationExpiresAt
+      activationExpiresAt,
     );
     if (!updated) throw AppError.internal('Failed to update activation token');
 
@@ -282,8 +280,7 @@ class AdminService {
     if (!application) throw AppError.notFound('Application not found');
 
     const emailService = require('../utils/emailService');
-    const frontendBase =
-      process.env.FRONTEND_BASE_URL || process.env.BACKEND_PUBLIC_URL || 'http://localhost:3000';
+    const frontendBase = process.env.FRONTEND_BASE_URL || process.env.BACKEND_PUBLIC_URL || 'http://localhost:3000';
     const activationUrl = `${frontendBase.replace(/\/$/, '')}/activate/${activationToken}`;
 
     try {

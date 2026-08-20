@@ -15,13 +15,14 @@ const registerSchema = z.object({
   educationLevel: z.string().trim().min(1).max(50),
   university: z.string().trim().min(1).max(100),
   profession: z.string().trim().min(1).max(100),
+  role: z.enum(['trainee', 'trainer']).optional().default('trainee'),
   skills: z.array(z.string().trim().min(1).max(50)).max(50).optional().default([]),
   answers: z
     .array(
       z.object({
         question_id: z.number().int().positive(),
         answer: z.string().trim().min(1).max(1000),
-      })
+      }),
     )
     .max(20)
     .optional()

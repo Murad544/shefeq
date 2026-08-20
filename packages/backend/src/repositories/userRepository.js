@@ -16,6 +16,7 @@ class UserRepository {
       SELECT
         u.id,
         u.email,
+        u.role,
         u.is_active,
         u.activated_at,
         u.created_at,
@@ -30,6 +31,7 @@ class UserRepository {
         a.education_level AS application_education_level,
         a.university AS application_university,
         a.profession AS application_profession,
+        a.role AS application_role,
         a.skills AS application_skills,
         a.place_of_birth AS application_place_of_birth,
         a.created_at AS application_created_at
@@ -52,14 +54,15 @@ class UserRepository {
 
   async createUser(userData) {
     const sql = `
-      INSERT INTO users (email, password_hash, is_active, created_at, updated_at)
-      VALUES ($1, $2, $3, NOW(), NOW())
-      RETURNING id, email, is_active, created_at
+      INSERT INTO users (email, password_hash, role, is_active, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, NOW(), NOW())
+      RETURNING id, email, role, is_active, created_at
     `;
 
     const { rows } = await db.query(sql, [
       userData.email,
       userData.password_hash,
+      userData.role || 'trainee',
       userData.is_active !== undefined ? userData.is_active : true,
     ]);
     return rows[0];

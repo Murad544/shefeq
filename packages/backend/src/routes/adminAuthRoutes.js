@@ -14,7 +14,7 @@ router.post(
   RateLimitMiddleware.auth(),
   SecurityMiddleware.sanitizeInput,
   ValidationMiddleware.validate(loginSchema),
-  adminAuthController.login
+  adminAuthController.login,
 );
 
 router.post('/logout', AuthMiddleware.ensureAdmin(), adminAuthController.logout);
@@ -27,7 +27,7 @@ router.post(
   AuthMiddleware.ensureAdmin(),
   RateLimitMiddleware.auth(),
   ValidationMiddleware.validate(createAdminSchema),
-  adminAuthController.createAdmin
+  adminAuthController.createAdmin,
 );
 
 router.delete(
@@ -36,7 +36,7 @@ router.delete(
   AuthMiddleware.ensureAdmin(),
   RateLimitMiddleware.auth(),
   ValidationMiddleware.validate(createAdminSchema),
-  adminAuthController.deleteAdmin
+  adminAuthController.deleteAdmin,
 );
 
 module.exports = router;

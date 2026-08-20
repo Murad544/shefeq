@@ -38,7 +38,7 @@ class App {
             frameSrc: ["'none'"],
           },
         },
-      })
+      }),
     );
 
     this.app.use(compression());

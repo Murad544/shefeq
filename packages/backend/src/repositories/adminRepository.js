@@ -2,22 +2,19 @@ const db = require('../config/database');
 
 class AdminRepository {
   async findByEmail(email) {
-    const sql =
-      'SELECT id, email, password_hash, name, role, is_active FROM admins WHERE LOWER(email) = LOWER($1) LIMIT 1';
+    const sql = 'SELECT id, email, password_hash, name, role, is_active FROM admins WHERE LOWER(email) = LOWER($1) LIMIT 1';
     const { rows } = await db.query(sql, [email]);
     return rows[0] || null;
   }
 
   async findById(id) {
-    const sql =
-      'SELECT id, email, name, is_active, role, last_login_at, created_at FROM admins WHERE id = $1 LIMIT 1';
+    const sql = 'SELECT id, email, name, is_active, role, last_login_at, created_at FROM admins WHERE id = $1 LIMIT 1';
     const { rows } = await db.query(sql, [id]);
     return rows[0] || null;
   }
 
   async getAllAdmins() {
-    const sql =
-      'SELECT id, email, name, is_active, role, last_login_at, created_at FROM admins ORDER BY id ASC';
+    const sql = 'SELECT id, email, name, is_active, role, last_login_at, created_at FROM admins ORDER BY id ASC';
     const { rows } = await db.query(sql);
     return rows;
   }

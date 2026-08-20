@@ -10,9 +10,8 @@ if (!resend) {
 
 async function sendActivationEmail(toEmail, activationUrl, options = {}) {
   const subject = options.subject || 'Hesabınızı Aktivləşdirin';
-  const html =
-    options.html ||
-    `
+  const html = options.html
+    || `
     <p>Salam,</p>
 
     <p>Hesabınızı aktivləşdirmək üçün aşağıdakı linkə klikləyin:</p>

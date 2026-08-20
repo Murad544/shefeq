@@ -8,9 +8,7 @@ class RateLimitMiddleware {
       message: { success: false, message: 'Too many auth attempts' },
       standardHeaders: true,
       trustProxy: true,
-      keyGenerator: (req) => {
-        return req.ip;
-      },
+      keyGenerator: (req) => req.ip,
     });
   }
 
@@ -21,9 +19,7 @@ class RateLimitMiddleware {
       message: { success: false, message: 'Too many requests' },
       standardHeaders: true,
       trustProxy: true,
-      keyGenerator: (req) => {
-        return req.ip;
-      },
+      keyGenerator: (req) => req.ip,
     });
   }
 
@@ -34,9 +30,7 @@ class RateLimitMiddleware {
       message: { success: false, message: 'Too many upload attempts' },
       standardHeaders: true,
       trustProxy: true,
-      keyGenerator: (req) => {
-        return req.ip;
-      },
+      keyGenerator: (req) => req.ip,
     });
   }
 }

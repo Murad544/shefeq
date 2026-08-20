@@ -17,11 +17,9 @@ class SecurityMiddleware {
         // Remove null bytes and control characters
         sanitized[key] = value.trim().replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
       } else if (Array.isArray(value)) {
-        sanitized[key] = value.map((item) =>
-          typeof item === 'string'
-            ? item.trim().replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
-            : item
-        );
+        sanitized[key] = value.map((item) => (typeof item === 'string'
+          ? item.trim().replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+          : item));
       } else {
         sanitized[key] = value;
       }

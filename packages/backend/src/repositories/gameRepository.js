@@ -2,7 +2,7 @@ const db = require('../config/database');
 
 class GameRepository {
   async startSession({ userId }) {
-    const sql = `INSERT INTO game_sessions (user_id) VALUES($1) RETURNING *`;
+    const sql = 'INSERT INTO game_sessions (user_id) VALUES($1) RETURNING *';
     const { rows } = await db.query(sql, [userId]);
     return rows[0] || null;
   }
@@ -103,7 +103,7 @@ class GameRepository {
   // Get all maps with their top leaders
   async getAllMapsWithLeaders(limit = 5) {
     // First get all maps
-    const mapsSQL = `SELECT id, name, code FROM maps ORDER BY name`;
+    const mapsSQL = 'SELECT id, name, code FROM maps ORDER BY name';
     const { rows: maps } = await db.query(mapsSQL);
 
     // For each map, get top leaders
@@ -216,6 +216,7 @@ class GameRepository {
       note,
     };
   }
+
   // Fetch game account data by application ID (user_id)
   async getGameAccountByApplicationId(applicationId) {
     const sql = `

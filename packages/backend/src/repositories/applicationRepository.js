@@ -73,7 +73,7 @@ class ApplicationRepository {
     `;
     }
 
-    sql += ` ORDER BY a.created_at DESC`;
+    sql += ' ORDER BY a.created_at DESC';
 
     const { rows } = await db.query(sql, params);
     return rows;
@@ -84,10 +84,10 @@ class ApplicationRepository {
       INSERT INTO applications (
         name, surname, father_name, date_of_birth, sex, place_of_birth,
         national_serial_num, national_id_num, phone_number, email,
-        education_level, university, profession, skills,
+        education_level, university, profession, role, skills,
         created_at, updated_at
       ) VALUES (
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,NOW(),NOW()
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,NOW(),NOW()
       )
       RETURNING id, created_at
     `;
@@ -106,6 +106,7 @@ class ApplicationRepository {
       applicationData.educationLevel,
       applicationData.university,
       applicationData.profession,
+      applicationData.role || 'trainee',
       applicationData.skills || [],
     ];
 

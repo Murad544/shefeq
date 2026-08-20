@@ -17,11 +17,16 @@ const NAV_ITEMS = [
   
 ];
 
-const Sidebar = ({ active, onSelect }) => {
+const Sidebar = ({ active, onSelect, userRole }) => {
+  const isTrainer = userRole === 'trainer';
+  const visibleNavItems = isTrainer
+    ? NAV_ITEMS.filter((item) => ['profile', 'training'].includes(item.id))
+    : NAV_ITEMS;
+
   return (
     <Box sx={{ width: 240, bgcolor: 'background.paper', height: '100%', borderRight: '1px solid #e0e0e0' }}>
       <List>
-        {NAV_ITEMS.map(item => (
+        {visibleNavItems.map(item => (
           <ListItemButton
             key={item.id}
             selected={active === item.id}
