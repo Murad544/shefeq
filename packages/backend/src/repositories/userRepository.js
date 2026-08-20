@@ -98,6 +98,12 @@ class UserRepository {
   async deactivateUser(id) {
     return this.updateUser(id, { is_active: false });
   }
+
+  async updateSessionId(id, sessionId) {
+    const sql = 'UPDATE users SET session_id = $1, updated_at = NOW() WHERE id = $2 RETURNING *';
+    const { rows } = await db.query(sql, [sessionId, id]);
+    return rows[0] || null;
+  }
 }
 
 module.exports = new UserRepository();

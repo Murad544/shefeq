@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const userRepository = require('../repositories/userRepository');
 const encryptionService = require('./shared/encryptionService');
 const jwtService = require('./shared/jwtService');
@@ -27,6 +28,9 @@ class UserAuthService {
       throw AppError.unauthorized('Invalid credentials', 'INVALID_CREDENTIALS');
     }
 
+    const sessionId = crypto.randomUUID();
+    await userRepository.updateSessionId(user.id, sessionId);
+
     const userRole = user.role || 'trainee';
 
     const tokenPayload = {
@@ -34,6 +38,7 @@ class UserAuthService {
       email: user.email,
       role: userRole,
       client_type: clientType,
+      sessionId,
       iat: Math.floor(Date.now() / 1000),
     };
 
@@ -114,6 +119,14 @@ class UserAuthService {
       throw AppError.unauthorized('User account is inactive', 'USER_INACTIVE');
     }
 
+    if (user.session_id && decoded.sessionId !== user.session_id) {
+      await tokenBlacklistService.blacklistToken(token);
+      throw AppError.unauthorized(
+        'Session terminated. Logged in from another device',
+        'SESSION_TERMINATED'
+      );
+    }
+
     const role = user.role || decoded.role || 'trainee';
 
     return {
@@ -128,6 +141,16 @@ class UserAuthService {
         role,
       },
     };
+  }
+
+  async logout(token, userId) {
+    if (token) {
+      await tokenBlacklistService.blacklistToken(token);
+    }
+    if (userId) {
+      await userRepository.updateSessionId(userId, null);
+    }
+    return { success: true, message: 'Logged out successfully' };
   }
 }
 

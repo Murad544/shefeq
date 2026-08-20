@@ -62,6 +62,17 @@ class UserController {
 
     return handler(req, res, next);
   }
+
+  logout(req, res, next) {
+    const handler = ErrorHandler.asyncWrapper(async (request, response) => {
+      const token = request.token;
+      const userId = request.user && request.user.id;
+      const result = await userAuthService.logout(token, userId);
+      sendSuccess(response, result, 'Logged out successfully');
+    });
+
+    return handler(req, res, next);
+  }
 }
 
 module.exports = new UserController();
