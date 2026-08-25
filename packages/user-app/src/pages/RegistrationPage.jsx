@@ -259,13 +259,13 @@ const RegistrationPage = () => {
                 >
                   Qeydiyyat formu
                 </Typography>
-                <Typography
+                {/* <Typography
                   variant="body2"
                   color="text.secondary"
                   sx={{ mt: 1 }}
                 >
                   {BRAND.COURSE_NAME}
-                </Typography>
+                </Typography> */}
               </Box>
 
               {/* Error alert */}
@@ -351,7 +351,9 @@ const RegistrationPage = () => {
                     lineHeight: 1.5,
                   }}
                 >
-                   Məlumatlarınız tədris prosesinin təşkili və yekun nəticənin müəyyən edilməsi <br/> məqsədilə istifadə olunur və üçüncü şəxslərlə paylaşılmır.
+                  Məlumatlarınız tədris prosesinin təşkili və yekun nəticənin
+                  müəyyən edilməsi <br /> məqsədilə istifadə olunur və üçüncü
+                  şəxslərlə paylaşılmır.
                 </Typography>
               </Box>
             </Paper>
