@@ -30,21 +30,21 @@ const maps_3 = `${R2_BASE_URL}/photos/maps_3.png`;
 const maps_4 = `${R2_BASE_URL}/photos/maps_4.png`;
 // Hardcoded level data
 const INITIAL_LEVELS_DATA = [
+  // {
+  //   id: 1,
+  //   title: "Səviyyə 1: Bakı",
+  //   description: "Bakı şəhərinin mərkəzində uçuş. Başlanğıc səviyyəsi üçün.",
+  //   image: maps_1,
+  //   difficulty: "Asan",
+  //   timesPlayed: 0,
+  //   duration: 1,
+  //   checkpoints: 3,
+  //   completed: false,
+  //   bestTime: null,
+  // },
   {
     id: 1,
-    title: "Səviyyə 1: Bakı",
-    description: "Bakı şəhərinin mərkəzində uçuş. Başlanğıc səviyyəsi üçün.",
-    image: maps_1,
-    difficulty: "Asan",
-    timesPlayed: 0,
-    duration: 1,
-    checkpoints: 3,
-    completed: false,
-    bestTime: null,
-  },
-  {
-    id: 2,
-    title: "Səviyyə 2: Tərk edilmiş şəhər",
+    title: "Səviyyə 1: Tərk edilmiş şəhər",
     description: "Binaların arasında sürətli naviqasiya.",
     image: maps_2,
     difficulty: "Orta",
@@ -55,8 +55,8 @@ const INITIAL_LEVELS_DATA = [
     bestTime: null,
   },
   {
-    id: 3,
-    title: "Səviyyə 3: Meşəlik ərazi",
+    id: 2,
+    title: "Səviyyə 2: Meşəlik ərazi",
     description: "Meşəlik ərazidə ağacların və çayın ətrafında uçuş.",
     image: maps_3,
     difficulty: "Çətin",
@@ -67,8 +67,8 @@ const INITIAL_LEVELS_DATA = [
     bestTime: null,
   },
   {
-    id: 4,
-    title: "Səviyyə 4: Tərk edilmiş şəhər - 2",
+    id: 3,
+    title: "Səviyyə 3: Tərk edilmiş şəhər - 2",
     description: "Anbar və binaların ətrafında uçuş.",
     image: maps_4,
     difficulty: "Çox Çətin",

@@ -29,7 +29,7 @@ class UserAuthService {
     }
 
     const sessionId = crypto.randomUUID();
-    await userRepository.updateSessionId(user.id, sessionId);
+    await userRepository.updateSessionId(user.id, sessionId, clientType);
 
     const userRole = user.role || 'trainee';
 
@@ -119,7 +119,12 @@ class UserAuthService {
       throw AppError.unauthorized('User account is inactive', 'USER_INACTIVE');
     }
 
-    if (user.session_id && decoded.sessionId !== user.session_id) {
+    const isGame = decoded.client_type === CLIENT_TYPES.GAME;
+    const currentSessionId = isGame
+      ? user.game_session_id
+      : (user.web_session_id !== undefined ? user.web_session_id : user.session_id);
+
+    if (currentSessionId && decoded.sessionId !== currentSessionId) {
       await tokenBlacklistService.blacklistToken(token);
       throw AppError.unauthorized(
         'Session terminated. Logged in from another device',
@@ -143,13 +148,31 @@ class UserAuthService {
     };
   }
 
-  async logout(token, userId) {
+  async logout(token, userId, clientType) {
+    let resolvedClientType = clientType;
+
     if (token) {
       await tokenBlacklistService.blacklistToken(token);
+      if (!resolvedClientType) {
+        try {
+          const decoded = jwtService.verifyToken(token);
+          if (decoded && decoded.client_type) {
+            resolvedClientType = decoded.client_type;
+          }
+        } catch (error) {
+          // Token verification might fail if expired or invalid, continue logout
+        }
+      }
     }
+
     if (userId) {
-      await userRepository.updateSessionId(userId, null);
+      if (resolvedClientType) {
+        await userRepository.updateSessionId(userId, null, resolvedClientType);
+      } else {
+        await userRepository.updateSessionId(userId, null, 'all');
+      }
     }
+
     return { success: true, message: 'Logged out successfully' };
   }
 }

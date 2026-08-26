@@ -67,7 +67,8 @@ class UserController {
     const handler = ErrorHandler.asyncWrapper(async (request, response) => {
       const token = request.token;
       const userId = request.user && request.user.id;
-      const result = await userAuthService.logout(token, userId);
+      const clientType = request.tokenData?.client_type || request.body?.client_type;
+      const result = await userAuthService.logout(token, userId, clientType);
       sendSuccess(response, result, 'Logged out successfully');
     });
 

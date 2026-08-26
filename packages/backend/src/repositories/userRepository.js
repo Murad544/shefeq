@@ -1,4 +1,5 @@
 const db = require('../config/database');
+const { CLIENT_TYPES } = require('../middleware/validation/types/types');
 
 class UserRepository {
   async findById(id) {
@@ -99,8 +100,15 @@ class UserRepository {
     return this.updateUser(id, { is_active: false });
   }
 
-  async updateSessionId(id, sessionId) {
-    const sql = 'UPDATE users SET session_id = $1, updated_at = NOW() WHERE id = $2 RETURNING *';
+  async updateSessionId(id, sessionId, clientType = CLIENT_TYPES.WEB) {
+    if (clientType === 'all') {
+      const sql = 'UPDATE users SET web_session_id = $1, game_session_id = $1, session_id = $1, updated_at = NOW() WHERE id = $2 RETURNING *';
+      const { rows } = await db.query(sql, [sessionId, id]);
+      return rows[0] || null;
+    }
+
+    const column = clientType === CLIENT_TYPES.GAME ? 'game_session_id' : 'web_session_id';
+    const sql = `UPDATE users SET ${column} = $1, updated_at = NOW() WHERE id = $2 RETURNING *`;
     const { rows } = await db.query(sql, [sessionId, id]);
     return rows[0] || null;
   }
