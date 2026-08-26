@@ -23,13 +23,13 @@ import { endpoints } from "../../services/api/endpoints";
 
 const R2_BASE_URL = process.env.REACT_APP_R2_BASE_URL;
 
-const maps_1 = `${R2_BASE_URL}/photos/maps_1.png`;
-const maps_2 = `${R2_BASE_URL}/photos/maps_2.png`;
-const maps_3 = `${R2_BASE_URL}/photos/maps_3.png`;
-const maps_4 = `${R2_BASE_URL}/photos/maps_4.png`;
-const maps_5 = `${R2_BASE_URL}/photos/maps_5.png`;
-const maps_6 = `${R2_BASE_URL}/photos/maps_6.png`;
-const maps_7 = `${R2_BASE_URL}/photos/maps_7.png`;
+const maps_1 = `${R2_BASE_URL}/photos/LostCityPreview.png`;
+const maps_2 = `${R2_BASE_URL}/photos/StonehengePreview.png`;
+const maps_3 = `${R2_BASE_URL}/photos/AncientLevelPreview.png`;
+const maps_4 = `${R2_BASE_URL}/photos/LostCity2Preview.png`;
+const maps_5 = `${R2_BASE_URL}/photos/ForestPreview.png`;
+const maps_6 = `${R2_BASE_URL}/photos/AncientCastleLeve2Prevew.png`;
+const maps_7 = `${R2_BASE_URL}/photos/GaragePreview.png`;
 
 // Hardcoded level data
 const INITIAL_LEVELS_DATA = [
