@@ -14,6 +14,7 @@ import ErrorBoundary from "../components/common/ErrorBoundary";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import RegistrationStepper from "../components/registration/RegistrationStepper";
 import StepNavigation from "../components/registration/StepNavigation";
+import TemporaryRegistrationStep from "../components/registration/TemporaryRegistrationStep";
 import ResultDialog from "../components/dialogs/ResultDialog";
 
 // Step components
@@ -31,6 +32,7 @@ import useResultDialog from "../hooks/useResultDialog";
 // Config
 import { BRAND } from "../config/brand";
 import { STRINGS } from "../config/constants";
+import { TEMPORARY_SIMPLE_REGISTRATION } from "../config/registration";
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
@@ -78,6 +80,16 @@ const RegistrationPage = () => {
   };
 
   const renderStepContent = () => {
+    if (TEMPORARY_SIMPLE_REGISTRATION) {
+      return (
+        <TemporaryRegistrationStep
+          values={form}
+          onChange={handleChange}
+          errors={errors}
+        />
+      );
+    }
+
     if (loading && questions.length === 0 && step === 3) {
       return (
         <Box sx={{ py: 8 }}>
@@ -279,7 +291,9 @@ const RegistrationPage = () => {
               )}
 
               {/* Stepper */}
-              <RegistrationStepper activeStep={step} steps={STRINGS.STEPS} />
+              {!TEMPORARY_SIMPLE_REGISTRATION && (
+                <RegistrationStepper activeStep={step} steps={STRINGS.STEPS} />
+              )}
 
               {/* Step Content */}
               <Box

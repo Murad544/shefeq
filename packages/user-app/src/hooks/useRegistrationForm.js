@@ -4,9 +4,11 @@ import { useErrorHandler } from "./useErrorHandler";
 import { apiClient } from "../services/api/apiClient";
 import { API_ENDPOINTS } from "../config/constants";
 import { validateStep } from "../services/validation/validators";
+import temporaryRegistrationSchema from "../services/validation/temporaryRegistrationSchema";
 import { formatPhoneNumberForSubmission } from "../utils/formatters";
+import { TEMPORARY_SIMPLE_REGISTRATION } from "../config/registration";
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = TEMPORARY_SIMPLE_REGISTRATION ? 1 : 6;
 
 const initialFormState = {
   // Personal Information
@@ -165,13 +167,28 @@ export const useRegistrationForm = () => {
   };
 
   const handleNext = async () => {
-    const validation = await validateStep(step, form);
+    const validation = TEMPORARY_SIMPLE_REGISTRATION
+      ? await validateTemporaryForm()
+      : await validateStep(step, form);
 
     if (validation.isValid) {
       setErrors({});
       setStep((prev) => Math.min(prev + 1, TOTAL_STEPS - 1));
     } else {
       setErrors(validation.errors);
+    }
+  };
+
+  const validateTemporaryForm = async () => {
+    try {
+      await temporaryRegistrationSchema.validate(form, { abortEarly: false });
+      return { isValid: true, errors: {} };
+    } catch (validationError) {
+      const validationErrors = {};
+      validationError.inner.forEach((error) => {
+        if (error.path) validationErrors[error.path] = error.message;
+      });
+      return { isValid: false, errors: validationErrors };
     }
   };
 
@@ -182,21 +199,23 @@ export const useRegistrationForm = () => {
   const buildFormData = () => {
     const formData = new FormData();
 
-    const textFields = [
-      "name",
-      "surname",
-      "fatherName",
-      "dateOfBirth",
-      "sex",
-      "role",
-      "placeOfBirth",
-      "nationalSerialNumber",
-      "nationalIdNumber",
-      "email",
-      "educationLevel",
-      "university",
-      "profession",
-    ];
+    const textFields = TEMPORARY_SIMPLE_REGISTRATION
+      ? ["name", "surname", "role", "nationalIdNumber", "email"]
+      : [
+          "name",
+          "surname",
+          "fatherName",
+          "dateOfBirth",
+          "sex",
+          "role",
+          "placeOfBirth",
+          "nationalSerialNumber",
+          "nationalIdNumber",
+          "email",
+          "educationLevel",
+          "university",
+          "profession",
+        ];
 
     textFields.forEach((field) => {
       if (!form[field]) return;
@@ -262,15 +281,29 @@ export const useRegistrationForm = () => {
       setLoading(true);
       if (openDialog) openDialog("loading", "Yüklənir...");
 
-      for (let i = 0; i < TOTAL_STEPS - 1; i++) {
-        const validation = await validateStep(i, form);
+      if (TEMPORARY_SIMPLE_REGISTRATION) {
+        const validation = await validateTemporaryForm();
         if (!validation.isValid) {
           setErrors(validation.errors);
           if (openDialog) {
             openDialog("error", "Formda səhvlər var. Zəhmət olmasa yoxlayın.");
           }
-          setStep(i);
           return;
+        }
+      } else {
+        for (let i = 0; i < TOTAL_STEPS - 1; i++) {
+          const validation = await validateStep(i, form);
+          if (!validation.isValid) {
+            setErrors(validation.errors);
+            if (openDialog) {
+              openDialog(
+                "error",
+                "Formda səhvlər var. Zəhmət olmasa yoxlayın.",
+              );
+            }
+            setStep(i);
+            return;
+          }
         }
       }
 

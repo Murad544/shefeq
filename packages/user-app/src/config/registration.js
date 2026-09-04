@@ -1,0 +1,1 @@
+export const TEMPORARY_SIMPLE_REGISTRATION = true;
