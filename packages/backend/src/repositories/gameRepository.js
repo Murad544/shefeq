@@ -7,13 +7,42 @@ class GameRepository {
     return rows[0] || null;
   }
 
-  async updateHeartbeat({ sessionId }) {
+  async updateHeartbeat({ sessionId, timeoutSeconds = 90 }) {
     const sql = `UPDATE game_sessions
       SET last_heartbeat_at = NOW()
-      WHERE id = $1 AND session_ended_at IS NULL
+      WHERE id = $1 
+        AND session_ended_at IS NULL
+        AND COALESCE(last_heartbeat_at, session_started_at) >= NOW() - ($2 * INTERVAL '1 second')
       RETURNING id, user_id, session_started_at, session_ended_at, duration_seconds, end_reason, created_at`;
-    const { rows } = await db.query(sql, [sessionId]);
+    const { rows } = await db.query(sql, [sessionId, timeoutSeconds]);
     return rows[0] || null;
+  }
+
+  async endInactiveSessions(timeoutSeconds = 90) {
+    const sql = `UPDATE game_sessions
+      SET 
+        session_ended_at = COALESCE(last_heartbeat_at, NOW()),
+        duration_seconds = GREATEST(0, EXTRACT(EPOCH FROM (COALESCE(last_heartbeat_at, NOW()) - session_started_at))::INT),
+        end_reason = 'timeout'
+      WHERE 
+        session_ended_at IS NULL
+        AND COALESCE(last_heartbeat_at, session_started_at) < NOW() - ($1 * INTERVAL '1 second')
+      RETURNING id, user_id, session_started_at, session_ended_at, duration_seconds, end_reason`;
+    const { rows } = await db.query(sql, [timeoutSeconds]);
+    return rows || [];
+  }
+
+  async endUserActiveSessions({ userId, endReason = 'disconnect' }) {
+    const sql = `UPDATE game_sessions
+      SET 
+        session_ended_at = COALESCE(last_heartbeat_at, NOW()),
+        duration_seconds = GREATEST(0, EXTRACT(EPOCH FROM (COALESCE(last_heartbeat_at, NOW()) - session_started_at))::INT),
+        end_reason = $2
+      WHERE 
+        user_id = $1 AND session_ended_at IS NULL
+      RETURNING id, user_id, duration_seconds`;
+    const { rows } = await db.query(sql, [userId, endReason]);
+    return rows || [];
   }
 
   async endSession({ sessionId, endReason }) {

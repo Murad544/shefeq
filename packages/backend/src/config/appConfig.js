@@ -15,6 +15,9 @@ class AppConfig {
         secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
         bucketName: process.env.R2_BUCKET_NAME,
       },
+      gameHeartbeatTimeoutSeconds: parseInt(process.env.GAME_HEARTBEAT_TIMEOUT_SECONDS, 10) || 90,
+      gameHeartbeatCleanupIntervalMs:
+        parseInt(process.env.GAME_HEARTBEAT_CLEANUP_INTERVAL_MS, 10) || 15000,
     };
   }
 
