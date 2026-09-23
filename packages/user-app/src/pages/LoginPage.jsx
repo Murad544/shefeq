@@ -2,29 +2,23 @@ import {
   Alert,
   Box,
   Button,
-  Card,
   CircularProgress,
-  Container,
   IconButton,
   InputAdornment,
   TextField,
-  Typography,
-  useMediaQuery,
-  useTheme,
 } from "@mui/material";
 import React from "react";
 import { MdEmail, MdLock, MdVisibility, MdVisibilityOff } from "react-icons/md";
+import { ArrowForward } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
-import Logo from "../assets/icons/Logo";
+import AuthShell from "../components/military/AuthShell";
 import { apiClient } from "../services/api/apiClient";
 import { endpoints } from "../services/api/endpoints";
-import { Link as RouterLink } from "react-router-dom";
+import { C } from "../config/tokens";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -56,111 +50,116 @@ export default function LoginPage() {
     }
   };
 
+  const adornmentColor = { color: C.olive, display: "flex" };
+
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        p: 2,
-      }}
+    <AuthShell
+      eyebrow="Şəxsi kabinet"
+      title="Hesaba giriş"
+      subtitle="Email və şifrənizi daxil edin"
     >
-      <Container maxWidth="sm">
-        <Card sx={{ p: { xs: 3, md: 4 } }}>
-          <Box sx={{ textAlign: "center", mb: 2 }}>
-  <Box
-    component={RouterLink}
-    to="/"
-    sx={{
-      display: "inline-flex",
-      justifyContent: "center",
-      textDecoration: "none",
-      cursor: "pointer",
-    }}
-  >
-    <Logo size={64} />
-  </Box>
+      <Box component="form" onSubmit={handleSubmit}>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2.5, animation: "sg-fade-up .35s ease backwards" }}>
+            {error}
+          </Alert>
+        )}
 
-  <Typography variant="h5" sx={{ mt: 1, fontWeight: 700 }}>
-    Hesaba giriş
-  </Typography>
-  <Typography variant="body2" color="text.secondary">
-    Email və şifrənizi daxil edin
-  </Typography>
-</Box>
+        <TextField
+          type="email"
+          label="E-poçt"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          fullWidth
+          autoComplete="email"
+          sx={{ mb: 2.5 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Box component="span" sx={adornmentColor}>
+                  <MdEmail size={18} />
+                </Box>
+              </InputAdornment>
+            ),
+          }}
+        />
 
-          <Box component="form" onSubmit={handleSubmit}>
-            {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-              </Alert>
-            )}
+        <TextField
+          type={showPwd ? "text" : "password"}
+          label="Şifrə"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          fullWidth
+          autoComplete="current-password"
+          sx={{ mb: 3 }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Box component="span" sx={adornmentColor}>
+                  <MdLock size={18} />
+                </Box>
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label={showPwd ? "Şifrəni gizlət" : "Şifrəni göstər"}
+                  onClick={() => setShowPwd((s) => !s)}
+                  edge="end"
+                >
+                  {showPwd ? <MdVisibilityOff /> : <MdVisibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
 
-            <TextField
-              type="email"
-              label="E-poçt"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              fullWidth
-              sx={{ mb: 2 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MdEmail />
-                  </InputAdornment>
-                ),
-              }}
-            />
+        <Button
+          type="submit"
+          variant="contained"
+          size="large"
+          fullWidth
+          disabled={submitting}
+          endIcon={submitting ? null : <ArrowForward />}
+        >
+          {submitting ? (
+            <CircularProgress size={22} color="inherit" />
+          ) : (
+            "Daxil ol"
+          )}
+        </Button>
 
-            <TextField
-              type={showPwd ? "text" : "password"}
-              label="Şifrə"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              fullWidth
-              sx={{ mb: 2 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <MdLock />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPwd((s) => !s)}
-                      edge="end"
-                    >
-                      {showPwd ? <MdVisibilityOff /> : <MdVisibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <Button
-              type="submit"
-              variant="contained"
-              fullWidth
-              disabled={submitting}
-              sx={{ py: 1.5 }}
-            >
-              {submitting ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                "Daxil ol"
-              )}
-            </Button>
-
-            <Box sx={{ textAlign: "center", mt: 2 }}>
-              <Button onClick={() => navigate("/register")}>Qeydiyyat</Button>
-            </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            mt: 3,
+            color: C.textFaint,
+            "&::before, &::after": {
+              content: '""',
+              flex: 1,
+              height: "1px",
+              bgcolor: C.rule,
+            },
+          }}
+        >
+          <Box component="span" sx={{ fontSize: "0.75rem" }}>
+            və ya
           </Box>
-        </Card>
-      </Container>
-    </Box>
+        </Box>
+
+        <Button
+          fullWidth
+          variant="outlined"
+          onClick={() => navigate("/register")}
+          sx={{ mt: 2 }}
+        >
+          Qeydiyyat
+        </Button>
+      </Box>
+    </AuthShell>
   );
 }

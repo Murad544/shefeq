@@ -1,5 +1,6 @@
 import { Box, Typography, Grid } from "@mui/material";
 import { getColorScheme } from "../../../constants/colors";
+import { C, labelCaps } from "../../../styles/tokens";
 
 export default function TableHeader({
   title,
@@ -13,32 +14,34 @@ export default function TableHeader({
   return (
     <Box
       sx={{
+        position: "relative",
         p: { xs: 2.5, sm: 3 },
-        bgcolor: colors.dark,
-        color: "white",
-        borderBottom: "1px solid",
-        borderColor: colors.main,
+        bgcolor: C.field900,
+        color: C.textOnDark,
+        borderBottom: `3px solid ${colors.main}`,
       }}
     >
-      <Grid justifyContent={"space-between"}>
-        <Grid item xs={12} md={children ? 8 : 12}>
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 700,
-              mb: subtitle || children ? 1 : 0,
-              fontSize: { xs: "1.1rem", md: "1.25rem" },
-            }}
-          >
-            {title}
-          </Typography>
+      <Grid container spacing={2} justifyContent="space-between" alignItems="flex-start">
+        <Grid item xs={12} md={actions ? 8 : 12}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: subtitle || children ? 1.25 : 0 }}>
+            <Box sx={{ width: 4, height: 22, bgcolor: colors.main === C.olive ? C.brass : colors.main }} />
+            <Typography
+              component="h2"
+              sx={{
+                ...labelCaps,
+                fontWeight: 700,
+                fontSize: { xs: "1.1rem", md: "1.25rem" },
+              }}
+            >
+              {title}
+            </Typography>
+          </Box>
           {subtitle && (
             <Typography
               variant="body2"
               sx={{
-                opacity: 0.9,
-                mb: children ? 1 : 0,
-                fontSize: { xs: "0.85rem", md: "0.875rem" },
+                color: C.textOnDarkMuted,
+                mb: children ? 1.5 : 0,
               }}
             >
               {subtitle}

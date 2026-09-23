@@ -1,21 +1,20 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Paper,
-  Typography,
-  Fade,
-  useTheme,
-  Alert,
-  LinearProgress,
-} from "@mui/material";
-import ResponsiveContainer from "../components/common/ResponsiveContainer";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Box, Typography, Fade, Alert, Stack } from "@mui/material";
+import { ScreenRotation, VerifiedUser } from "@mui/icons-material";
+import dayjs from "dayjs";
 import ErrorBoundary from "../components/common/ErrorBoundary";
-import LoadingSpinner from "../components/common/LoadingSpinner";
 import RegistrationStepper from "../components/registration/RegistrationStepper";
 import StepNavigation from "../components/registration/StepNavigation";
 import TemporaryRegistrationStep from "../components/registration/TemporaryRegistrationStep";
 import ResultDialog from "../components/dialogs/ResultDialog";
+import Logo from "../assets/icons/Logo";
+import BrandLockup from "../components/military/BrandLockup";
+import Emblem from "../components/military/Emblem";
+import RadarLoader from "../components/military/RadarLoader";
+import SegmentedProgress from "../components/military/SegmentedProgress";
+import TacticalBackground from "../components/military/TacticalBackground";
+import TricolorBar from "../components/military/TricolorBar";
 
 // Step components
 import PersonalInfoStep from "../components/registration/steps/PersonalInfoStep";
@@ -33,10 +32,10 @@ import useResultDialog from "../hooks/useResultDialog";
 import { BRAND } from "../config/brand";
 import { STRINGS } from "../config/constants";
 import { TEMPORARY_SIMPLE_REGISTRATION } from "../config/registration";
+import { C, EASE, FONT, labelCaps } from "../config/tokens";
 
 const RegistrationPage = () => {
   const navigate = useNavigate();
-  const theme = useTheme();
 
   const {
     step,
@@ -93,7 +92,7 @@ const RegistrationPage = () => {
     if (loading && questions.length === 0 && step === 3) {
       return (
         <Box sx={{ py: 8 }}>
-          <LoadingSpinner message="Suallar yüklənir..." />
+          <RadarLoader message="Suallar yüklənir" />
         </Box>
       );
     }
@@ -162,216 +161,238 @@ const RegistrationPage = () => {
     return Object.keys(errors).length > 0;
   };
 
+  const docMeta = {
+    fontFamily: FONT.mono,
+    fontSize: "0.72rem",
+    letterSpacing: "0.06em",
+    color: C.textMuted,
+    lineHeight: 1.9,
+  };
+
   return (
     <ErrorBoundary>
       <Box
         sx={{
           minHeight: "100vh",
-          background: `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.main} 50%, ${theme.palette.primary.dark} 100%)`,
-          py: { xs: 2, md: 4 },
           position: "relative",
+          bgcolor: C.field900,
+          pb: { xs: 3, md: 6 },
         }}
       >
+        <TacticalBackground />
+
         <Box
           sx={{
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-            "&::before, &::after": {
-              content: '""',
-              position: "absolute",
-              borderRadius: "50%",
-              filter: "blur(120px)",
-              opacity: 0.1,
-            },
-            "&::before": {
-              width: 300,
-              height: 300,
-              top: "10%",
-              left: "10%",
-              background: theme.palette.secondary.main,
-            },
-            "&::after": {
-              width: 400,
-              height: 400,
-              bottom: "10%",
-              right: "10%",
-              background:
-                theme.palette.accent?.main || theme.palette.secondary.light,
-            },
+            position: "relative",
+            maxWidth: 920,
+            mx: "auto",
+            px: { xs: 0, sm: 2 },
           }}
-        />
-
-        <ResponsiveContainer maxWidth="lg" centerContent fullHeight padding={0}>
-          <Fade in timeout={600}>
-            <Paper
-              elevation={16}
+        >
+          {/* Utility row */}
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ px: { xs: 2, sm: 0 }, py: 2.5, color: C.textOnDark }}
+          >
+            <Box
+              component={RouterLink}
+              to="/"
               sx={{
-                mx: "auto",
-                p: { xs: 3, md: 5 },
-                borderRadius: 4,
-                background: "rgba(255, 255, 255, 0.98)",
-                backdropFilter: "blur(20px)",
-                boxShadow: `0 24px 48px rgba(54, 79, 107, 0.15)`,
-                width: "100%",
-                maxWidth: 900,
-                position: "relative",
-                overflow: "hidden",
+                display: "inline-flex",
+                color: "inherit",
+                textDecoration: "none",
               }}
             >
-              {/* Progress indicator */}
-              <Box sx={{ mb: 2 }}>
-                <LinearProgress
-                  variant="determinate"
-                  value={getStepProgress()}
-                  sx={{
-                    height: 6,
-                    borderRadius: 3,
-                    bgcolor: "grey.200",
-                    "& .MuiLinearProgress-bar": {
-                      borderRadius: 3,
-                      background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                    },
-                  }}
-                />
-                <Typography
-                  variant="caption"
-                  sx={{
-                    display: "block",
-                    textAlign: "center",
-                    mt: 1,
-                    color: "text.secondary",
-                    fontWeight: 500,
-                  }}
-                >
-                  {step + 1} / {totalSteps} addım tamamlandı
-                </Typography>
-              </Box>
+              <BrandLockup size="sm" />
+            </Box>
+          </Stack>
 
-              {/* Header */}
-              <Box sx={{ mb: 4, textAlign: "center" }}>
-                <Typography
-                  variant="h4"
-                  sx={{
-                    fontWeight: 700,
-                    mb: 1,
-                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                    backgroundClip: "text",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    fontSize: { xs: "1.75rem", md: "2.125rem" },
-                  }}
-                >
-                  {BRAND.PROJECT_NAME}
-                </Typography>
-                <Typography
-                  variant="h6"
-                  color="text.secondary"
-                  sx={{ fontSize: { xs: "1rem", md: "1.25rem" } }}
-                >
-                  Qeydiyyat formu
-                </Typography>
-                {/* <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mt: 1 }}
-                >
-                  {BRAND.COURSE_NAME}
-                </Typography> */}
-              </Box>
+          {/* Document */}
+          <Box
+            sx={{
+              position: "relative",
+              bgcolor: C.paperRaised,
+              boxShadow: "0 40px 80px -40px rgba(0, 0, 0, 0.8)",
+              overflow: "hidden",
+              animation: `sg-fade-up .7s ${EASE.out} backwards`,
+            }}
+          >
+            <TricolorBar />
 
-              {/* Error alert */}
-              {hasFormErrors() && (
-                <Alert severity="warning" sx={{ mb: 3 }} onClose={() => {}}>
-                  <Typography variant="body2">
-                    Formda səhvlər var. Zəhmət olmasa qırmızı sahələri düzəldin
-                    və yenidən cəhd edin.
-                  </Typography>
-                </Alert>
-              )}
-
-              {/* Stepper */}
-              {!TEMPORARY_SIMPLE_REGISTRATION && (
-                <RegistrationStepper activeStep={step} steps={STRINGS.STEPS} />
-              )}
-
-              {/* Step Content */}
-              <Box
-                sx={{
-                  mb: 4,
-                  minHeight: { xs: 400, md: 500 },
-                  position: "relative",
-                }}
+            {/* Header */}
+            <Box
+              sx={{
+                px: { xs: 2.5, sm: 4, md: 6 },
+                pt: { xs: 3, md: 4.5 },
+                pb: 2.5,
+                borderBottom: `2px solid ${C.text}`,
+              }}
+            >
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                justifyContent="space-between"
+                alignItems={{ xs: "flex-start", sm: "center" }}
+                spacing={2}
               >
-                <Fade
-                  in={!loading}
-                  timeout={300}
-                  style={{
-                    transitionDelay: loading ? "0ms" : "150ms",
-                  }}
-                >
-                  <Box>{renderStepContent()}</Box>
-                </Fade>
-
-                {/* Loading overlay for form submission */}
-                {loading && dialogType !== "loading" && (
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      bgcolor: "rgba(255, 255, 255, 0.8)",
-                      backdropFilter: "blur(4px)",
-                      borderRadius: 2,
-                      zIndex: 1,
-                    }}
-                  >
-                    <LoadingSpinner message="İşlənir..." />
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Logo size={56} />
+                  <Box>
+                    <Typography
+                      variant="overline"
+                      sx={{ color: C.brassDark, display: "block", lineHeight: 1.5 }}
+                    >
+                      {BRAND.COURSE_NAME}
+                    </Typography>
+                    <Typography
+                      variant="h3"
+                      component="h1"
+                      sx={{ fontSize: { xs: "1.7rem", md: "2.1rem" } }}
+                    >
+                      Qeydiyyat forması
+                    </Typography>
                   </Box>
-                )}
-              </Box>
+                </Stack>
+                <Box sx={{ ...docMeta, textAlign: { sm: "right" }, flexShrink: 0 }}>
+                  <div>TARİX: {dayjs().format("DD.MM.YYYY")}</div>
+                  <div>
+                    ADDIM {step + 1} / {totalSteps}
+                  </div>
+                </Box>
+              </Stack>
+            </Box>
+            <Box sx={{ height: 3, borderBottom: `1px solid ${C.text}` }} />
 
-              {/* Navigation */}
-              <StepNavigation
-                currentStep={step}
-                totalSteps={totalSteps}
-                onBack={handleBack}
-                onNext={handleNext}
-                onSubmit={onSubmit}
-                isLastStep={isLastStep}
-                loading={loading}
+            {/* Body */}
+            <Box
+              sx={{
+                position: "relative",
+                px: { xs: 2.5, sm: 4, md: 6 },
+                py: { xs: 3, md: 4.5 },
+              }}
+            >
+              <Emblem
+                decorative
+                size={300}
+                color={C.olive}
+                opacity={0.045}
+                sx={{
+                  position: "absolute",
+                  right: { xs: -60, md: 30 },
+                  bottom: 30,
+                  pointerEvents: "none",
+                }}
               />
 
-              {/* Form info footer */}
-              <Box
-                sx={{
-                  mt: 3,
-                  pt: 3,
-                  borderTop: "1px solid",
-                  borderColor: "grey.200",
-                  textAlign: "center",
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
+              <Box sx={{ position: "relative" }}>
+                {/* Progress indicator */}
+                <Box sx={{ mb: 4 }}>
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    sx={{ ...labelCaps, fontSize: "0.72rem", color: C.textMuted, mb: 1 }}
+                  >
+                    <span>Doldurulma</span>
+                    <span>
+                      {step + 1} / {totalSteps} addım tamamlandı
+                    </span>
+                  </Stack>
+                  <SegmentedProgress value={getStepProgress()} segments={24} height={8} />
+                </Box>
+
+                {/* Error alert */}
+                {hasFormErrors() && (
+                  <Alert
+                    severity="warning"
+                    sx={{ mb: 3, animation: "sg-fade-up .35s ease backwards" }}
+                  >
+                    <Typography variant="body2">
+                      Formda səhvlər var. Zəhmət olmasa qırmızı sahələri düzəldin
+                      və yenidən cəhd edin.
+                    </Typography>
+                  </Alert>
+                )}
+
+                {/* Stepper */}
+                {!TEMPORARY_SIMPLE_REGISTRATION && (
+                  <RegistrationStepper activeStep={step} steps={STRINGS.STEPS} />
+                )}
+
+                {/* Step Content */}
+                <Box
                   sx={{
-                    display: "block",
-                    lineHeight: 1.5,
+                    mb: 2,
+                    minHeight: TEMPORARY_SIMPLE_REGISTRATION ? 0 : { xs: 400, md: 500 },
+                    position: "relative",
                   }}
                 >
-                  Məlumatlarınız tədris prosesinin təşkili və yekun nəticənin
-                  müəyyən edilməsi <br /> məqsədilə istifadə olunur və üçüncü
-                  şəxslərlə paylaşılmır.
-                </Typography>
+                  <Fade
+                    in={!loading}
+                    timeout={300}
+                    style={{
+                      transitionDelay: loading ? "0ms" : "150ms",
+                    }}
+                  >
+                    <Box key={step} sx={{ animation: `sg-fade-up .45s ${EASE.out} backwards` }}>
+                      {renderStepContent()}
+                    </Box>
+                  </Fade>
+
+                  {/* Loading overlay for form submission */}
+                  {loading && dialogType !== "loading" && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        inset: 0,
+                        minHeight: 180,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        bgcolor: "rgba(251, 250, 245, 0.85)",
+                        zIndex: 1,
+                      }}
+                    >
+                      <RadarLoader message="İşlənir" />
+                    </Box>
+                  )}
+                </Box>
+
+                {/* Navigation */}
+                <StepNavigation
+                  currentStep={step}
+                  totalSteps={totalSteps}
+                  onBack={handleBack}
+                  onNext={handleNext}
+                  onSubmit={onSubmit}
+                  isLastStep={isLastStep}
+                  loading={loading}
+                />
+
+                {/* Form info footer */}
+                <Stack
+                  direction="row"
+                  spacing={1.5}
+                  alignItems="flex-start"
+                  sx={{
+                    mt: 3,
+                    pt: 3,
+                    borderTop: `1px dashed ${C.ruleStrong}`,
+                  }}
+                >
+                  <VerifiedUser sx={{ color: C.olive, fontSize: 20, mt: 0.25 }} />
+                  <Typography
+                    variant="caption"
+                    sx={{ color: C.textMuted, lineHeight: 1.6, fontSize: "0.8rem" }}
+                  >
+                    Məlumatlarınız tədris prosesinin təşkili və yekun nəticənin
+                    müəyyən edilməsi məqsədilə istifadə olunur və üçüncü
+                    şəxslərlə paylaşılmır.
+                  </Typography>
+                </Stack>
               </Box>
-            </Paper>
-          </Fade>
+            </Box>
+          </Box>
 
           {/* Result Dialog */}
           <ResultDialog
@@ -383,19 +404,24 @@ const RegistrationPage = () => {
           />
 
           {/* Help text for mobile users */}
-          <Box sx={{ mt: 2, textAlign: "center", display: { md: "none" } }}>
-            <Typography
-              variant="caption"
-              sx={{
-                color: "white",
-                opacity: 0.8,
-                fontSize: "0.75rem",
-              }}
-            >
-              💡 Daha yaxşı təcrübə üçün telefonu üfüqi vəziyyətə çevirin
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            justifyContent="center"
+            sx={{
+              mt: 2,
+              px: 2,
+              display: { xs: "flex", md: "none" },
+              color: C.textOnDarkMuted,
+            }}
+          >
+            <ScreenRotation sx={{ fontSize: 16 }} />
+            <Typography variant="caption" sx={{ fontSize: "0.75rem" }}>
+              Daha yaxşı təcrübə üçün telefonu üfüqi vəziyyətə çevirin
             </Typography>
-          </Box>
-        </ResponsiveContainer>
+          </Stack>
+        </Box>
       </Box>
     </ErrorBoundary>
   );

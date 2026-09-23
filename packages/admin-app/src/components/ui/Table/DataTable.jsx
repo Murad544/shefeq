@@ -1,21 +1,32 @@
 import {
-  Paper,
   Table,
   TableHead,
   TableBody,
   TableRow,
   TableCell,
   TableContainer,
-  Container,
   Box,
   Grid,
 } from "@mui/material";
 import { useDragScroll } from "../../../hooks/ui/useDragScroll";
 import { createScrollContainerStyles } from "../../../styles/commonStyles";
+import { getColorScheme } from "../../../constants/colors";
+import { C, FONT, labelCaps } from "../../../styles/tokens";
 import TableHeader from "./TableHeader";
 import LoadingState from "../Feedback/LoadingState";
 import EmptyState from "../Feedback/EmptyState";
 import ErrorAlert from "../Feedback/ErrorAlert";
+
+// First rows fade in one after another when the list mounts.
+const rowStagger = {
+  "& > tr": { animation: "sg-fade-in .4s ease backwards" },
+  ...Object.fromEntries(
+    Array.from({ length: 16 }, (_, i) => [
+      `& > tr:nth-of-type(${i + 1})`,
+      { animationDelay: `${i * 35}ms` },
+    ])
+  ),
+};
 
 export default function DataTable({
   // Data props
@@ -48,6 +59,7 @@ export default function DataTable({
   loadingMessage,
 }) {
   const dragScrollRef = useDragScroll();
+  const scheme = getColorScheme(colorScheme);
 
   const renderTableContent = () => {
     if (loading) {
@@ -64,7 +76,12 @@ export default function DataTable({
       return (
         <Grid container spacing={2}>
           {data.map((item, index) => (
-            <Grid item xs={12} key={item.id || index}>
+            <Grid
+              item
+              xs={12}
+              key={item.id || index}
+              sx={{ animation: `sg-fade-up .45s ease ${Math.min(index, 10) * 50}ms backwards` }}
+            >
               {renderMobileCard ? renderMobileCard(item, index) : null}
             </Grid>
           ))}
@@ -73,36 +90,24 @@ export default function DataTable({
     }
 
     return (
-      <Box
-        sx={{
-          position: "relative",
-          "&::after": {
-            content: '""',
-            position: "absolute",
-            top: 0,
-            right: 0,
-            bottom: 0,
-            width: "30px",
-            background: "linear-gradient(90deg, transparent, rgba(0,0,0,0.1))",
-            pointerEvents: "none",
-            zIndex: 1,
-            opacity: 0.7,
-          },
-          "&::before": {
-            content: '"← Drag to scroll →"',
-            position: "absolute",
-            top: "10px",
-            right: "40px",
-            fontSize: "0.75rem",
-            color: "text.secondary",
-            opacity: 0.6,
-            zIndex: 2,
-            pointerEvents: "none",
-            fontWeight: 500,
-          },
-        }}
-      >
-        <TableContainer ref={dragScrollRef} sx={createScrollContainerStyles()}>
+      <Box sx={{ position: "relative" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            mb: 1,
+            fontFamily: FONT.mono,
+            fontSize: "0.66rem",
+            letterSpacing: "0.12em",
+            color: C.textFaint,
+          }}
+        >
+          ⇆ SÜRÜŞDÜRƏRƏK BAXIN
+        </Box>
+        <TableContainer
+          ref={dragScrollRef}
+          sx={{ ...createScrollContainerStyles(), border: `1px solid ${C.rule}` }}
+        >
           <Table stickyHeader size="small" sx={{ minWidth }}>
             <TableHead>
               <TableRow>
@@ -110,13 +115,12 @@ export default function DataTable({
                   <TableCell
                     key={column.key}
                     sx={{
+                      ...labelCaps,
                       minWidth: column.minWidth || 120,
-                      fontWeight: 700,
-                      color: `${colorScheme}.main`,
-                      bgcolor: "grey.50",
-                      borderBottom: "2px solid",
-                      borderColor: `${colorScheme}.light`,
-                      fontSize: { xs: "0.8rem", md: "0.875rem" },
+                      fontSize: { xs: "0.72rem", md: "0.78rem" },
+                      color: C.text,
+                      bgcolor: C.paperSunk,
+                      borderBottom: `2px solid ${scheme.main}`,
                       whiteSpace: "nowrap",
                       position: "sticky",
                       top: 0,
@@ -128,7 +132,7 @@ export default function DataTable({
                 ))}
               </TableRow>
             </TableHead>
-            <TableBody>
+            <TableBody sx={rowStagger}>
               {data.map((item, index) =>
                 renderRow ? renderRow(item, index) : null
               )}
@@ -140,13 +144,11 @@ export default function DataTable({
   };
 
   return (
-    <Paper
+    <Box
       sx={{
-        borderRadius: 3,
+        bgcolor: C.paperRaised,
+        border: `1px solid ${C.rule}`,
         overflow: "hidden",
-        boxShadow: "0 4px 20px rgba(54, 79, 107, 0.08)",
-        border: "1px solid",
-        borderColor: "grey.200",
       }}
     >
       <TableHeader
@@ -158,7 +160,7 @@ export default function DataTable({
         {headerChildren}
       </TableHeader>
 
-      <Container maxWidth={false} sx={{ px: { xs: 2.5, sm: 3 }, py: 3 }}>
+      <Box sx={{ px: { xs: 2, sm: 3 }, py: 3 }}>
         <ErrorAlert error={error} />
 
         <Box
@@ -166,14 +168,14 @@ export default function DataTable({
             maxHeight: {
               xs: "calc(100vh - 350px)",
               sm: "calc(100vh - 400px)",
-              md: 600,
+              md: 640,
             },
             overflowY: "auto",
           }}
         >
           {renderTableContent()}
         </Box>
-      </Container>
-    </Paper>
+      </Box>
+    </Box>
   );
 }

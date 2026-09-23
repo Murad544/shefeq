@@ -1,26 +1,33 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  Card,
-  CardContent,
-  CardMedia,
   Grid,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Typography,
-  Chip,
-  LinearProgress,
 } from "@mui/material";
 import {
   EmojiEvents as EmojiEventsIcon,
   PlayArrow as PlayArrowIcon,
   Schedule as ScheduleIcon,
   FlagOutlined as FlagIcon,
-  Star as StarIcon,
   TrendingUp as TrendingUpIcon,
-  Person as PersonIcon,
+  Timer as TimerIcon,
+  Map as MapIcon,
 } from "@mui/icons-material";
 import { apiClient } from "../../services/api/apiClient";
 import { endpoints } from "../../services/api/endpoints";
 import { INITIAL_LEVELS_DATA, MAPS } from "../../constants/maps";
+import { C, EASE, FONT, labelCaps } from "../../config/tokens";
+import CornerBrackets from "../military/CornerBrackets";
+import CountUp from "../military/CountUp";
+import Panel from "../military/Panel";
+import SegmentedProgress from "../military/SegmentedProgress";
+import TacticalBackground from "../military/TacticalBackground";
 
 // const ACHIEVEMENTS = [
 //   { id: 1, title: "Uçuş ustası", subtitle: "3 səviyyə tamamlandı", color: "#FFD700" },
@@ -28,129 +35,144 @@ import { INITIAL_LEVELS_DATA, MAPS } from "../../constants/maps";
 //   { id: 3, title: "Checkpoint master", subtitle: "8/8 checkpoint tamamlandı", color: "#2196F3" },
 // ];
 
-const ACHIEVEMENTS = [
-  {
-    id: 1,
-    title: "Uçuş ustası",
-    subtitle: "3 səviyyə tamamlandı",
-    color: "#FFD700",
-  },
-  {
-    id: 2,
-    title: "Çevik pilot",
-    subtitle: "2 səviyyə 20 dəq-dən az",
-    color: "#4CAF50",
-  },
-  {
-    id: 3,
-    title: "Checkpoint master",
-    subtitle: "8/8 checkpoint tamamlandı",
-    color: "#2196F3",
-  },
-];
-
 const STREAK = {
   current: 1,
   best: 1,
   note: "Son 1 gündür ardıcıl uçuş",
 };
 
-const LEVEL_RESULTS = [
-  { id: 1, level: "Səviyyə 1", bestTime: "1:45", checkpointRate: "3/3" },
-  { id: 2, level: "Səviyyə 2", bestTime: "2:30", checkpointRate: "4/4" },
-  { id: 3, level: "Səviyyə 3", bestTime: "3:12", checkpointRate: "5/5" },
-  { id: 4, level: "Səviyyə 4", bestTime: "4:25", checkpointRate: "6/6" },
-  { id: 5, level: "Səviyyə 5", bestTime: "5:10", checkpointRate: "8/8" },
-];
-
-// const LEVEL_LEADERS = [
-//   { id: 1, level: "Səviyyə 1", leaders: [{ name: "Rəşad", time: "09:32" }, { name: "Aylin", time: "10:18" }] },
-//   { id: 2, level: "Səviyyə 2", leaders: [{ name: "Kamran", time: "14:20" }, { name: "Leyla", time: "15:05" }] },
-//   { id: 3, level: "Səviyyə 3", leaders: [{ name: "Murad", time: "20:12" }, { name: "Nigar", time: "21:00" }] },
-//   { id: 4, level: "Səviyyə 4", leaders: [{ name: "Sadiq", time: "28:39" }, { name: "Elvin", time: "29:05" }] },
-//   { id: 5, level: "Səviyyə 5", leaders: [{ name: "Fərid", time: "36:40" }, { name: "Aynur", time: "38:20" }] },
-// ];
-
-// Difficulty color mapping
-const getDifficultyColor = (difficulty) => {
-  const colorMap = {
-    Asan: "#4CAF50",
-    Orta: "#FF9800",
-    Çətin: "#FF5722",
-    "Çox Çətin": "#9C27B0",
-  };
-  return colorMap[difficulty] || "#757575";
+// Difficulty rendered as a four-bar threat meter
+const DIFFICULTY = {
+  Asan: { level: 1, color: C.greenLight },
+  Orta: { level: 2, color: "#D9A441" },
+  Çətin: { level: 3, color: "#D07A3A" },
+  "Çox Çətin": { level: 4, color: C.redLight },
 };
 
+const formatBestTime = (seconds) =>
+  seconds
+    ? `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, "0")}`
+    : null;
+
+const MiniStat = ({ icon, label, value }) => (
+  <Box sx={{ minWidth: 0 }}>
+    <Stack
+      direction="row"
+      spacing={0.5}
+      alignItems="center"
+      sx={{ ...labelCaps, fontSize: "0.62rem", color: C.textMuted, "& svg": { fontSize: 13, color: C.brassDark } }}
+    >
+      {icon}
+      <span>{label}</span>
+    </Stack>
+    <Box sx={{ fontFamily: FONT.mono, fontSize: "0.85rem", fontWeight: 600, mt: 0.25 }}>
+      {value}
+    </Box>
+  </Box>
+);
+
 // Level Card Component
-const LevelCard = ({ level }) => {
-  const bgGradient = level.completed
-    ? "linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(76, 175, 80, 0.05) 100%)"
-    : "linear-gradient(135deg, rgba(200, 200, 200, 0.1) 0%, rgba(200, 200, 200, 0.05) 100%)";
+const LevelCard = ({ level, index }) => {
+  const difficulty = DIFFICULTY[level.difficulty] || { level: 0, color: C.textOnDarkMuted };
+  const bestTime = formatBestTime(level.bestTime);
+  const status = level.completed
+    ? { label: "Tamamlandı", bg: C.olive, color: C.paper }
+    : level.timesPlayed > 0
+      ? { label: "Davam etmək", bg: C.amber, color: C.ink }
+      : { label: "Başlamadı", bg: C.paperSunk, color: C.textMuted };
 
   return (
-    <Card
+    <Box
       sx={{
         height: "100%",
-        borderRadius: 2,
-        background: bgGradient,
-        border: `1px solid ${level.completed ? "#4CAF50" : "#e0e0e0"}`,
-        transition: "all 0.3s ease",
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: C.paperRaised,
+        border: `1px solid ${level.completed ? C.olive : C.rule}`,
+        transition: "border-color .25s, transform .25s, box-shadow .25s",
+        animation: `sg-fade-up .5s ${EASE.out} ${index * 70}ms backwards`,
         "&:hover": {
-          transform: "translateY(-4px)",
-          boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+          borderColor: C.brassDark,
+          transform: "translateY(-3px)",
+          boxShadow: "0 18px 30px -22px rgba(16, 21, 15, 0.6)",
         },
+        "&:hover .sg-level-img": { transform: "scale(1.05)" },
       }}
     >
       {/* Level Image */}
-      <CardMedia
-        component="img"
-        height="150"
-        image={level.image}
-        alt={level.title}
-        sx={{ objectFit: "cover" }}
-      />
-
-      <CardContent sx={{ pb: 2 }}>
-        {/* Title & Status */}
+      <Box sx={{ position: "relative", height: 160, overflow: "hidden", bgcolor: C.ink }}>
         <Box
+          component="img"
+          className="sg-level-img"
+          src={level.image}
+          alt={level.title}
           sx={{
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            mb: 1.5,
-          }}
-        >
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, flex: 1 }}>
-            {level.title}
-          </Typography>
-          {level.completed && (
-            <EmojiEventsIcon
-              sx={{ color: "#FFD700", fontSize: "1.5rem", ml: 1 }}
-            />
-          )}
-        </Box>
-
-        {/* Description */}
-        <Typography
-          variant="body2"
-          sx={{ color: "#666", mb: 2, fontStyle: "italic" }}
-        >
-          {level.description}
-        </Typography>
-
-        {/* Difficulty Chip */}
-        <Chip
-          label={level.difficulty}
-          size="small"
-          sx={{
-            backgroundColor: getDifficultyColor(level.difficulty),
-            color: "#ffffff",
-            fontWeight: 600,
-            mb: 2,
-            borderRadius: 1,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+            transition: "transform .6s ease",
+            filter: level.timesPlayed > 0 ? "none" : "grayscale(0.45) brightness(0.85)",
           }}
         />
+        <Box
+          sx={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(180deg, rgba(11,15,10,.35) 0%, transparent 35%, rgba(11,15,10,.85) 100%)",
+          }}
+        />
+        <CornerBrackets size={10} inset={8} color="rgba(232, 228, 212, 0.75)" />
+        {level.completed && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 10,
+              right: 12,
+              width: 30,
+              height: 30,
+              display: "grid",
+              placeItems: "center",
+              bgcolor: C.brass,
+              color: C.ink,
+              animation: "sg-scale-in .4s ease .3s backwards",
+            }}
+          >
+            <EmojiEventsIcon sx={{ fontSize: 18 }} />
+          </Box>
+        )}
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={1}
+          sx={{ position: "absolute", left: 14, bottom: 12 }}
+        >
+          <Stack direction="row" spacing="2px" alignItems="flex-end">
+            {[1, 2, 3, 4].map((n) => (
+              <Box
+                key={n}
+                sx={{
+                  width: 5,
+                  height: 5 + n * 3,
+                  bgcolor: n <= difficulty.level ? difficulty.color : "rgba(232,228,212,.25)",
+                }}
+              />
+            ))}
+          </Stack>
+          <Box sx={{ ...labelCaps, fontSize: "0.72rem", color: difficulty.color }}>
+            {level.difficulty}
+          </Box>
+        </Stack>
+      </Box>
+
+      <Box sx={{ p: 2.25, flex: 1, display: "flex", flexDirection: "column" }}>
+        {/* Title & Description */}
+        <Typography sx={{ fontFamily: FONT.serif, fontWeight: 600, fontSize: "1.08rem", lineHeight: 1.3, mb: 0.75 }}>
+          {level.title}
+        </Typography>
+        <Typography variant="body2" sx={{ color: C.textMuted, mb: 2, flex: 1 }}>
+          {level.description}
+        </Typography>
 
         {/* Stats Grid */}
         <Box
@@ -158,156 +180,32 @@ const LevelCard = ({ level }) => {
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
             gap: 1.5,
+            pt: 1.5,
             mb: 2,
+            borderTop: `1px dashed ${C.ruleStrong}`,
           }}
         >
-          {/* Times Played */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <PlayArrowIcon sx={{ fontSize: "1.2rem", color: "#5b7c99" }} />
-            <Box>
-              <Typography
-                variant="caption"
-                sx={{ fontSize: "0.7rem", color: "#666" }}
-              >
-                Oynandı
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {level.timesPlayed} dəfə
-              </Typography>
-            </Box>
-          </Box>
-
-          {/* Duration */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <ScheduleIcon sx={{ fontSize: "1.2rem", color: "#5b7c99" }} />
-            <Box>
-              <Typography
-                variant="caption"
-                sx={{ fontSize: "0.7rem", color: "#666" }}
-              >
-                Müddət
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {level.duration}
-              </Typography>
-            </Box>
-          </Box>
-
-          {/* Checkpoints */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              gridColumn: "1 / -1",
-            }}
-          >
-            <FlagIcon sx={{ fontSize: "1.2rem", color: "#5b7c99" }} />
-            <Box sx={{ flex: 1 }}>
-              <Typography
-                variant="caption"
-                sx={{ fontSize: "0.7rem", color: "#666" }}
-              >
-                Sınaq nöqtələri
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  {level.checkpoints ?? "—"}
-                </Typography>
-                <LinearProgress
-                  variant="determinate"
-                  value={level.completed ? 100 : 30}
-                  sx={{
-                    flex: 1,
-                    ml: 1,
-                    height: 4,
-                    borderRadius: 2,
-                    backgroundColor: "#e0e0e0",
-                    "& .MuiLinearProgress-bar": {
-                      borderRadius: 2,
-                      background: `linear-gradient(90deg, #5b7c99 0%, #4a6a8a 100%)`,
-                    },
-                  }}
-                />
-              </Box>
-            </Box>
-          </Box>
-
-          {/* Best Time */}
-          {level.bestTime && (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                gridColumn: "1 / -1",
-              }}
-            >
-              <ScheduleIcon sx={{ fontSize: "1.2rem", color: "#5b7c99" }} />
-              <Box>
-                <Typography
-                  variant="caption"
-                  sx={{ fontSize: "0.7rem", color: "#666" }}
-                >
-                  Ən yaxşı vaxt
-                </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  {Math.floor(level.bestTime / 60)}:
-                  {(level.bestTime % 60).toString().padStart(2, "0")}
-                </Typography>
-              </Box>
-            </Box>
-          )}
+          <MiniStat icon={<PlayArrowIcon />} label="Oynandı" value={`${level.timesPlayed} dəfə`} />
+          <MiniStat icon={<ScheduleIcon />} label="Müddət" value={level.duration} />
+          <MiniStat icon={<FlagIcon />} label="Sınaq nöqtələri" value={level.checkpoints ?? "—"} />
+          <MiniStat icon={<TimerIcon />} label="Ən yaxşı vaxt" value={bestTime || "—"} />
         </Box>
 
         {/* Status Badge */}
-        <Box sx={{ mt: 2 }}>
-          {level.completed ? (
-            <Chip
-              label="Tamamlandı"
-              size="small"
-              sx={{
-                backgroundColor: "#4CAF50",
-                color: "#ffffff",
-                fontWeight: 600,
-                width: "100%",
-                borderRadius: 1,
-              }}
-            />
-          ) : level.timesPlayed > 0 ? (
-            <Chip
-              label="Davam etmək"
-              size="small"
-              sx={{
-                backgroundColor: "#FF9800",
-                color: "#ffffff",
-                fontWeight: 600,
-                width: "100%",
-                borderRadius: 1,
-              }}
-            />
-          ) : (
-            <Chip
-              label="Başlamadı"
-              size="small"
-              sx={{
-                backgroundColor: "#9E9E9E",
-                color: "#ffffff",
-                fontWeight: 600,
-                width: "100%",
-                borderRadius: 1,
-              }}
-            />
-          )}
+        <Box
+          sx={{
+            ...labelCaps,
+            fontSize: "0.74rem",
+            textAlign: "center",
+            py: 0.75,
+            bgcolor: status.bg,
+            color: status.color,
+          }}
+        >
+          {status.label}
         </Box>
-      </CardContent>
-    </Card>
+      </Box>
+    </Box>
   );
 };
 
@@ -395,217 +293,150 @@ const LevelsSection = ({ userRole }) => {
   const completedLevels = levelsData.filter((l) => l.completed).length;
   const totalLevels = levelsData.length;
   const overallProgress = (completedLevels / totalLevels) * 100;
+  const totalPlays = levelsData.reduce(
+    (acc, l) => acc + Number(l.timesPlayed || 0),
+    0,
+  );
+
+  const summaryStats = [
+    { label: "Tamamlandı", value: completedLevels },
+    { label: "Qalan", value: totalLevels - completedLevels },
+    { label: "Cəmi Oynama", value: totalPlays },
+  ];
 
   return (
-    <Box sx={{ mt: 3 }}>
+    <Box sx={{ mt: 1 }}>
       {/* Progress Summary */}
-      <Card
+      <Box
         sx={{
-          p: 3,
+          position: "relative",
+          bgcolor: C.field800,
+          color: C.textOnDark,
+          p: { xs: 2.5, sm: 3.5 },
           mb: 4,
-          background: "linear-gradient(135deg, #5b7c99 0%, #4a6a8a 100%)",
-          color: "white",
-          borderRadius: 2,
+          overflow: "hidden",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-          <EmojiEventsIcon sx={{ mr: 1.5, fontSize: "1.8rem" }} />
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
-            Səviyyə İrəliləyişi
-          </Typography>
-        </Box>
-        <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-            <Typography variant="subtitle2">Ümumi İrəliləyiş</Typography>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-              {overallProgress.toFixed(0)}%
-            </Typography>
-          </Box>
-          <LinearProgress
-            variant="determinate"
-            value={overallProgress}
-            sx={{
-              height: 12,
-              borderRadius: 6,
-              backgroundColor: "rgba(255, 255, 255, 0.3)",
-              "& .MuiLinearProgress-bar": {
-                borderRadius: 6,
-                backgroundColor: "rgba(255, 255, 255, 0.9)",
-              },
-            }}
-          />
-        </Box>
+        <TacticalBackground topo={false} />
+        <Grid container spacing={3} alignItems="center" sx={{ position: "relative" }}>
+          <Grid item xs={12} md={4}>
+            <Stack direction="row" spacing={1.25} alignItems="center">
+              <EmojiEventsIcon sx={{ color: C.brass, fontSize: 22 }} />
+              <Box sx={{ ...labelCaps, fontSize: "0.85rem" }}>Səviyyə İrəliləyişi</Box>
+            </Stack>
+            <Box
+              sx={{
+                fontFamily: FONT.serif,
+                fontWeight: 700,
+                fontSize: { xs: "3.2rem", md: "4rem" },
+                lineHeight: 1,
+                color: C.brassLight,
+                mt: 1.5,
+              }}
+            >
+              <CountUp value={Math.round(overallProgress)} suffix="%" />
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={8}>
+            <SegmentedProgress
+              value={overallProgress}
+              segments={totalLevels * 4}
+              height={14}
+              tone="dark"
+              label="Ümumi İrəliləyiş"
+            />
+            <Stack direction="row" sx={{ mt: 2.5, borderTop: `1px solid ${C.lineDark}` }}>
+              {summaryStats.map((stat, i) => (
+                <Box
+                  key={stat.label}
+                  sx={{ flex: 1, pt: 2, pl: i ? 2.5 : 0, borderLeft: i ? `1px solid ${C.lineDark}` : "none" }}
+                >
+                  <Box sx={{ fontFamily: FONT.mono, fontSize: "1.6rem", lineHeight: 1.1 }}>
+                    <CountUp value={stat.value} />
+                  </Box>
+                  <Box sx={{ ...labelCaps, fontSize: "0.68rem", color: C.textOnDarkMuted, mt: 0.5 }}>
+                    {stat.label}
+                  </Box>
+                </Box>
+              ))}
+            </Stack>
+          </Grid>
+        </Grid>
+      </Box>
 
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-            gap: 2,
-          }}
-        >
-          <Box sx={{ textAlign: "center" }}>
-            <Typography variant="h4" sx={{ fontWeight: 700 }}>
-              {completedLevels}
-            </Typography>
-            <Typography variant="caption">Tamamlandı</Typography>
-          </Box>
-          <Box sx={{ textAlign: "center" }}>
-            <Typography variant="h4" sx={{ fontWeight: 700 }}>
-              {totalLevels - completedLevels}
-            </Typography>
-            <Typography variant="caption">Qalan</Typography>
-          </Box>
-          <Box sx={{ textAlign: "center" }}>
-            <Typography variant="h4" sx={{ fontWeight: 700 }}>
-              {levelsData.reduce(
-                (acc, l) => acc + Number(l.timesPlayed || 0),
-                0,
-              )}
-            </Typography>
-            <Typography variant="caption">Cəmi Oynama</Typography>
-          </Box>
-        </Box>
-      </Card>
-
-      <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-        Levellər
-      </Typography>
-      <Grid container spacing={3}>
-        {levelsData.map((level) => (
+      <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
+        <Typography variant="h6" component="h3">
+          Levellər
+        </Typography>
+      </Stack>
+      <Grid container spacing={2.5}>
+        {levelsData.map((level, index) => (
           <Grid item xs={12} sm={6} md={4} key={level.id}>
-            <LevelCard level={level} />
+            <LevelCard level={level} index={index} />
           </Grid>
         ))}
       </Grid>
 
-      {/* <Grid container spacing={3} sx={{ mt: 4 }}>
-        <Grid item xs={12} md={4}>
-          <Card
-            sx={{
-              height: "100%",
-              borderRadius: 3,
-              p: 3,
-              background: "rgba(255, 255, 255, 0.92)",
-              backdropFilter: "blur(10px)",
-              border: "1px solid rgba(66, 165, 245, 0.18)",
-              boxShadow: "0 18px 48px rgba(54,79,107,0.14)",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <StarIcon sx={{ color: "#FFD700", mr: 1.5, fontSize: "1.6rem" }} />
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                Uğurlar
-              </Typography>
+      <Grid container spacing={3} sx={{ mt: 1 }}>
+        <Grid item xs={12} md={7}>
+          <Panel title="Səviyyə nəticələri" icon={<MapIcon />} noPadding sx={{ height: "100%" }}>
+            <Box sx={{ overflowX: "auto" }}>
+              <Table size="small" sx={{ minWidth: 420 }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Səviyyə</TableCell>
+                    <TableCell>Ən yaxşı vaxt</TableCell>
+                    <TableCell>Checkpoint</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {levelsData.map((level) => (
+                    <TableRow key={level.id} hover>
+                      <TableCell sx={{ fontWeight: 500 }}>{level.title}</TableCell>
+                      <TableCell sx={{ fontFamily: FONT.mono }}>
+                        {formatBestTime(level.bestTime) || "N/A"}
+                      </TableCell>
+                      <TableCell sx={{ fontFamily: FONT.mono }}>{level.checkpoints ?? "—"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </Box>
-            {ACHIEVEMENTS.map((achievement) => (
-              <Box
-                key={achievement.id}
-                sx={{
-                  mb: 2,
-                  p: 2,
-                  borderRadius: 3,
-                  background: `${achievement.color}18`,
-                  border: `1px solid ${achievement.color}40`,
-                }}
-              >
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
-                  {achievement.title}
-                </Typography>
-                <Typography variant="body2" sx={{ color: "#455A64" }}>
-                  {achievement.subtitle}
-                </Typography>
-              </Box>
-            ))}
-          </Card>
-        </Grid> */}
-      <Grid container spacing={3} sx={{ mt: 4 }}>
-        <Grid item xs={12} md={6}>
-          <Card
-            sx={{
-              height: "100%",
-              borderRadius: 3,
-              p: 3,
-              background: "rgba(18, 52, 86, 0.94)",
-              color: "white",
-              boxShadow: "0 18px 48px rgba(0,0,0,0.18)",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <PersonIcon
-                sx={{ color: "#64B5F6", mr: 1.5, fontSize: "1.6rem" }}
-              />
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                Səviyyə nəticələri
-              </Typography>
-            </Box>
-            {levelsData.map((level, index) => (
-              <Box
-                key={level.id}
-                sx={{
-                  mb: index < levelsData.length - 1 ? 2 : 0,
-                  p: 2,
-                  borderRadius: 3,
-                  background:
-                    index % 2 === 0
-                      ? "rgba(255,255,255,0.08)"
-                      : "rgba(255,255,255,0.12)",
-                }}
-              >
-                <Typography
-                  variant="subtitle2"
-                  sx={{ fontWeight: 700, mb: 0.5, color: "#E3F2FD" }}
-                >
-                  {level.title}
-                </Typography>
-                <Typography variant="body2" sx={{ color: "#BBDEFB" }}>
-                  Ən yaxşı vaxt:{" "}
-                  <strong>
-                    {level.bestTime
-                      ? `${Math.floor(level.bestTime / 60)}:${(level.bestTime % 60).toString().padStart(2, "0")}`
-                      : "N/A"}
-                  </strong>
-                </Typography>
-                <Typography variant="body2" sx={{ color: "#90CAF9" }}>
-                  Checkpoint: <strong>{level.checkpoints ?? "—"}</strong>
-                </Typography>
-              </Box>
-            ))}
-          </Card>
+          </Panel>
         </Grid>
 
-        <Grid item xs={12} md={6}>
-          <Card
-            sx={{
-              height: "40%",
-              borderRadius: 3,
-              p: 3,
-              background:
-                "linear-gradient(135deg, rgba(76,175,80,0.12), rgba(255,255,255,0.95))",
-              border: "1px solid rgba(76,175,80,0.24)",
-              boxShadow: "0 18px 48px rgba(76,175,80,0.14)",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <TrendingUpIcon
-                sx={{ color: "#4CAF50", mr: 1.5, fontSize: "1.6rem" }}
-              />
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                Ardıcıllıq
-              </Typography>
-            </Box>
-            <Typography
-              variant="h2"
-              sx={{ fontWeight: 800, color: "#2E7D32", mb: 1 }}
-            >
-              {streak.current} gün
-            </Typography>
-            <Typography variant="body2" sx={{ color: "#37474F", mb: 2 }}>
+        <Grid item xs={12} md={5}>
+          <Panel title="Ardıcıllıq" icon={<TrendingUpIcon />} sx={{ height: "100%" }}>
+            <Stack direction="row" alignItems="baseline" spacing={1.25}>
+              <Box sx={{ fontFamily: FONT.serif, fontWeight: 700, fontSize: "3.6rem", lineHeight: 1, color: C.olive }}>
+                <CountUp value={streak.current} />
+              </Box>
+              <Box sx={{ ...labelCaps, fontSize: "1rem", color: C.textMuted }}>gün</Box>
+            </Stack>
+            <Stack direction="row" spacing={0.75} sx={{ my: 2 }}>
+              {Array.from({ length: 7 }, (_, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    flex: 1,
+                    height: 10,
+                    bgcolor: i < Math.min(streak.current, 7) ? C.olive : C.paperSunk,
+                    transformOrigin: "left",
+                    animation: `sg-draw-x .4s ease ${i * 70}ms backwards`,
+                  }}
+                />
+              ))}
+            </Stack>
+            <Typography variant="body2" sx={{ color: C.textMuted, mb: 1.5 }}>
               {streak.note}
             </Typography>
-            <Typography variant="body2" sx={{ color: "#546E7A" }}>
-              Ən yaxşı davamlılıq: <strong>{streak.best} gün</strong>
-            </Typography>
-          </Card>
+            <Box sx={{ pt: 1.5, borderTop: `1px dashed ${C.ruleStrong}`, fontSize: "0.9rem" }}>
+              Ən yaxşı davamlılıq:{" "}
+              <Box component="strong" sx={{ fontFamily: FONT.mono }}>
+                {streak.best} gün
+              </Box>
+            </Box>
+          </Panel>
         </Grid>
       </Grid>
     </Box>

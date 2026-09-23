@@ -2,24 +2,22 @@ import * as React from "react";
 import {
   Box,
   Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Chip,
-  CircularProgress,
   Container,
   Grid,
   MenuItem,
-  Paper,
   Stack,
   TextField,
   Typography,
   Alert,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { MdArrowBack, MdSave } from "react-icons/md";
+import { MdArrowBack, MdSave, MdEditDocument } from "react-icons/md";
 import { adminApi } from "../api/adminApi";
 import { educationLevelOptions } from "../constants/educationLevelOptions";
+import InfoCard from "../components/ui/Display/InfoCard";
+import RadarLoader from "../components/ui/Military/RadarLoader";
+import TricolorBar from "../components/ui/Military/TricolorBar";
+import { C, EASE, FONT, labelCaps } from "../styles/tokens";
 
 export default function UserEditPage() {
   const { id } = useParams();
@@ -113,26 +111,51 @@ export default function UserEditPage() {
   if (loading) {
     return (
       <Container sx={{ py: 8, display: "flex", justifyContent: "center" }}>
-        <CircularProgress />
+        <RadarLoader message="Məlumatlar yüklənir" />
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Paper sx={{ p: { xs: 2, md: 4 }, borderRadius: 3 }}>
+    <Container
+      maxWidth="md"
+      sx={{ py: { xs: 1, md: 3 }, px: { xs: 0, sm: 2 } }}
+    >
+      <Box
+        sx={{
+          bgcolor: C.paperRaised,
+          border: `1px solid ${C.rule}`,
+          animation: `sg-fade-up .6s ${EASE.out} backwards`,
+        }}
+      >
+        <TricolorBar height={4} />
         <Stack
-          direction="row"
+          direction={{ xs: "column", sm: "row" }}
           justifyContent="space-between"
-          alignItems="center"
+          alignItems={{ xs: "flex-start", sm: "center" }}
           spacing={2}
-          sx={{ mb: 3 }}
+          sx={{
+            p: { xs: 2.5, md: 4 },
+            pb: { xs: 2, md: 3 },
+            borderBottom: `2px solid ${C.text}`,
+          }}
         >
           <Box>
-            <Typography variant="h5" fontWeight={700}>
+            <Box
+              sx={{
+                fontFamily: FONT.mono,
+                fontSize: "0.7rem",
+                letterSpacing: "0.12em",
+                color: C.brassDark,
+                mb: 0.5,
+              }}
+            >
+              FORMA · REDAKTƏ
+            </Box>
+            <Typography variant="h4" component="h1">
               İstifadəçi məlumatlarını redaktə et
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
               Şəxsi məlumatlar, təhsil və telefon nömrəsi dəyişdirilə bilər.
               Şifrə də yenilənə bilər.
             </Typography>
@@ -146,24 +169,39 @@ export default function UserEditPage() {
           </Button>
         </Stack>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-        {success && (
-          <Alert severity="success" sx={{ mb: 2 }}>
-            {success}
-          </Alert>
-        )}
+        <Box sx={{ p: { xs: 2.5, md: 4 } }}>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {success}
+            </Alert>
+          )}
 
-        <Card variant="outlined">
-          <CardHeader
+          <InfoCard
             title="Redaktə forması"
-            subheader="Yalnız superadmin bu səhifəni istifadə edə bilər"
-            action={<Chip label="Superadmin" color="primary" size="small" />}
-          />
-          <CardContent>
+            icon={<MdEditDocument size={18} />}
+            actions={
+              <Box
+                sx={{
+                  ...labelCaps,
+                  fontSize: "0.7rem",
+                  px: 1,
+                  py: 0.25,
+                  border: `1px solid ${C.brassDark}`,
+                  color: C.brassDark,
+                }}
+              >
+                Superadmin
+              </Box>
+            }
+          >
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
+              Yalnız superadmin bu səhifəni istifadə edə bilər
+            </Typography>
             <Box key={id} component="form" onSubmit={handleSubmit}>
               <Grid container spacing={2}>
                 <Grid item xs={12} md={6}>
@@ -268,9 +306,9 @@ export default function UserEditPage() {
                 </Button>
               </Stack>
             </Box>
-          </CardContent>
-        </Card>
-      </Paper>
+          </InfoCard>
+        </Box>
+      </Box>
     </Container>
   );
 }

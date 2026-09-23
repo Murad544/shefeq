@@ -1,6 +1,8 @@
 import { TextField, InputAdornment } from "@mui/material";
 import { MdSearch } from "react-icons/md";
+import { C, FONT } from "../../../styles/tokens";
 
+// Search input styled for the dark table command bar.
 export default function SearchField({
   value,
   onChange,
@@ -8,18 +10,9 @@ export default function SearchField({
   color = "primary",
   fullWidth = true,
   size = "small",
+  isMobile,
   ...props
 }) {
-  const getColorValue = (color) => {
-    const colorMap = {
-      primary: "#364F6B",
-      secondary: "#3FC1C9",
-      success: "#10B981",
-      error: "#EF4444",
-    };
-    return colorMap[color] || colorMap.primary;
-  };
-
   return (
     <TextField
       value={value}
@@ -28,22 +21,22 @@ export default function SearchField({
       fullWidth={fullWidth}
       size={size}
       sx={{
-        "& .MuiInputBase-root": {
-          bgcolor: "rgba(255, 255, 255, 0.95)",
-          borderRadius: 2,
-          fontSize: { xs: "0.9rem", md: "1rem" },
-          color: `${color}.main`,
+        "& .MuiOutlinedInput-root": {
+          bgcolor: C.field800,
+          color: C.textOnDark,
+          fontSize: { xs: "0.9rem", md: "0.95rem" },
+          "& .MuiOutlinedInput-notchedOutline": { borderColor: C.lineDarkStrong },
+          "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: C.brassDark },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: C.brass },
         },
         "& .MuiInputBase-input": {
+          py: 1.1,
           "&::placeholder": {
-            color: `rgba(${
-              color === "primary"
-                ? "54, 79, 107"
-                : color === "success"
-                ? "16, 185, 129"
-                : "63, 193, 201"
-            }, 0.7)`,
+            color: C.textOnDarkMuted,
             opacity: 1,
+            fontFamily: FONT.mono,
+            fontSize: "0.82rem",
+            letterSpacing: "0.04em",
           },
         },
         ...props.sx,
@@ -51,10 +44,7 @@ export default function SearchField({
       InputProps={{
         startAdornment: (
           <InputAdornment position="start">
-            <MdSearch
-              size={props.isMobile ? 18 : 20}
-              color={getColorValue(color)}
-            />
+            <MdSearch size={isMobile ? 18 : 20} color={C.brass} />
           </InputAdornment>
         ),
         ...props.InputProps,

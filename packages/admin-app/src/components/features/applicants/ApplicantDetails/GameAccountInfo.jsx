@@ -47,7 +47,7 @@ export default function GameAccountInfo({ loading, gameAccount }) {
           <Box
             sx={{
               bgcolor: "grey.50",
-              borderRadius: 2,
+              borderRadius: 0,
               p: 2,
               mb: 3,
               border: "1px solid",
@@ -79,7 +79,7 @@ export default function GameAccountInfo({ loading, gameAccount }) {
           <TableContainer
             component={Paper}
             variant="outlined"
-            sx={{ borderRadius: 2, mb: 1 }}
+            sx={{ borderRadius: 0, mb: 1 }}
           >
             <Table size="small">
               <TableHead>

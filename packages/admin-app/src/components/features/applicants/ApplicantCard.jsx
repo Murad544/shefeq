@@ -30,7 +30,6 @@ import { formatDate, readField, formatEducationLevel, formatProfession } from ".
 export default function ApplicantCard({ user, onViewDetails }) {
   const [expanded, setExpanded] = React.useState(false);
 
-  const id = readField(user, "id");
   const name = readField(user, "name");
   const surname = readField(user, "surname");
   const fatherName = readField(user, "father_name", "fatherName");
@@ -50,15 +49,15 @@ export default function ApplicantCard({ user, onViewDetails }) {
     <Card
       sx={{
         mb: 2,
-        borderRadius: 3,
+        borderRadius: 0,
         border: "1px solid",
         borderColor: "grey.200",
-        boxShadow: "0 2px 12px rgba(54, 79, 107, 0.08)",
+        boxShadow: "0 2px 12px rgba(16, 21, 15, 0.08)",
         overflow: "hidden",
         transition: "all 0.2s ease",
         "&:hover": {
           borderColor: "primary.light",
-          boxShadow: "0 4px 20px rgba(54, 79, 107, 0.15)",
+          boxShadow: "0 4px 20px rgba(16, 21, 15, 0.15)",
           transform: "translateY(-1px)",
         },
       }}
@@ -75,7 +74,7 @@ export default function ApplicantCard({ user, onViewDetails }) {
                   justifyContent: "center",
                   width: 40,
                   height: 40,
-                  borderRadius: 2,
+                  borderRadius: 0,
                   bgcolor: "primary.light",
                   color: "white",
                 }}
@@ -99,19 +98,6 @@ export default function ApplicantCard({ user, onViewDetails }) {
                 {name} {surname}
               </Typography>
               <Grid container spacing={1} alignItems="center">
-                <Grid item>
-                  <Chip
-                    label={`ID: ${id}`}
-                    size="small"
-                    variant="outlined"
-                    sx={{
-                      height: 20,
-                      fontSize: "0.7rem",
-                      borderColor: "primary.light",
-                      color: "primary.main",
-                    }}
-                  />
-                </Grid>
                 <Grid item>
                   <Chip
                     label={sex}
@@ -149,7 +135,7 @@ export default function ApplicantCard({ user, onViewDetails }) {
                     borderColor: "secondary.light",
                     width: 32,
                     height: 32,
-                    borderRadius: 1.5,
+                    borderRadius: 0,
                     "&:hover": {
                       bgcolor: "secondary.light",
                       color: "white",
@@ -172,7 +158,7 @@ export default function ApplicantCard({ user, onViewDetails }) {
                     px: 1.5,
                     py: 0.5,
                     minWidth: "auto",
-                    borderRadius: 1.5,
+                    borderRadius: 0,
                     fontWeight: 600,
                   }}
                 >
@@ -196,7 +182,7 @@ export default function ApplicantCard({ user, onViewDetails }) {
                       justifyContent: "center",
                       width: 24,
                       height: 24,
-                      borderRadius: 1,
+                      borderRadius: 0,
                       bgcolor: "secondary.light",
                       color: "white",
                     }}
@@ -229,7 +215,7 @@ export default function ApplicantCard({ user, onViewDetails }) {
                       justifyContent: "center",
                       width: 24,
                       height: 24,
-                      borderRadius: 1,
+                      borderRadius: 0,
                       bgcolor: "info.light",
                       color: "white",
                     }}
@@ -280,7 +266,7 @@ export default function ApplicantCard({ user, onViewDetails }) {
                             justifyContent: "center",
                             width: 24,
                             height: 24,
-                            borderRadius: 1,
+                            borderRadius: 0,
                             bgcolor: "primary.light",
                             color: "white",
                           }}
@@ -316,7 +302,7 @@ export default function ApplicantCard({ user, onViewDetails }) {
                             justifyContent: "center",
                             width: 24,
                             height: 24,
-                            borderRadius: 1,
+                            borderRadius: 0,
                             bgcolor: "primary.light",
                             color: "white",
                           }}
@@ -381,7 +367,7 @@ export default function ApplicantCard({ user, onViewDetails }) {
                         justifyContent: "center",
                         width: 24,
                         height: 24,
-                        borderRadius: 1,
+                        borderRadius: 0,
                         bgcolor: "accent.main",
                         color: "white",
                       }}

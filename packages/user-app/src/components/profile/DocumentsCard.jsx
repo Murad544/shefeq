@@ -1,19 +1,11 @@
 import {
   Folder as FolderIcon,
   Visibility as VisibilityIcon,
-  PictureAsPdf,
-  VideoFile,
 } from "@mui/icons-material";
-import {
-  Box,
-  Divider,
-  IconButton,
-  List,
-  ListItem,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import React from "react";
+import Panel from "../military/Panel";
+import { C, FONT } from "../../config/tokens";
 
 const formatBytes = (bytes) => {
   if (!bytes || bytes === 0) return "";
@@ -24,86 +16,95 @@ const formatBytes = (bytes) => {
 };
 
 const DocumentsCard = ({ documents, onDownloadDocument }) => {
-  return (
-    <Paper elevation={0} sx={{ p: 3, borderRadius: 2 }}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <FolderIcon sx={{ mr: 1.5, color: "warning.main" }} />
-        <Typography variant="h6" fontWeight={600}>
-          Yüklənmiş Fayllar ({documents?.length || 0})
-        </Typography>
-      </Box>
+  const count = documents?.length || 0;
 
+  return (
+    <Panel
+      title={`Yüklənmiş Fayllar (${count})`}
+      icon={<FolderIcon />}
+      noPadding
+    >
       {documents && documents.length > 0 ? (
-        <List disablePadding>
-          {documents.map((doc, index) => (
-            <React.Fragment key={doc.id || index}>
-              {index > 0 && <Divider sx={{ my: 1 }} />}
-              <ListItem
-                disablePadding
+        <Box>
+          {documents.map((doc, index) => {
+            const isPdf = doc.type === "pdf";
+            return (
+              <Stack
+                key={doc.id || index}
+                direction="row"
+                alignItems="center"
+                spacing={1.5}
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  py: 1,
+                  px: { xs: 2, sm: 2.5 },
+                  py: 1.5,
+                  borderTop: index ? `1px solid ${C.rule}` : "none",
+                  transition: "background-color .2s",
+                  animation: `sg-fade-up .4s ease ${index * 60}ms backwards`,
+                  "&:hover": { bgcolor: "rgba(201, 166, 70, 0.07)" },
                 }}
               >
                 <Box
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    flex: 1,
-                    minWidth: 0,
+                    width: 44,
+                    height: 30,
+                    flexShrink: 0,
+                    display: "grid",
+                    placeItems: "center",
+                    border: `1.5px solid ${isPdf ? C.red : C.blue}`,
+                    color: isPdf ? C.red : C.blue,
+                    fontFamily: FONT.mono,
+                    fontSize: "0.68rem",
+                    fontWeight: 600,
+                    letterSpacing: "0.06em",
                   }}
                 >
-                  <Box
-                    sx={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 1.5,
-                      bgcolor: doc.type === "pdf" ? "#ffebee" : "#e3f2fd",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mr: 1.5,
-                      flexShrink: 0,
-                    }}
-                  >
-                    {doc.type === "pdf" ? (
-                      <PictureAsPdf sx={{ color: "#d32f2f", fontSize: 20 }} />
-                    ) : (
-                      <VideoFile sx={{ color: "#1976d2", fontSize: 20 }} />
-                    )}
-                  </Box>
-                  <Box sx={{ minWidth: 0, flex: 1, mr: 2 }}>
-                    <Typography variant="body2" fontWeight={500} noWrap>
-                      {doc.name}
-                    </Typography>
-                    {doc.size ? (
-                      <Typography variant="caption" color="text.secondary">
-                        {formatBytes(doc.size)}
-                      </Typography>
-                    ) : null}
-                  </Box>
+                  {isPdf ? "PDF" : "MP4"}
+                </Box>
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography variant="body2" fontWeight={500} noWrap>
+                    {doc.name}
+                  </Typography>
+                  {doc.size ? (
+                    <Box sx={{ fontFamily: FONT.mono, fontSize: "0.72rem", color: C.textMuted }}>
+                      {formatBytes(doc.size)}
+                    </Box>
+                  ) : null}
                 </Box>
                 {onDownloadDocument && (
-                  <IconButton
-                    size="small"
-                    onClick={() => onDownloadDocument(doc)}
-                    sx={{ color: "text.secondary" }}
-                  >
-                    <VisibilityIcon fontSize="small" />
-                  </IconButton>
+                  <Tooltip title="Bax">
+                    <IconButton
+                      size="small"
+                      onClick={() => onDownloadDocument(doc)}
+                      sx={{
+                        border: `1px solid ${C.rule}`,
+                        color: C.olive,
+                        "&:hover": { bgcolor: C.olive, color: C.paper, borderColor: C.olive },
+                      }}
+                    >
+                      <VisibilityIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 )}
-              </ListItem>
-            </React.Fragment>
-          ))}
-        </List>
+              </Stack>
+            );
+          })}
+        </Box>
       ) : (
-        <Typography variant="body2" color="text.secondary">
-          Sənəd yoxdur
-        </Typography>
+        <Box sx={{ p: { xs: 2, sm: 2.5 } }}>
+          <Box
+            sx={{
+              py: 3,
+              textAlign: "center",
+              border: `1px dashed ${C.ruleStrong}`,
+              color: C.textMuted,
+              fontSize: "0.9rem",
+            }}
+          >
+            Sənəd yoxdur
+          </Box>
+        </Box>
       )}
-    </Paper>
+    </Panel>
   );
 };
 

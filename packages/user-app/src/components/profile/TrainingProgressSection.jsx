@@ -1,47 +1,45 @@
 import {
+  Alert,
   Box,
-  Card,
-  Typography,
-  LinearProgress,
+  ButtonBase,
   CircularProgress,
-  Chip,
-  Grid,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Collapse,
-  IconButton,
-  Divider,
+  Grid,
+  Stack,
+  Typography,
 } from "@mui/material";
 import {
+  Check as CheckIcon,
   ExpandMore as ExpandMoreIcon,
-  CheckCircle as CheckCircleIcon,
-  RadioButtonUnchecked as RadioButtonUncheckedIcon,
   PlayCircle as PlayCircleIcon,
   PictureAsPdf as PictureAsPdfIcon,
   HelpOutline as HelpOutlineIcon,
   FitnessCenter as FitnessCenterIcon,
   School as SchoolIcon,
+  OpenInNew as OpenInNewIcon,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { apiClient } from "../../services/api/apiClient";
 import { endpoints } from "../../services/api/endpoints";
+import { C, EASE, FONT, labelCaps } from "../../config/tokens";
+import CountUp from "../military/CountUp";
+import RadarLoader from "../military/RadarLoader";
+import SegmentedProgress from "../military/SegmentedProgress";
+import TacticalBackground from "../military/TacticalBackground";
 
 // Icons & labels
+const CONTENT_TYPES = {
+  video: { icon: PlayCircleIcon, color: C.red },
+  pdf: { icon: PictureAsPdfIcon, color: C.amber },
+  quiz: { icon: HelpOutlineIcon, color: C.blue },
+  practice: { icon: FitnessCenterIcon, color: C.olive },
+};
+
 const getContentIcon = (type) => {
-  switch (type) {
-    case "video":
-      return <PlayCircleIcon sx={{ color: "#FF6B6B", mr: 1 }} />;
-    case "pdf":
-      return <PictureAsPdfIcon sx={{ color: "#FFA500", mr: 1 }} />;
-    case "quiz":
-      return <HelpOutlineIcon sx={{ color: "#4ECDC4", mr: 1 }} />;
-    case "practice":
-      return <FitnessCenterIcon sx={{ color: "#45B7D1", mr: 1 }} />;
-    default:
-      return null;
-  }
+  const meta = CONTENT_TYPES[type];
+  if (!meta) return null;
+  const Icon = meta.icon;
+  return <Icon sx={{ color: meta.color, fontSize: 20 }} />;
 };
 
 const getContentTypeLabel = (type) => {
@@ -57,6 +55,7 @@ const getContentTypeLabel = (type) => {
 // Single module card
 const ModuleItem = ({
   module,
+  index,
   onToggleLessonCompletion,
   submitting,
   submittingLessonId,
@@ -65,160 +64,203 @@ const ModuleItem = ({
   const completedCount = module.lessons.filter((l) => l.completed).length;
   const totalCount = module.lessons.length;
   const progress = totalCount ? (completedCount / totalCount) * 100 : 0;
+  const done = totalCount > 0 && completedCount === totalCount;
 
   return (
-    <Card
-      sx={{ mb: 2, border: "1px solid #e0e0e0", backgroundColor: "#ffffff" }}
+    <Box
+      sx={{
+        mb: 2,
+        bgcolor: C.paperRaised,
+        border: `1px solid ${expanded ? C.ruleStrong : C.rule}`,
+        transition: "border-color .2s",
+        animation: `sg-fade-up .5s ${EASE.out} ${index * 70}ms backwards`,
+      }}
     >
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          p: 2,
-          cursor: "pointer",
-        }}
+      <ButtonBase
         onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+        sx={{
+          width: "100%",
+          display: "flex",
+          flexWrap: { xs: "wrap", sm: "nowrap" },
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 2,
+          p: { xs: 2, sm: 2.5 },
+          textAlign: "left",
+          "&:hover": { bgcolor: "rgba(201, 166, 70, 0.05)" },
+        }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", flex: 1 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, mr: 2 }}>
+        <Box
+          sx={{
+            width: 48,
+            height: 48,
+            flexShrink: 0,
+            display: "grid",
+            placeItems: "center",
+            bgcolor: done ? C.olive : C.paperSunk,
+            color: done ? C.paper : C.text,
+            border: `1px solid ${done ? C.olive : C.ruleStrong}`,
+            fontFamily: FONT.mono,
+            fontWeight: 600,
+            fontSize: "1.05rem",
+          }}
+        >
+          {done ? <CheckIcon /> : index + 1}
+        </Box>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography
+            sx={{ fontFamily: FONT.serif, fontWeight: 600, fontSize: "1.15rem", lineHeight: 1.3 }}
+          >
             {module.title}
           </Typography>
-          <Chip
-            label={`${completedCount}/${totalCount}`}
-            size="small"
-            variant="outlined"
-            sx={{ mr: 2 }}
-          />
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Box sx={{ width: 150 }}>
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}
-            >
-              <Typography variant="caption" sx={{ fontSize: "0.75rem" }}>
-                İrəliləyiş
-              </Typography>
-              <Typography variant="caption" sx={{ fontSize: "0.75rem" }}>
-                {progress.toFixed(0)}%
-              </Typography>
-            </Box>
-            <LinearProgress
-              variant="determinate"
-              value={progress}
-              sx={{
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: "#e0e0e0",
-                "& .MuiLinearProgress-bar": {
-                  borderRadius: 3,
-                  background:
-                    "linear-gradient(90deg, #5b7c99 0%, #4a6a8a 100%)",
-                },
-              }}
-            />
+          <Box sx={{ fontFamily: FONT.mono, fontSize: "0.72rem", color: C.textMuted, mt: 0.25 }}>
+            {completedCount}/{totalCount}
           </Box>
-          <IconButton
-            size="small"
-            sx={{
-              transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
-              transition: "transform 0.3s",
-            }}
-          >
-            <ExpandMoreIcon />
-          </IconButton>
         </Box>
-      </Box>
+        <Box sx={{ width: { xs: "calc(100% - 56px)", sm: 180 }, ml: { xs: 8, sm: 0 } }}>
+          <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.75 }}>
+            <Box sx={{ ...labelCaps, fontSize: "0.68rem", color: C.textMuted }}>
+              İrəliləyiş
+            </Box>
+            <Box sx={{ fontFamily: FONT.mono, fontSize: "0.72rem" }}>
+              {progress.toFixed(0)}%
+            </Box>
+          </Stack>
+          <SegmentedProgress value={progress} segments={10} height={6} gap={2} />
+        </Box>
+        <ExpandMoreIcon
+          sx={{
+            color: C.textMuted,
+            transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.3s",
+          }}
+        />
+      </ButtonBase>
 
       <Collapse in={expanded}>
-        <Divider />
-        <List sx={{ p: 0 }}>
-          {module.lessons.map((lesson, index) => (
-            <ListItem
-              key={lesson.id}
-              sx={{
-                pl: 4,
-                pr: 2,
-                py: 1.5,
-                backgroundColor: lesson.completed ? "#f5f5f5" : "transparent",
-                borderBottom:
-                  index < module.lessons.length - 1 ? "1px solid #eee" : "none",
-              }}
-            >
-              <ListItemIcon
+        <Box sx={{ borderTop: `1px solid ${C.rule}` }}>
+          {module.lessons.map((lesson, lessonIndex) => {
+            const busy = submitting && submittingLessonId === lesson.id;
+            return (
+              <Stack
+                key={lesson.id}
+                direction="row"
+                alignItems="center"
+                spacing={1.75}
                 sx={{
-                  minWidth: 32,
-                  cursor: submitting ? "default" : "pointer",
+                  pl: { xs: 2, sm: 3 },
+                  pr: 2,
+                  py: 1.5,
+                  borderTop: lessonIndex ? `1px dashed ${C.rule}` : "none",
+                  bgcolor: lesson.completed ? "rgba(75, 83, 32, 0.05)" : "transparent",
+                  transition: "background-color .3s",
                 }}
-                onClick={() =>
-                  !submitting &&
-                  onToggleLessonCompletion(
-                    module.id,
-                    lesson.id,
-                    lesson.completed,
-                  )
-                }
               >
-                {submitting && submittingLessonId === lesson.id ? (
-                  <CircularProgress size={20} />
-                ) : lesson.completed ? (
-                  <CheckCircleIcon
-                    sx={{ color: "#5b7c99", fontSize: "1.5rem" }}
-                  />
-                ) : (
-                  <RadioButtonUncheckedIcon
-                    sx={{ color: "#bdbdbd", fontSize: "1.5rem" }}
-                  />
-                )}
-              </ListItemIcon>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  flex: 1,
-                  cursor: lesson.link ? "pointer" : "default",
-                }}
-                onClick={() =>
-                  lesson.link && window.open(lesson.link, "_blank")
-                }
-              >
-                {getContentIcon(lesson.type)}
-                <ListItemText
-                  primary={lesson.title}
-                  secondary={getContentTypeLabel(lesson.type)}
-                  primaryTypographyProps={{
-                    sx: {
-                      textDecoration: lesson.completed
-                        ? "line-through"
-                        : lesson.link
-                          ? "underline"
-                          : "none",
-                      color: lesson.completed
-                        ? "#9e9e9e"
-                        : lesson.link
-                          ? "#1976d2"
-                          : "#333",
-                      "&:hover": lesson.link ? { color: "#1565c0" } : {},
-                    },
+                <ButtonBase
+                  aria-label={lesson.completed ? "Tamamlanmamış kimi qeyd et" : "Tamamlanmış kimi qeyd et"}
+                  onClick={() =>
+                    !submitting &&
+                    onToggleLessonCompletion(
+                      module.id,
+                      lesson.id,
+                      lesson.completed,
+                    )
+                  }
+                  sx={{
+                    width: 26,
+                    height: 26,
+                    flexShrink: 0,
+                    border: `2px solid ${lesson.completed ? C.olive : C.ruleStrong}`,
+                    bgcolor: lesson.completed ? C.olive : C.paperRaised,
+                    color: C.paper,
+                    cursor: submitting ? "default" : "pointer",
+                    transition: "background-color .2s, border-color .2s",
+                    "&:hover": { borderColor: C.olive },
                   }}
-                  secondaryTypographyProps={{ sx: { fontSize: "0.75rem" } }}
-                />
-              </Box>
-              {lesson.completed && (
-                <Typography
-                  variant="caption"
-                  sx={{ ml: 2, color: "#5b7c99", fontWeight: 500 }}
                 >
-                  Tamamlanmış
-                </Typography>
-              )}
-            </ListItem>
-          ))}
-        </List>
+                  {busy ? (
+                    <CircularProgress size={14} sx={{ color: lesson.completed ? C.paper : C.olive }} />
+                  ) : lesson.completed ? (
+                    <CheckIcon sx={{ fontSize: 18, animation: "sg-scale-in .25s ease backwards" }} />
+                  ) : null}
+                </ButtonBase>
+
+                <Box sx={{ display: "flex", flexShrink: 0 }}>{getContentIcon(lesson.type)}</Box>
+
+                <Box
+                  sx={{
+                    flex: 1,
+                    minWidth: 0,
+                    cursor: lesson.link ? "pointer" : "default",
+                  }}
+                  onClick={() =>
+                    lesson.link && window.open(lesson.link, "_blank")
+                  }
+                >
+                  <Typography
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: "0.95rem",
+                      textDecoration: lesson.completed ? "line-through" : "none",
+                      color: lesson.completed
+                        ? C.textFaint
+                        : lesson.link
+                          ? C.olive
+                          : C.text,
+                      "&:hover": lesson.link
+                        ? { color: C.oliveDark, textDecoration: "underline" }
+                        : {},
+                    }}
+                  >
+                    {lesson.title}
+                    {lesson.link && !lesson.completed && (
+                      <OpenInNewIcon sx={{ fontSize: 14, ml: 0.75, verticalAlign: "-2px" }} />
+                    )}
+                  </Typography>
+                  <Box sx={{ ...labelCaps, fontSize: "0.66rem", color: C.textMuted }}>
+                    {getContentTypeLabel(lesson.type)}
+                  </Box>
+                </Box>
+
+                {lesson.completed && (
+                  <Box
+                    sx={{
+                      ...labelCaps,
+                      fontSize: "0.68rem",
+                      color: C.olive,
+                      display: { xs: "none", sm: "block" },
+                    }}
+                  >
+                    Tamamlanmış
+                  </Box>
+                )}
+              </Stack>
+            );
+          })}
+        </Box>
       </Collapse>
-    </Card>
+    </Box>
   );
 };
+
+const SummaryStat = ({ label, value, first }) => (
+  <Box
+    sx={{
+      flex: 1,
+      pt: 2,
+      pl: first ? 0 : 2.5,
+      borderLeft: first ? "none" : `1px solid ${C.lineDark}`,
+    }}
+  >
+    <Box sx={{ fontFamily: FONT.mono, fontSize: "1.6rem", color: C.textOnDark, lineHeight: 1.1 }}>
+      <CountUp value={value} />
+    </Box>
+    <Box sx={{ ...labelCaps, fontSize: "0.68rem", color: C.textOnDarkMuted, mt: 0.5 }}>
+      {label}
+    </Box>
+  </Box>
+);
 
 // Main Section
 const TrainingProgressSection = () => {
@@ -297,83 +339,78 @@ const TrainingProgressSection = () => {
 
   if (loading) {
     return (
-      <Box sx={{ mt: 3 }}>
-        <Typography>Yüklənir...</Typography>
+      <Box sx={{ py: 6 }}>
+        <RadarLoader message="Yüklənir" />
       </Box>
     );
   }
 
   if (error) {
-    return (
-      <Box sx={{ mt: 3 }}>
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
+    return <Alert severity="error">{error}</Alert>;
   }
 
   return (
-    <Box sx={{ mt: 3 }}>
+    <Box>
       {/* Progress Summary */}
-      <Card
+      <Box
         sx={{
-          p: 3,
-          mb: 3,
-          background: "linear-gradient(135deg, #5b7c99 0%, #4a6a8a 100%)",
-          color: "white",
+          position: "relative",
+          bgcolor: C.field800,
+          color: C.textOnDark,
+          p: { xs: 2.5, sm: 3.5 },
+          mb: 4,
+          overflow: "hidden",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-          <SchoolIcon sx={{ mr: 1.5, fontSize: "1.8rem" }} />
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>
-            İrəliləyiş
-          </Typography>
-        </Box>
-        <Box sx={{ mb: 3 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-            <Typography variant="subtitle2">Ümumi İrəliləyiş</Typography>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-              {overallProgress.toFixed(0)}%
-            </Typography>
-          </Box>
-          <LinearProgress
-            variant="determinate"
-            value={overallProgress}
-            sx={{
-              height: 12,
-              borderRadius: 6,
-              backgroundColor: "rgba(255, 255, 255, 0.3)",
-              "& .MuiLinearProgress-bar": {
-                borderRadius: 6,
-                backgroundColor: "rgba(255, 255, 255, 0.9)",
-              },
-            }}
-          />
-        </Box>
-
-        <Grid container spacing={2}>
-          <Grid item xs={6} sm={3}>
-            <Box sx={{ textAlign: "center" }}>
-              <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                {completedLessons}
-              </Typography>
-              <Typography variant="caption">Tamamlanmış</Typography>
-              <Typography variant="caption" sx={{ display: "block" }}>
-                ({completedLessons} / {totalLessons})
-              </Typography>
+        <TacticalBackground topo={false} />
+        <Grid container spacing={3} alignItems="center" sx={{ position: "relative" }}>
+          <Grid item xs={12} md={4}>
+            <Stack direction="row" spacing={1.25} alignItems="center">
+              <SchoolIcon sx={{ color: C.brass, fontSize: 22 }} />
+              <Box sx={{ ...labelCaps, fontSize: "0.85rem" }}>Ümumi İrəliləyiş</Box>
+            </Stack>
+            <Box
+              sx={{
+                fontFamily: FONT.serif,
+                fontWeight: 700,
+                fontSize: { xs: "3.4rem", md: "4.2rem" },
+                lineHeight: 1,
+                color: C.brassLight,
+                mt: 1.5,
+              }}
+            >
+              <CountUp value={Math.round(overallProgress)} suffix="%" />
             </Box>
           </Grid>
+          <Grid item xs={12} md={8}>
+            <SegmentedProgress
+              value={overallProgress}
+              segments={30}
+              height={14}
+              tone="dark"
+              label="Ümumi İrəliləyiş"
+            />
+            <Stack direction="row" sx={{ mt: 2.5, borderTop: `1px solid ${C.lineDark}` }}>
+              <SummaryStat first label="Tamamlanmış" value={completedLessons} />
+              <SummaryStat label="Cəmi dərs" value={totalLessons} />
+              <SummaryStat label="Modullar" value={modules.length} />
+            </Stack>
+          </Grid>
         </Grid>
-      </Card>
+      </Box>
 
       {/* Modules */}
       <Box>
-        <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-          Tədris Modulları
-        </Typography>
-        {modules.map((module) => (
+        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
+          <Typography variant="h6" component="h3">
+            Tədris Modulları
+          </Typography>
+        </Stack>
+        {modules.map((module, index) => (
           <ModuleItem
             key={module.id}
             module={module}
+            index={index}
             onToggleLessonCompletion={handleToggleLessonCompletion}
             submitting={submitting}
             submittingLessonId={submittingLessonId}

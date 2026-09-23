@@ -16,9 +16,7 @@ export default function ErrorAlert({
       severity={severity}
       sx={{
         mb: 3,
-        borderRadius: 2,
-        border: "1px solid",
-        borderColor: `${severity}.light`,
+        animation: "sg-fade-up .35s ease backwards",
         ...sx,
       }}
       {...props}

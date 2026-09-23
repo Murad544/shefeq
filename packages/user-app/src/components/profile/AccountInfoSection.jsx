@@ -2,60 +2,37 @@ import {
   CheckCircle as CheckCircleIcon,
   Lock as LockIcon,
 } from "@mui/icons-material";
-import { Box, Divider, List, ListItem, Typography } from "@mui/material";
+import { Box, Grid, Tooltip } from "@mui/material";
 import CollapsibleSection from "../common/CollapsibleSection";
+import DataField from "../military/DataField";
+import { C } from "../../config/tokens";
 
 const AccountInfoSection = ({ contactInfo }) => {
   return (
-    <CollapsibleSection title="Hesab Məlumatları" icon={LockIcon}>
-      <List disablePadding>
-        <ListItem
-          sx={{
-            px: 0,
-            py: 1.5,
-            flexDirection: "column",
-            alignItems: "flex-start",
-          }}
-        >
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            display="block"
-            sx={{ mb: 0.5 }}
-          >
-            EMAİL ÜNVANI
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <Typography variant="body1" fontWeight={500}>
-              {contactInfo?.email || "-"}
-            </Typography>
-            {contactInfo?.emailVerified && (
-              <CheckCircleIcon sx={{ fontSize: 18, color: "#16a085" }} />
-            )}
-          </Box>
-        </ListItem>
-        <Divider />
-        <ListItem
-          sx={{
-            px: 0,
-            py: 1.5,
-            flexDirection: "column",
-            alignItems: "flex-start",
-          }}
-        >
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            display="block"
-            sx={{ mb: 0.5 }}
-          >
-            TELEFON NÖMRƏSİ
-          </Typography>
-          <Typography variant="body1" fontWeight={500}>
-            {contactInfo?.phone || "-"}
-          </Typography>
-        </ListItem>
-      </List>
+    <CollapsibleSection title="Hesab Məlumatları" icon={LockIcon} defaultOpen>
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6}>
+          <DataField
+            label="Email ünvanı"
+            mono
+            value={
+              contactInfo?.email ? (
+                <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: 1 }}>
+                  {contactInfo.email}
+                  {contactInfo?.emailVerified && (
+                    <Tooltip title="Təsdiqlənib">
+                      <CheckCircleIcon sx={{ fontSize: 18, color: C.green }} />
+                    </Tooltip>
+                  )}
+                </Box>
+              ) : null
+            }
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <DataField label="Telefon nömrəsi" mono value={contactInfo?.phone} />
+        </Grid>
+      </Grid>
     </CollapsibleSection>
   );
 };

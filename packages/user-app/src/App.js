@@ -1,11 +1,18 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { Box } from "@mui/material";
 import ErrorBoundary from "./components/common/ErrorBoundary";
+import BootSequence from "./components/military/BootSequence";
+import PageTransition from "./components/military/PageTransition";
 import ActivationPage from "./pages/ActivationPage";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import RegistrationPage from "./pages/RegistrationPage";
+
+const CABINET_BOOT_LINES = [
+  "SİSTEM İŞƏ SALINIR",
+  "ŞƏXSİ KABİNET YÜKLƏNİR",
+  "İNTERFEYS HAZIRLANIR",
+];
 
 const ProtectedRoute = ({ children }) => {
   const token = window.localStorage.getItem("auth_token");
@@ -30,14 +37,8 @@ const PublicOnlyRoute = ({ children }) => {
 function App() {
   return (
     <ErrorBoundary>
-      <Box
-        sx={{
-          minHeight: "100vh",
-          background:
-            "linear-gradient(135deg, #5A7298 0%, #364F6B 50%, #243348 100%)",
-        }}
-      >
-        <BrowserRouter>
+      <BrowserRouter>
+        <PageTransition>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/register" element={<RegistrationPage />} />
@@ -54,14 +55,19 @@ function App() {
               path="/profile"
               element={
                 <ProtectedRoute>
+                  {/* Start-up sequence plays once per session on entering the cabinet */}
+                  <BootSequence
+                    storageKey="sg_cabinet_boot_done"
+                    lines={CABINET_BOOT_LINES}
+                  />
                   <ProfilePage />
                 </ProtectedRoute>
               }
             />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </BrowserRouter>
-      </Box>
+        </PageTransition>
+      </BrowserRouter>
     </ErrorBoundary>
   );
 }

@@ -34,13 +34,13 @@ function FileItem({ file, index }) {
       variant="outlined"
       sx={{
         p: 2,
-        borderRadius: 2,
+        borderRadius: 0,
         bgcolor: "background.paper",
         borderColor: "grey.200",
         transition: "all 0.2s ease",
         "&:hover": {
           borderColor: "primary.light",
-          boxShadow: "0 2px 8px rgba(54, 79, 107, 0.1)",
+          boxShadow: "0 2px 8px rgba(16, 21, 15, 0.1)",
         },
       }}
     >
@@ -53,7 +53,7 @@ function FileItem({ file, index }) {
               justifyContent: "center",
               width: 48,
               height: 48,
-              borderRadius: 2,
+              borderRadius: 0,
               bgcolor: isPdf
                 ? "rgba(244, 67, 54, 0.1)"
                 : isVideo
@@ -140,7 +140,7 @@ export default function FilesInfo({ loading, files }) {
           fontSize: { xs: "0.75rem", md: "0.875rem" },
           px: 2,
           py: 0.5,
-          borderRadius: 2,
+          borderRadius: 0,
           borderColor: "secondary.main",
           color: "secondary.main",
           "&:hover": {

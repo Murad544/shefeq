@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { Box, CircularProgress } from "@mui/material";
+import { Box } from "@mui/material";
+import RadarLoader from "../../ui/Military/RadarLoader";
 import { useCurrentAdmin } from "../../../hooks/data/useCurrentAdmin";
 
 export default function RequireSuperAdmin({ children }) {
@@ -17,7 +18,7 @@ export default function RequireSuperAdmin({ children }) {
           justifyContent: "center",
         }}
       >
-        <CircularProgress />
+        <RadarLoader message="Səlahiyyət yoxlanılır" />
       </Box>
     );
   }

@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { authApi } from "../../../api/authApi";
+import { C } from "../../../styles/tokens";
 import { validate } from "../../validation/validators";
 
 const initialFormState = {
@@ -103,22 +104,26 @@ const CreateAdminModal = ({ modalOpen, onClose }) => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
+            bgcolor: C.paperRaised,
+            borderTop: `3px solid ${C.brass}`,
             boxShadow: 24,
-            p: 4,
-            borderRadius: 2,
-            width: 400,
+            p: { xs: 3, sm: 4 },
+            width: 440,
+            maxWidth: "calc(100vw - 32px)",
+            maxHeight: "calc(100vh - 32px)",
+            overflowY: "auto",
           }}
         >
           <IconButton
+            aria-label="Bağla"
             onClick={!loading ? onClose : undefined}
             disabled={loading}
-            sx={{ position: "absolute", top: 8, right: 8 }}
+            sx={{ position: "absolute", top: 10, right: 10 }}
           >
             <CloseIcon />
           </IconButton>
 
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h5" component="h2" sx={{ mb: 3, pr: 5 }}>
             Yeni adminin məlumatları
           </Typography>
 

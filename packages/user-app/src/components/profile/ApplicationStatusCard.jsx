@@ -1,65 +1,57 @@
-import { CheckCircle as CheckCircleIcon } from "@mui/icons-material";
-import { Box, Chip, Divider, Paper, Typography } from "@mui/material";
+import {
+  AssignmentTurnedIn as StatusIcon,
+  CheckCircle as CheckCircleIcon,
+  HourglassTop as PendingIcon,
+} from "@mui/icons-material";
+import { Box, Stack } from "@mui/material";
+import Panel from "../military/Panel";
+import Stamp from "../military/Stamp";
+import { C, FONT, labelCaps } from "../../config/tokens";
+
+const Row = ({ label, children, last }) => (
+  <Stack
+    direction="row"
+    alignItems="center"
+    justifyContent="space-between"
+    spacing={2}
+    sx={{ py: 1.75, borderBottom: last ? "none" : `1px dashed ${C.ruleStrong}` }}
+  >
+    <Box sx={{ ...labelCaps, fontSize: "0.72rem", color: C.textMuted }}>{label}</Box>
+    <Box sx={{ textAlign: "right", minWidth: 0 }}>{children}</Box>
+  </Stack>
+);
 
 const ApplicationStatusCard = ({ applicationStatus }) => {
+  const approved = applicationStatus?.current === "Təsdiqlənib";
+  const complianceOk = applicationStatus?.compliance === "Təsdiqlənib";
+
   return (
-    <Paper elevation={0} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-      <Typography variant="h6" fontWeight={600} sx={{ mb: 3 }}>
-        Müraciət Statusu
-      </Typography>
-
-      <Box sx={{ mb: 2 }}>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          display="block"
-          sx={{ mb: 1 }}
-        >
-          Hazırkı Status
-        </Typography>
-        <Chip
+    <Panel title="Müraciət Statusu" icon={<StatusIcon />} sx={{ mb: 3 }} bodySx={{ py: 1 }}>
+      <Row label="Hazırkı Status">
+        <Stamp
           label={applicationStatus?.current || "-"}
-          sx={{
-            bgcolor: "#E8F5E9",
-            color: "#2e7d32",
-            fontWeight: 600,
-          }}
+          tone={approved ? "green" : "amber"}
+          size="sm"
+          rotate={-4}
+          delay={300}
         />
-      </Box>
-      <Divider sx={{ my: 2 }} />
-
-      <Box sx={{ mb: 2 }}>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          display="block"
-          sx={{ mb: 0.5 }}
-        >
-          Təsdiqlənmə Tarixi
-        </Typography>
-        <Typography variant="body1" fontWeight={500}>
-          {applicationStatus?.confirmationDate || "-"}
-        </Typography>
-      </Box>
-      <Divider sx={{ my: 2 }} />
-
-      <Box>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          display="block"
-          sx={{ mb: 0.5 }}
-        >
-          Uyğunluq
-        </Typography>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <CheckCircleIcon sx={{ fontSize: 18, color: "#16a085" }} />
-          <Typography variant="body1" fontWeight={500}>
-            {applicationStatus?.compliance || "-"}
-          </Typography>
+      </Row>
+      <Row label="Təsdiqlənmə Tarixi">
+        <Box sx={{ fontFamily: FONT.mono, fontSize: "0.95rem" }}>
+          {applicationStatus?.confirmationDate || "—"}
         </Box>
-      </Box>
-    </Paper>
+      </Row>
+      <Row label="Uyğunluq" last>
+        <Stack direction="row" alignItems="center" spacing={1} justifyContent="flex-end">
+          {complianceOk ? (
+            <CheckCircleIcon sx={{ fontSize: 18, color: C.green }} />
+          ) : (
+            <PendingIcon sx={{ fontSize: 18, color: C.amber }} />
+          )}
+          <Box sx={{ fontWeight: 500 }}>{applicationStatus?.compliance || "-"}</Box>
+        </Stack>
+      </Row>
+    </Panel>
   );
 };
 

@@ -9,58 +9,59 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Check } from "@mui/icons-material";
+import { C, FONT } from "../../config/tokens";
 
 // Connector with responsive offsets
 const CustomStepConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${StepConnector.alternativeLabel}`]: {
-    top: 10,
-    left: "calc(-50% + 16px)",
-    right: "calc(50% + 16px)",
+    top: 20,
+    left: "calc(-50% + 26px)",
+    right: "calc(50% + 26px)",
     [theme.breakpoints.down("sm")]: {
-      top: 6,
-      left: "calc(-50% + 12px)",
-      right: "calc(50% + 12px)",
+      top: 15,
+      left: "calc(-50% + 20px)",
+      right: "calc(50% + 20px)",
     },
   },
   [`& .${StepConnector.line}`]: {
-    borderColor: theme.palette.grey[300],
+    borderColor: C.rule,
     borderTopWidth: 2,
-    borderRadius: 1,
+    borderTopStyle: "dashed",
   },
   [`&.${StepConnector.active} .${StepConnector.line}`]: {
-    borderColor: theme.palette.primary.main,
+    borderColor: C.olive,
+    borderTopStyle: "solid",
   },
   [`&.${StepConnector.completed} .${StepConnector.line}`]: {
-    borderColor: theme.palette.primary.main,
+    borderColor: C.olive,
+    borderTopStyle: "solid",
   },
 }));
 
-// Icon that scales down on small screens
+// Square step marker, like a numbered field on a form
 const CustomStepIconRoot = styled("div")(({ theme, ownerState }) => ({
-  backgroundColor: ownerState.completed
-    ? theme.palette.primary.main
-    : theme.palette.grey[300],
+  backgroundColor: ownerState.completed ? C.olive : C.paperRaised,
+  border: `2px solid ${ownerState.completed || ownerState.active ? C.olive : C.ruleStrong}`,
   zIndex: 1,
-  color: "#fff",
-  width: 50,
-  height: 50,
+  color: ownerState.completed ? C.paper : ownerState.active ? C.olive : C.textFaint,
+  width: 42,
+  height: 42,
   display: "flex",
-  borderRadius: "50%",
   justifyContent: "center",
   alignItems: "center",
-  fontSize: "1.2rem",
+  fontFamily: FONT.mono,
+  fontSize: "1rem",
   fontWeight: 600,
-  transition: theme.transitions.create(["background-color", "transform"], {
+  transition: theme.transitions.create(["background-color", "border-color", "box-shadow"], {
     duration: theme.transitions.duration.short,
   }),
   ...(ownerState.active && {
-    backgroundColor: theme.palette.primary.main,
-    transform: "scale(1.1)",
+    boxShadow: `0 0 0 4px rgba(201, 166, 70, 0.3)`,
   }),
   [theme.breakpoints.down("sm")]: {
-    width: 34,
-    height: 34,
-    fontSize: "0.95rem",
+    width: 32,
+    height: 32,
+    fontSize: "0.85rem",
   },
 }));
 
@@ -96,17 +97,17 @@ const RegistrationStepper = ({ activeStep, steps }) => {
         sx={{
           minWidth: isSmDown ? 520 : "auto", // provide a scrollable width budget on phones
           "& .MuiStepLabel-label": {
-            fontSize: isSmDown ? "0.75rem" : isMdDown ? "0.85rem" : "0.9rem",
-            fontWeight: 500,
+            fontSize: isSmDown ? "0.72rem" : isMdDown ? "0.8rem" : "0.85rem",
             mt: isSmDown ? 0.5 : 1,
             whiteSpace: isSmDown ? "nowrap" : "normal",
+            color: C.textFaint,
           },
           "& .MuiStepLabel-label.Mui-active": {
-            color: theme.palette.primary.main,
-            fontWeight: 600,
+            color: C.olive,
+            fontWeight: 700,
           },
           "& .MuiStepLabel-label.Mui-completed": {
-            color: theme.palette.primary.main,
+            color: C.text,
             fontWeight: 600,
           },
         }}

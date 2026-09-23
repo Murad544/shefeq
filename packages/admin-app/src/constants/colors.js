@@ -1,33 +1,35 @@
+import { C } from "../styles/tokens";
+
 export const COLORS = {
   primary: {
-    main: "#364F6B",
-    light: "#5A7298",
-    dark: "#243348",
+    main: C.olive,
+    light: C.oliveLight,
+    dark: C.oliveDark,
   },
   secondary: {
-    main: "#3FC1C9",
-    light: "#6DD4DB",
-    dark: "#2B878D",
+    main: C.brass,
+    light: C.brassLight,
+    dark: C.brassDark,
   },
   success: {
-    main: "#10B981",
-    light: "#34D399",
-    dark: "#059669",
+    main: C.green,
+    light: C.greenLight,
+    dark: "#2C5A29",
   },
   error: {
-    main: "#EF4444",
-    light: "#F87171",
-    dark: "#DC2626",
+    main: C.red,
+    light: C.redLight,
+    dark: "#7E241E",
   },
   warning: {
-    main: "#F59E0B",
-    light: "#FCD34D",
-    dark: "#D97706",
+    main: C.amber,
+    light: "#D9A441",
+    dark: "#8F6614",
   },
   accent: {
-    main: "#FC5185",
-    light: "#FD789D",
-    dark: "#E0385D",
+    main: C.brass,
+    light: C.brassLight,
+    dark: C.brassDark,
   },
 };
 

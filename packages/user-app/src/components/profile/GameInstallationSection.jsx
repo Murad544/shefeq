@@ -4,17 +4,44 @@ import {
   Download as DownloadIcon,
   ArrowBackIos as ArrowBackIosIcon,
   ArrowForwardIos as ArrowForwardIosIcon,
+  Memory as MemoryIcon,
 } from "@mui/icons-material";
 import {
   Box,
   Button,
   Grid,
-  List,
-  ListItem,
-  Paper,
-  Typography,
   IconButton,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
 } from "@mui/material";
+import { C, EASE, FONT, labelCaps } from "../../config/tokens";
+import CornerBrackets from "../military/CornerBrackets";
+import Panel from "../military/Panel";
+
+const FALLBACK_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%231C2419' width='400' height='300'/%3E%3Ctext fill='%23A5A58F' font-family='monospace' font-size='20' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EŞəkil%3C/text%3E%3C/svg%3E";
+
+const REQUIREMENTS = [
+  { label: "ƏS", min: "Windows 10 (64 bit)", rec: "Windows 11 (64 bit)" },
+  {
+    label: "CPU",
+    min: "Quad-core 2.5GHZ (Intel i5 / Ryzen 3)",
+    rec: "6-8 cores (Ryzen 5 / Intel i5 12th gen+)",
+  },
+  { label: "Ram", min: "8GB", rec: "16GB" },
+  {
+    label: "GPU",
+    min: "DirectX 11/12 compatible (GTX 1050Ti / RX560)",
+    rec: "DirectX 11/12 compatible (GTX 1080 / RTX 2060 / RX6600+)",
+  },
+  { label: "Yaddaş", min: "15GB (SSD tövsiyyə olunur)", rec: "20GB (SSD)" },
+  { label: "Controller", min: "—", rec: "Radiomaster TX165 / TX12 / Boxer" },
+];
 
 const GameInstallationSection = ({ gameInstallation, onDownloadGame }) => {
   const [activeScreenshot, setActiveScreenshot] = useState(0);
@@ -43,248 +70,253 @@ const GameInstallationSection = ({ gameInstallation, onDownloadGame }) => {
     return () => clearInterval(timer);
   }, [screenshotCount, isHovered]);
 
+  const current = gameInstallation?.screenshots?.[activeScreenshot];
+
   return (
-    <Paper elevation={0} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-        <CloudDownloadIcon
-          sx={{ mr: 1.5, color: "primary.main", fontSize: 24 }}
-        />
-        <Typography variant="h6" fontWeight={600}>
-          Oyunun Quraşdırılması
-        </Typography>
-      </Box>
-
-      {/* Instructions */}
-      {gameInstallation?.instructions && (
-        <List sx={{ mb: 3 }}>
-          {gameInstallation.instructions.map((instruction, index) => (
-            <ListItem
-              key={index}
-              sx={{ px: 0, py: 1, alignItems: "flex-start" }}
-            >
-              <Box
-                sx={{
-                  minWidth: 32,
-                  height: 32,
-                  borderRadius: "50%",
-                  bgcolor: "primary.main",
-                  color: "white",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: 600,
-                  mr: 2,
-                  flexShrink: 0,
-                }}
-              >
-                {index + 1}
-              </Box>
-              <Typography variant="body2" sx={{ pt: 0.5 }}>
-                {instruction}
-              </Typography>
-            </ListItem>
-          ))}
-        </List>
-      )}
-
-      {/* Download Button */}
-      <Button
-        variant="contained"
-        fullWidth
-        startIcon={<DownloadIcon />}
-        onClick={onDownloadGame}
-        sx={{
-          bgcolor: "#16a085",
-          "&:hover": { bgcolor: "#138d75" },
-          textTransform: "none",
-          py: 1.5,
-          mb: 3,
-          fontSize: "1rem",
-          fontWeight: 600,
-        }}
-      >
-        Oyunu Yüklə (.exe)
-      </Button>
-
-      {/* Screenshots */}
-      {gameInstallation?.screenshots &&
-        gameInstallation.screenshots.length > 0 && (
-          <Box
-            sx={{ mb: 3 }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+    <Box>
+      <Grid container spacing={3} sx={{ mb: 3 }}>
+        {/* Procedure */}
+        <Grid item xs={12} lg={5}>
+          <Panel
+            title="Oyunun Quraşdırılması"
+            icon={<CloudDownloadIcon />}
+            sx={{ height: "100%" }}
           >
-            <Typography
-              variant="subtitle2"
-              color="text.secondary"
+            {gameInstallation?.instructions && (
+              <Box sx={{ mb: 3 }}>
+                {gameInstallation.instructions.map((instruction, index) => (
+                  <Stack
+                    key={index}
+                    direction="row"
+                    spacing={2}
+                    sx={{
+                      position: "relative",
+                      pb: 2.25,
+                      animation: `sg-fade-up .45s ${EASE.out} ${index * 80}ms backwards`,
+                      "&:not(:last-of-type)::before": {
+                        content: '""',
+                        position: "absolute",
+                        left: 15,
+                        top: 34,
+                        bottom: 4,
+                        width: "1px",
+                        bgcolor: C.ruleStrong,
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        flexShrink: 0,
+                        display: "grid",
+                        placeItems: "center",
+                        bgcolor: C.olive,
+                        color: C.paper,
+                        fontFamily: FONT.mono,
+                        fontWeight: 600,
+                        fontSize: "0.85rem",
+                      }}
+                    >
+                      {index + 1}
+                    </Box>
+                    <Typography variant="body2" sx={{ pt: 0.6, lineHeight: 1.6 }}>
+                      {instruction}
+                    </Typography>
+                  </Stack>
+                ))}
+              </Box>
+            )}
+
+            {/* Download Button */}
+            <Button
+              variant="contained"
+              color="secondary"
+              fullWidth
+              size="large"
+              startIcon={<DownloadIcon />}
+              onClick={onDownloadGame}
               sx={{
-                mb: 2,
-                textTransform: "uppercase",
-                letterSpacing: 0.5,
+                position: "relative",
+                overflow: "hidden",
+                "&::after": {
+                  content: '""',
+                  position: "absolute",
+                  inset: 0,
+                  background:
+                    "linear-gradient(110deg, transparent 30%, rgba(255,255,255,.45) 50%, transparent 70%)",
+                  transform: "translateX(-120%)",
+                  transition: "transform .7s ease",
+                },
+                "&:hover::after": { transform: "translateX(120%)" },
               }}
             >
-              EKRAN GÖRÜNTÜLƏRİ
-            </Typography>
-            <Grid container spacing={1}>
-              {Array.from({ length: Math.min(2, screenshotCount) }).map(
-                (_, index) => {
-                  const screenshotIndex =
-                    (activeScreenshot + index) % screenshotCount;
-                  const screenshot = gameInstallation.screenshots[screenshotIndex];
+              Oyunu Yüklə (.exe)
+            </Button>
+          </Panel>
+        </Grid>
 
-                  return (
-                    <Grid item xs={6} key={screenshot.id || screenshotIndex}>
-                      <Box
-                        component="img"
-                        src={screenshot.url}
-                        alt={screenshot.alt || `Screenshot ${screenshotIndex + 1}`}
-                        sx={{
-                          width: "100%",
-                          height: 180,
-                          objectFit: "cover",
-                          borderRadius: 2,
-                          bgcolor: "grey.100",
-                          display: "block",
-                        }}
-                        onError={(e) => {
-                          e.target.src =
-                            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23e0e0e0' width='400' height='300'/%3E%3Ctext fill='%23666' font-family='sans-serif' font-size='24' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EŞəkil%3C/text%3E%3C/svg%3E";
-                        }}
-                      />
-                    </Grid>
-                  );
-                }
-              )}
-            </Grid>
-            {screenshotCount > 1 && (
-              <Box
+        {/* Screenshots */}
+        <Grid item xs={12} lg={7}>
+          {screenshotCount > 0 && (
+            <Box
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              sx={{ bgcolor: C.field800, p: { xs: 1.5, sm: 2 }, height: "100%" }}
+            >
+              <Stack
+                direction="row"
+                justifyContent="space-between"
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  mt: 1,
+                  fontFamily: FONT.mono,
+                  fontSize: "0.68rem",
+                  letterSpacing: "0.1em",
+                  color: C.textOnDarkMuted,
+                  mb: 1.5,
                 }}
               >
-                <Box>
-                  <IconButton
-                    onClick={handlePrevScreenshot}
-                    sx={{
-                      bgcolor: "rgba(0,0,0,0.12)",
-                      color: "text.primary",
-                      '&:hover': { bgcolor: "rgba(0,0,0,0.2)" },
-                    }}
-                    size="small"
-                  >
-                    <ArrowBackIosIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    onClick={handleNextScreenshot}
-                    sx={{
-                      bgcolor: "rgba(0,0,0,0.12)",
-                      color: "text.primary",
-                      ml: 1,
-                      '&:hover': { bgcolor: "rgba(0,0,0,0.2)" },
-                    }}
-                    size="small"
-                  >
-                    <ArrowForwardIosIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-                <Box sx={{ display: "flex", gap: 1 }}>
+                <span>EKRAN GÖRÜNTÜLƏRİ</span>
+                <span>
+                  KADR {activeScreenshot + 1} /{" "}
+                  {screenshotCount}
+                </span>
+              </Stack>
+
+              <Box sx={{ position: "relative", aspectRatio: "16 / 9", bgcolor: C.ink }}>
+                <Box
+                  key={activeScreenshot}
+                  component="img"
+                  src={current?.url}
+                  alt={current?.alt || `Screenshot ${activeScreenshot + 1}`}
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                    animation: "sg-fade-in .6s ease backwards",
+                  }}
+                  onError={(e) => {
+                    e.target.src = FALLBACK_IMAGE;
+                  }}
+                />
+                <CornerBrackets size={20} inset={10} color="rgba(232, 228, 212, 0.8)" />
+                <Box
+                  aria-hidden
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    width: 28,
+                    height: 28,
+                    m: "-14px",
+                    background:
+                      "linear-gradient(rgba(232,228,212,.7), rgba(232,228,212,.7)) center / 100% 1px no-repeat, linear-gradient(rgba(232,228,212,.7), rgba(232,228,212,.7)) center / 1px 100% no-repeat",
+                  }}
+                />
+                {screenshotCount > 1 && (
+                  <>
+                    <IconButton
+                      aria-label="Əvvəlki"
+                      onClick={handlePrevScreenshot}
+                      size="small"
+                      sx={{
+                        position: "absolute",
+                        left: 12,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        bgcolor: "rgba(16, 21, 15, 0.7)",
+                        color: C.textOnDark,
+                        border: `1px solid ${C.lineDarkStrong}`,
+                        "&:hover": { bgcolor: C.brass, color: C.ink },
+                      }}
+                    >
+                      <ArrowBackIosIcon fontSize="small" sx={{ ml: 0.75 }} />
+                    </IconButton>
+                    <IconButton
+                      aria-label="Növbəti"
+                      onClick={handleNextScreenshot}
+                      size="small"
+                      sx={{
+                        position: "absolute",
+                        right: 12,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        bgcolor: "rgba(16, 21, 15, 0.7)",
+                        color: C.textOnDark,
+                        border: `1px solid ${C.lineDarkStrong}`,
+                        "&:hover": { bgcolor: C.brass, color: C.ink },
+                      }}
+                    >
+                      <ArrowForwardIosIcon fontSize="small" />
+                    </IconButton>
+                  </>
+                )}
+              </Box>
+
+              {screenshotCount > 1 && (
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: `repeat(${screenshotCount}, 1fr)`,
+                    gap: 1,
+                    mt: 1.5,
+                  }}
+                >
                   {gameInstallation.screenshots.map((screenshot, index) => (
                     <Box
                       key={screenshot.id || index}
+                      component="button"
+                      type="button"
+                      aria-label={`Kadr ${index + 1}`}
                       onClick={() => setActiveScreenshot(index)}
                       sx={{
-                        width: 10,
-                        height: 10,
-                        borderRadius: "50%",
-                        bgcolor:
-                          index === activeScreenshot
-                            ? "primary.main"
-                            : "grey.400",
+                        p: 0,
+                        aspectRatio: "16 / 9",
+                        border: `2px solid ${index === activeScreenshot ? C.brass : "transparent"}`,
+                        backgroundImage: `url(${screenshot.url})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        bgcolor: C.ink,
                         cursor: "pointer",
+                        opacity: index === activeScreenshot ? 1 : 0.55,
+                        transition: "opacity .2s, border-color .2s",
+                        "&:hover": { opacity: 1 },
                       }}
                     />
                   ))}
                 </Box>
-              </Box>
-            )}
-          </Box>
-        )}
+              )}
+            </Box>
+          )}
+        </Grid>
+      </Grid>
 
       {/* System Requirements */}
-      <Box sx={{ mt: 3 }}>
-        <Typography
-          variant="subtitle2"
-          color="text.secondary"
-          sx={{ mb: 2, letterSpacing: 0.5 }}
-        >
-          <h2>Sistem Tələbləri</h2>
-        </Typography>
-
-        <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-          Minimum sistem:
-        </Typography>
-        <List sx={{ mb: 2, px: 0 }}>
-          <ListItem sx={{ px: 0, py: 0.5 }}>
-            <Typography variant="body2">
-              ƏS: Windows 10 (64 bit)
-            </Typography>
-          </ListItem>
-          <ListItem sx={{ px: 0, py: 0.5 }}>
-            <Typography variant="body2">
-              CPU: Quad-core 2.5GHZ (Intel i5 / Ryzen 3)
-            </Typography>
-          </ListItem>
-          <ListItem sx={{ px: 0, py: 0.5 }}>
-            <Typography variant="body2">Ram: 8GB</Typography>
-          </ListItem>
-          <ListItem sx={{ px: 0, py: 0.5 }}>
-            <Typography variant="body2">
-              GPU: DirectX 11/12 compatible (GTX 1050Ti / RX560)
-            </Typography>
-          </ListItem>
-          <ListItem sx={{ px: 0, py: 0.5 }}>
-            <Typography variant="body2">
-              Yaddaş: 15GB (SSD tövsiyyə olunur)
-            </Typography>
-          </ListItem>
-        </List>
-
-        <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-          Tövsiyyə olunan sistem:
-        </Typography>
-        <List sx={{ px: 0 }}>
-          <ListItem sx={{ px: 0, py: 0.5 }}>
-            <Typography variant="body2">
-              ƏS: Windows 11 (64 bit)
-            </Typography>
-          </ListItem>
-          <ListItem sx={{ px: 0, py: 0.5 }}>
-            <Typography variant="body2">
-              CPU: 6-8 cores (Ryzen 5 / Intel i5 12th gen+)
-            </Typography>
-          </ListItem>
-          <ListItem sx={{ px: 0, py: 0.5 }}>
-            <Typography variant="body2">Ram: 16GB</Typography>
-          </ListItem>
-          <ListItem sx={{ px: 0, py: 0.5 }}>
-            <Typography variant="body2">
-              GPU: DirectX 11/12 compatible (GTX 1080 / RTX 2060 / RX6600+)
-            </Typography>
-          </ListItem>
-          <ListItem sx={{ px: 0, py: 0.5 }}>
-            <Typography variant="body2">Yaddaş: 20GB (SSD)</Typography>
-          </ListItem>
-          <ListItem sx={{ px: 0, py: 0.5 }}>
-            <Typography variant="body2">
-              Controller: Radiomaster TX165 / TX12 / Boxer
-            </Typography>
-          </ListItem>
-        </List>
-      </Box>
-    </Paper>
+      <Panel title="Sistem Tələbləri" icon={<MemoryIcon />} noPadding>
+        <Box sx={{ overflowX: "auto" }}>
+          <Table size="small" sx={{ minWidth: 560 }}>
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ width: 140 }}>Parametr</TableCell>
+                <TableCell>Minimum sistem</TableCell>
+                <TableCell>Tövsiyyə olunan sistem</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {REQUIREMENTS.map((row) => (
+                <TableRow key={row.label} hover>
+                  <TableCell sx={{ ...labelCaps, fontSize: "0.78rem", color: C.olive }}>
+                    {row.label}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: "0.88rem" }}>{row.min}</TableCell>
+                  <TableCell sx={{ fontSize: "0.88rem", fontWeight: 500 }}>{row.rec}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
+      </Panel>
+    </Box>
   );
 };
 

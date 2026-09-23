@@ -7,9 +7,11 @@ import {
   Typography,
   Box,
 } from "@mui/material";
-import { CheckCircle, Error } from "@mui/icons-material";
-import LoadingSpinner from "../common/LoadingSpinner";
+import RadarLoader from "../military/RadarLoader";
+import Stamp from "../military/Stamp";
+import { BRAND } from "../../config/brand";
 import { STRINGS } from "../../config/constants";
+import { C, FONT } from "../../config/tokens";
 
 const ResultDialog = ({ open, type, message, onClose }) => {
   const getDialogConfig = () => {
@@ -17,25 +19,29 @@ const ResultDialog = ({ open, type, message, onClose }) => {
       case "loading":
         return {
           title: STRINGS.LOADING,
-          icon: null,
+          stamp: null,
+          accent: C.brass,
           allowClose: false,
         };
       case "success":
         return {
           title: STRINGS.SUCCESS_TITLE,
-          icon: <CheckCircle color="success" sx={{ fontSize: 64 }} />,
+          stamp: <Stamp label="Qəbul edildi" tone="green" size="lg" />,
+          accent: C.green,
           allowClose: true,
         };
       case "error":
         return {
           title: STRINGS.ERROR_TITLE,
-          icon: <Error color="error" sx={{ fontSize: 64 }} />,
+          stamp: <Stamp label="Xəta" tone="red" size="lg" rotate={-5} />,
+          accent: C.red,
           allowClose: true,
         };
       default:
         return {
           title: "",
-          icon: null,
+          stamp: null,
+          accent: C.brass,
           allowClose: true,
         };
     }
@@ -49,21 +55,31 @@ const ResultDialog = ({ open, type, message, onClose }) => {
       onClose={config.allowClose ? onClose : undefined}
       PaperProps={{
         sx: {
-          borderRadius: 3,
-          minWidth: 400,
+          width: "100%",
           maxWidth: 500,
+          m: 2,
+          borderTop: `3px solid ${config.accent}`,
         },
       }}
       disableEscapeKeyDown={!config.allowClose}
     >
-      <DialogTitle
+      <Box
         sx={{
-          textAlign: "center",
-          fontWeight: 700,
-          fontSize: "1.3rem",
-          pb: 1,
+          px: 3,
+          pt: 1.5,
+          display: "flex",
+          justifyContent: "space-between",
+          fontFamily: FONT.mono,
+          fontSize: "0.66rem",
+          letterSpacing: "0.1em",
+          color: C.textFaint,
         }}
       >
+        <span>{BRAND.PROJECT_NAME.toLocaleUpperCase("az")}</span>
+        <span>{type === "loading" ? "ÖTÜRÜLÜR" : "HESABAT"}</span>
+      </Box>
+
+      <DialogTitle sx={{ textAlign: "center", pb: 0.5, pt: 2 }}>
         {config.title}
       </DialogTitle>
 
@@ -73,14 +89,16 @@ const ResultDialog = ({ open, type, message, onClose }) => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            py: 2,
-            gap: 2,
+            py: 2.5,
+            gap: 2.5,
           }}
         >
           {type === "loading" ? (
-            <LoadingSpinner message={STRINGS.PLEASE_WAIT} />
+            <RadarLoader size={84} message={STRINGS.PLEASE_WAIT} />
           ) : (
-            <>{config.icon}</>
+            config.stamp && (
+              <Box sx={{ py: 1.5, px: 3, overflow: "hidden" }}>{config.stamp}</Box>
+            )
           )}
 
           {message && (
@@ -88,7 +106,7 @@ const ResultDialog = ({ open, type, message, onClose }) => {
               variant="body1"
               color="text.primary"
               textAlign="center"
-              sx={{ maxWidth: "100%" }}
+              sx={{ maxWidth: "100%", color: C.textMuted, lineHeight: 1.7 }}
             >
               {message}
             </Typography>
@@ -97,8 +115,10 @@ const ResultDialog = ({ open, type, message, onClose }) => {
       </DialogContent>
 
       {config.allowClose && (
-        <DialogActions sx={{ justifyContent: "center", pb: 3 }}>
-          <Button onClick={onClose} variant="outlined" sx={{ minWidth: 121 }}>
+        <DialogActions
+          sx={{ justifyContent: "center", pb: 3, borderTop: `1px solid ${C.rule}`, pt: 2 }}
+        >
+          <Button onClick={onClose} variant="contained" sx={{ minWidth: 140 }}>
             {STRINGS.CLOSE}
           </Button>
         </DialogActions>

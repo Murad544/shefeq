@@ -11,6 +11,7 @@ export default function ExportButton({
   size = "small",
   color = "primary",
   icon = <MdDownload size={16} />,
+  label = "Excel",
   ...props
 }) {
   return (
@@ -20,32 +21,20 @@ export default function ExportButton({
       color={color}
       onClick={onClick}
       disabled={disabled || loading}
+      startIcon={loading ? <CircularProgress size={14} color="inherit" /> : icon}
       sx={{
         minWidth: "auto",
         px: 2,
-        py: 1,
-        borderRadius: 1.5,
-        fontWeight: 600,
-        fontSize: "0.75rem",
-        textTransform: "none",
-        border: variant === "outlined" ? "1px solid" : "none",
-        borderColor: `${color}.light`,
-        color: variant === "outlined" ? `${color}.main` : "white",
-        bgcolor: variant === "contained" ? `${color}.main` : "transparent",
-        "&:hover": {
-          bgcolor: variant === "outlined" ? `${color}.light` : `${color}.dark`,
-          color: "white",
-          borderColor: variant === "outlined" ? `${color}.main` : "none",
-        },
-        "&:disabled": {
-          opacity: 0.6,
+        py: 0.9,
+        whiteSpace: "nowrap",
+        "&.Mui-disabled": {
+          opacity: 0.55,
         },
         ...props.sx,
       }}
       {...props}
     >
-      {" "}
-      {loading ? <CircularProgress size={16} color="inherit" /> : icon}
+      {label}
     </Button>
   );
 }

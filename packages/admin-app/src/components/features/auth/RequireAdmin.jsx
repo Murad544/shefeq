@@ -1,6 +1,9 @@
 import * as React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { Box, CircularProgress, Typography, Paper } from "@mui/material";
+import { Box, Typography } from "@mui/material";
+import RadarLoader from "../../ui/Military/RadarLoader";
+import TacticalBackground from "../../ui/Military/TacticalBackground";
+import { C } from "../../../styles/tokens";
 import { authApi } from "../../../api/authApi";
 import { getToken, removeToken } from "../../../api/http";
 
@@ -39,55 +42,31 @@ export default function RequireAdmin({ children }) {
     return (
       <Box
         sx={{
+          position: "relative",
           minHeight: "100vh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: `linear-gradient(135deg, #5A7298 0%, #364F6B 50%, #243348 100%)`,
+          bgcolor: C.field900,
+          color: C.textOnDark,
           p: 3,
         }}
       >
-        <Paper
-          elevation={8}
-          sx={{
-            p: 4,
-            borderRadius: 3,
-            textAlign: "center",
-            bgcolor: "rgba(255, 255, 255, 0.95)",
-            backdropFilter: "blur(10px)",
-            boxShadow: "0 8px 32px rgba(54, 79, 107, 0.2)",
-            minWidth: 300,
-          }}
-        >
-          <CircularProgress
-            size={48}
-            thickness={4}
-            sx={{
-              color: "primary.main",
-              mb: 2,
-            }}
-          />
-          <Typography
-            variant="h6"
-            sx={{
-              color: "primary.main",
-              fontWeight: 600,
-              mb: 1,
-            }}
-          >
-            Giriş yoxlanılır
-          </Typography>
+        <TacticalBackground />
+        <Box sx={{ position: "relative", textAlign: "center" }}>
+          <RadarLoader size={104} dark message="Giriş yoxlanılır" />
           <Typography
             variant="body2"
             sx={{
-              color: "text.secondary",
-              maxWidth: 250,
+              color: C.textOnDarkMuted,
+              maxWidth: 280,
               mx: "auto",
+              mt: 1.5,
             }}
           >
             Zəhmət olmasa gözləyin, icazələriniz yoxlanılır...
           </Typography>
-        </Paper>
+        </Box>
       </Box>
     );
   }

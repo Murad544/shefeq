@@ -1,5 +1,7 @@
-import { Button, Chip, Container, TableCell, TableRow } from "@mui/material";
+import { Box, Button, Container, TableCell, TableRow } from "@mui/material";
 import React from "react";
+import { MdPersonAdd } from "react-icons/md";
+import { C, FONT } from "../../../styles/tokens";
 import { useAdmins } from "../../../hooks/data/useAdmins";
 import { useCurrentAdmin } from "../../../hooks/data/useCurrentAdmin";
 import { useTableConfig } from "../../../hooks/utils/useTableConfig";
@@ -46,34 +48,38 @@ export default function AdminsView() {
       maxWidth={false}
       sx={{
         width: "100%",
-        px: { xs: 2, sm: 3, md: 4, lg: 6, xl: 0 },
-        py: { xs: 2, sm: 3, md: 4, lg: 0 },
-        maxWidth: { xl: "2500px" },
-        mx: "auto",
+        px: 0,
         display: "flex",
-        justifyContent: "space-between",
+        alignItems: "center",
+        justifyContent: { xs: "space-between", md: "flex-end" },
+        gap: 2,
       }}
     >
-      <Chip
-        label={`${data?.length || 0} admin`}
-        size="small"
+      <Box
         sx={{
-          bgcolor: "rgba(255, 255, 255, 0.2)",
-          color: "white",
-          fontWeight: 600,
-          border: "1px solid rgba(255, 255, 255, 0.3)",
+          display: "inline-flex",
+          alignItems: "baseline",
+          gap: 1,
+          px: 1.5,
+          py: 0.5,
+          border: `1px solid ${C.lineDarkStrong}`,
+          fontFamily: FONT.mono,
         }}
-      />
+      >
+        <Box component="span" sx={{ fontSize: "1.05rem", color: C.brassLight }}>
+          {data?.length || 0}
+        </Box>
+        <Box component="span" sx={{ fontSize: "0.7rem", letterSpacing: "0.1em", color: C.textOnDarkMuted }}>
+          ADMİN
+        </Box>
+      </Box>
       {currentAdmin.role === "superadmin" && (
         <Button
+          variant="contained"
+          color="secondary"
+          size="small"
+          startIcon={<MdPersonAdd size={16} />}
           onClick={() => setModalOpen(!modalOpen)}
-          sx={{
-            bgcolor: "rgba(255, 255, 255, 0.2)",
-            color: "white",
-            fontWeight: 600,
-            border: "1px solid rgba(255, 255, 255, 0.3)",
-            padding: "0 10px",
-          }}
         >
           Admin Yarat
         </Button>

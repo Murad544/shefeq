@@ -1,5 +1,5 @@
 export const STRINGS = {
-  DEFAULT_PROJECT_NAME: "Şəfəq",
+  DEFAULT_PROJECT_NAME: "FPV Tədris Alt Sistemi",
   DEFAULT_COURSE_NAME: "PUA mütəxəssisləri üzrə seçim sorğusu",
 
   // Navigation & Steps

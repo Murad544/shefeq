@@ -27,7 +27,7 @@ export default function AdminCard({ admin }) {
                   justifyContent: "center",
                   width: 40,
                   height: 40,
-                  borderRadius: 2,
+                  borderRadius: 0,
                   bgcolor: admin.is_active ? "primary.main" : "grey.400",
                   color: "white",
                 }}
@@ -64,7 +64,7 @@ export default function AdminCard({ admin }) {
                     justifyContent: "center",
                     width: 32,
                     height: 32,
-                    borderRadius: 1.5,
+                    borderRadius: 0,
                     bgcolor: "secondary.light",
                     color: "white",
                   }}
@@ -92,7 +92,7 @@ export default function AdminCard({ admin }) {
                       justifyContent: "center",
                       width: 32,
                       height: 32,
-                      borderRadius: 1.5,
+                      borderRadius: 0,
                       bgcolor: "info.light",
                       color: "white",
                     }}
@@ -121,7 +121,7 @@ export default function AdminCard({ admin }) {
                     justifyContent: "center",
                     width: 32,
                     height: 32,
-                    borderRadius: 1.5,
+                    borderRadius: 0,
                     bgcolor: "warning.light",
                     color: "white",
                   }}

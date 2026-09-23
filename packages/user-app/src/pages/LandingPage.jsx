@@ -2,15 +2,10 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
-  Link,
   Typography,
-  Paper,
-  Fade,
   Stack,
   Grid,
-  Chip,
   Container,
-  useTheme,
 } from "@mui/material";
 import {
   School,
@@ -19,19 +14,30 @@ import {
   ControlCamera,
   GppGood,
   KeyboardArrowDown,
+  FlightTakeoff,
 } from "@mui/icons-material";
-import Logo from "../assets/icons/Logo";
-import ResponsiveContainer from "../components/common/ResponsiveContainer";
 import { BRAND } from "../config/brand";
 import { STRINGS } from "../config/constants";
+import { C, EASE, labelCaps } from "../config/tokens";
 import Navbar from "../components/landing/Navbar";
 import Information from "../components/landing/Information";
 import AboutUs from "../components/landing/AboutUs";
 import ContactUs from "../components/landing/ContactUs";
+import Footer from "../components/landing/Footer";
+import TrainingRoute from "../components/landing/TrainingRoute";
+import Emblem from "../components/military/Emblem";
+import TacticalBackground from "../components/military/TacticalBackground";
+import TricolorBar from "../components/military/TricolorBar";
+
+// Icons for STRINGS.FEATURES: realistic simulation, then training.
+const BRIEFING_ICONS = [<FlightTakeoff />, <School />];
+
+const enter = (delay) => ({
+  animation: `sg-fade-up .8s ${EASE.out} ${delay}ms backwards`,
+});
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const theme = useTheme();
 
   const handleGetStarted = () => {
     navigate("/register");
@@ -48,350 +54,311 @@ const LandingPage = () => {
   return (
     <>
       <Navbar />
+
+      {/* Hero */}
       <Box
+        component="section"
         sx={{
-          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 50%, ${theme.palette.primary.main} 100%)`,
+          position: "relative",
+          bgcolor: C.field900,
+          color: C.textOnDark,
+          overflow: "hidden",
+          minHeight: { md: "calc(100vh - 74px)" },
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <Box
+        <TacticalBackground />
+        <Emblem
+          decorative
+          size={520}
+          opacity={0.035}
+          sx={{ position: "absolute", left: -160, bottom: -120 }}
+        />
+
+        <Container
+          maxWidth="lg"
           sx={{
-            minHeight: "100vh",
+            position: "relative",
+            flex: 1,
             display: "flex",
             alignItems: "center",
-            position: "relative",
-            overflow: "hidden",
-            pb: 4,
+            py: { xs: 7, md: 8 },
           }}
         >
-          {/* Background decorative elements */}
-          <Box
-            sx={{
-              position: "absolute",
-              inset: 0,
-              pointerEvents: "none",
-              "&::before, &::after": {
-                content: '""',
-                position: "absolute",
-                borderRadius: "50%",
-                filter: "blur(100px)",
-                opacity: 0.1,
-              },
-              "&::before": {
-                width: 400,
-                height: 400,
-                top: -100,
-                left: -100,
-                background: theme.palette.secondary.main,
-              },
-              "&::after": {
-                width: 500,
-                height: 500,
-                bottom: -150,
-                right: -150,
-                background:
-                  theme.palette.accent?.main || theme.palette.secondary.light,
-              },
-            }}
-          />
-
-          {/* Main content using both ResponsiveContainer and Container for different sections */}
-          <ResponsiveContainer maxWidth="lg" centerContent fullHeight>
-            <Fade in timeout={800}>
-              <Paper
-                elevation={24}
-                sx={{
-                  p: { xs: 4, md: 6 },
-                  borderRadius: 4,
-                  textAlign: "center",
-                  background: "rgba(255, 255, 255, 0.98)",
-                  backdropFilter: "blur(20px)",
-                  boxShadow: `0 32px 64px rgba(54, 79, 107, 0.2)`,
-                  position: "relative",
-                  overflow: "hidden",
-                  maxWidth: 800,
-                  mx: "auto",
-                }}
+          <Grid container spacing={{ xs: 7, md: 4 }} alignItems="center">
+            <Grid item xs={12} md={7}>
+              <Typography
+                variant="overline"
+                sx={{ color: C.brass, display: "block", mb: 1.5, ...enter(180) }}
               >
-                {/* Header section */}
-                <Box sx={{ mb: 4 }}>
-                  <Box
-                    sx={{ mb: 2, display: "flex", justifyContent: "center" }}
-                  >
-                    <Logo size={80} />
-                  </Box>
+                {BRAND.COURSE_NAME}
+              </Typography>
 
-                  <Typography
-                    variant="h2"
+              {/* Official name: "FPV" as the monumental mark, descriptor beneath */}
+              <Typography variant="h1" aria-label={BRAND.PROJECT_NAME} sx={{ color: C.textOnDark }}>
+                <Box
+                  component="span"
+                  aria-hidden
+                  sx={{
+                    display: "block",
+                    fontSize: "clamp(4.2rem, 11vw, 8rem)",
+                    letterSpacing: "0.14em",
+                    lineHeight: 0.9,
+                    animation: `sg-track-in 1.2s ${EASE.out} .2s backwards`,
+                  }}
+                >
+                  {BRAND.PROJECT_MARK.toLocaleUpperCase("az")}
+                </Box>
+                {BRAND.PROJECT_DESCRIPTOR && (
+                  <Box
+                    component="span"
+                    aria-hidden
                     sx={{
-                      fontWeight: 800,
-                      mb: 1,
-                      background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                      backgroundClip: "text",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
+                      display: "block",
+                      mt: 1.5,
+                      fontSize: "clamp(1.45rem, 3.4vw, 2.45rem)",
+                      letterSpacing: "0.12em",
+                      lineHeight: 1.1,
+                      color: C.brassLight,
+                      ...enter(380),
                     }}
                   >
-                    {BRAND.PROJECT_NAME}
-                  </Typography>
+                    {BRAND.PROJECT_DESCRIPTOR.toLocaleUpperCase("az")}
+                  </Box>
+                )}
+              </Typography>
 
-                  {/* <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-                  {BRAND.COURSE_NAME}
-                </Typography> */}
-                </Box>
+              <TricolorBar
+                height={4}
+                animate
+                delay={500}
+                sx={{ width: 160, my: 3, transformOrigin: "left" }}
+              />
 
-                {/* Feature chips */}
-                <Stack
-                  direction="row"
-                  spacing={2}
-                  justifyContent="center"
-                  flexWrap="wrap"
-                  sx={{ mb: 4, gap: 1 }}
-                >
-                  {featureChips.map((item) => (
-                    <Chip
-                      key={item.label}
-                      icon={item.icon}
-                      label={item.label}
-                      variant="outlined"
-                      sx={{
-                        fontWeight: 600,
-                        borderColor: "primary.light",
-                        color: "primary.main",
-                        "& .MuiChip-icon": {
-                          color: "secondary.main",
-                        },
-                        "&:hover": {
-                          bgcolor: "primary.light",
-                          color: "white",
-                          "& .MuiChip-icon": {
-                            color: "white",
-                          },
-                        },
-                        transition: "all 0.3s ease",
-                      }}
-                    />
-                  ))}
-                </Stack>
+              <Typography
+                sx={{
+                  ...labelCaps,
+                  fontSize: { xs: "1rem", md: "1.2rem" },
+                  letterSpacing: "0.16em",
+                  color: C.textOnDark,
+                  mb: 2,
+                  ...enter(460),
+                }}
+              >
+                Dron tədrisi və praktiki təlimlər
+              </Typography>
+              <Typography
+                sx={{
+                  color: C.textOnDarkMuted,
+                  maxWidth: 560,
+                  mb: 4,
+                  fontSize: "1.05rem",
+                  ...enter(500),
+                }}
+              >
+                Gələcək PUA operatorlarının seçimi, nəzəri hazırlığı və
+                simulyator üzərində praktiki təlimi üçün vahid platforma.
+              </Typography>
 
-                {/* CTA Button */}
+              {/* Feature chips */}
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(4, 1fr)" },
+                  gap: 1,
+                  mb: 4.5,
+                  maxWidth: 560,
+                }}
+              >
+                {featureChips.map((item, index) => (
+                  <Box
+                    key={item.label}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      px: 1.5,
+                      py: 1.1,
+                      border: `1px solid ${C.lineDarkStrong}`,
+                      bgcolor: "rgba(11, 15, 10, 0.35)",
+                      ...labelCaps,
+                      fontSize: "0.8rem",
+                      color: C.textOnDark,
+                      transition: "border-color .25s, color .25s, background-color .25s",
+                      "& svg": { color: C.brass, fontSize: 18 },
+                      "&:hover": {
+                        borderColor: C.brass,
+                        bgcolor: "rgba(201, 166, 70, 0.08)",
+                      },
+                      ...enter(580 + index * 70),
+                    }}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </Box>
+                ))}
+              </Box>
+
+              {/* CTA Buttons */}
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                sx={enter(860)}
+              >
                 <Button
                   variant="contained"
+                  color="secondary"
                   size="large"
                   onClick={handleGetStarted}
                   endIcon={<ArrowForward />}
                   sx={{
-                    py: 2,
-                    px: 4,
-                    fontSize: "1.1rem",
-                    fontWeight: 700,
-                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                    boxShadow: `0 8px 32px rgba(54, 79, 107, 0.3)`,
-                    mb: 4,
-                    "&:hover": {
-                      transform: "translateY(-2px)",
-                      boxShadow: `0 12px 40px rgba(54, 79, 107, 0.4)`,
+                    position: "relative",
+                    overflow: "hidden",
+                    "&::after": {
+                      content: '""',
+                      position: "absolute",
+                      inset: 0,
+                      background:
+                        "linear-gradient(110deg, transparent 30%, rgba(255,255,255,.45) 50%, transparent 70%)",
+                      transform: "translateX(-120%)",
+                      transition: "transform .7s ease",
                     },
-                    transition: "all 0.3s ease",
+                    "&:hover::after": { transform: "translateX(120%)" },
+                    "& .MuiButton-endIcon": { transition: "transform .25s" },
+                    "&:hover .MuiButton-endIcon": { transform: "translateX(4px)" },
                   }}
                 >
                   {STRINGS.GET_STARTED}
                 </Button>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={() => navigate("/login")}
+                  sx={{
+                    color: C.textOnDark,
+                    borderColor: C.lineDarkStrong,
+                    "&:hover": {
+                      borderColor: C.brass,
+                      color: C.brass,
+                      bgcolor: "rgba(201, 166, 70, 0.06)",
+                    },
+                  }}
+                >
+                  {STRINGS.SIGN_IN}
+                </Button>
+              </Stack>
+            </Grid>
 
-                {/* Features section using Container for constrained width */}
-                <Container maxWidth="md" sx={{ px: 0 }}>
-                  <Grid
-                    container
-                    spacing={3}
-                    textAlign="left"
-                    justifyContent="center"
-                  >
-                    {STRINGS.FEATURES.map((feature, index) => (
-                      <Grid item xs={12} md={6} key={index}>
-                        <Box
-                          sx={{
-                            p: 3,
-                            borderRadius: 2,
-                            mx: "auto",
-                            maxWidth: 500,
-                            bgcolor: "grey.50",
-                            height: "100%",
-                            border: "1px solid",
-                            borderColor: "grey.200",
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              borderColor: "primary.light",
-                              bgcolor: "primary.light",
-                              color: "white",
-                              transform: "translateY(-4px)",
-                              boxShadow: `0 8px 24px rgba(54, 79, 107, 0.15)`,
-                            },
-                          }}
-                        >
-                          <Typography
-                            variant="h6"
-                            sx={{
-                              fontWeight: 700,
-                              mb: 1,
-                              fontSize: "1rem",
-                            }}
-                          >
-                            {feature.title}
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              lineHeight: 1.6,
-                            }}
-                          >
-                            {feature.description}
-                          </Typography>
-                        </Box>
-                      </Grid>
-                    ))}
-                  </Grid>
-                </Container>
+            <Grid item xs={12} md={5}>
+              <TrainingRoute />
+            </Grid>
+          </Grid>
+        </Container>
 
-                {/* Sign-in link for existing users */}
-                {/* <Box sx={{ mt: 2 }}>
-                <Typography variant="body2" color="text.secondary">
-                  {STRINGS.ALREADY_HAVE_ACCOUNT}
-                  <Link
-                    component="button"
-                    onClick={() => navigate("/login")}
-                    underline="hover"
-                    sx={{
-                      fontWeight: 700,
-                      textTransform: "none",
-                      pl: 0,
-                      ml: 0.5,
-                      color: "primary.main",
-                      bgcolor: "transparent",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {STRINGS.SIGN_IN}
-                  </Link>
-                </Typography>
-              </Box> */}
-              </Paper>
-            </Fade>
-          </ResponsiveContainer>
-        </Box>
-
-        {/* Information */}
+        {/* Briefing strip */}
         <Box
-          id="information"
           sx={{
-            width: "90%",
-            mx: "auto",
-            my: 8,
-            borderRadius: 4,
-            overflow: "hidden",
-            backgroundColor: "white",
-            boxShadow: 3,
+            position: "relative",
+            borderTop: `1px solid ${C.lineDark}`,
+            bgcolor: "rgba(11, 15, 10, 0.4)",
           }}
         >
-          <Information />
-        </Box>
-
-        {/* Divider */}
-        <Box
-          sx={{
-            width: "60%",
-            mx: "auto",
-            height: "1px",
-            background:
-              "linear-gradient(to right, transparent, #ccc, transparent)",
-            opacity: 0.6,
-          }}
-        />
-
-        {/* About */}
-        <Box
-          id="about"
-          sx={{
-            width: "90%",
-            mx: "auto",
-            my: 8,
-            borderRadius: 4,
-            overflow: "hidden",
-            backgroundColor: "white",
-            boxShadow: 3,
-          }}
-        >
-          <AboutUs />
-        </Box>
-
-        {/* Divider */}
-        <Box
-          sx={{
-            width: "60%",
-            mx: "auto",
-            height: "1px",
-            background:
-              "linear-gradient(to right, transparent, #ccc, transparent)",
-            opacity: 0.6,
-          }}
-        />
-
-        {/* Contact */}
-        <Box
-          id="contact"
-          sx={{
-            width: "90%",
-            mx: "auto",
-            my: 8,
-            borderRadius: 4,
-            overflow: "hidden",
-            backgroundColor: "white",
-            boxShadow: 3,
-          }}
-        >
-          <ContactUs />
-        </Box>
-
-        {/* Footer */}
-        <Box sx={{ pb: 3, textAlign: "center" }}>
-          <Typography
-            variant="caption"
-            sx={{
-              color: "white",
-              opacity: 0.8,
-              fontSize: "0.875rem",
-            }}
-          >
-            © {new Date().getFullYear()} {BRAND.PROJECT_NAME}.{" "}
-            {STRINGS.COPYRIGHT}
-          </Typography>
+          <Container maxWidth="lg">
+            <Grid container>
+              {STRINGS.FEATURES.map((feature, index) => (
+                <Grid
+                  item
+                  xs={12}
+                  md={6}
+                  key={feature.title}
+                  sx={{
+                    py: 3.5,
+                    pl: { md: index ? 4 : 0 },
+                    pr: { md: index ? 0 : 4 },
+                    borderLeft: { md: index ? `1px solid ${C.lineDark}` : "none" },
+                    borderTop: { xs: index ? `1px solid ${C.lineDark}` : "none", md: "none" },
+                    ...enter(1000 + index * 120),
+                  }}
+                >
+                  <Stack direction="row" spacing={2.5}>
+                    <Box
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        flexShrink: 0,
+                        display: "grid",
+                        placeItems: "center",
+                        border: `1px solid ${C.lineDarkStrong}`,
+                        color: C.brass,
+                        "& svg": { fontSize: 22 },
+                      }}
+                    >
+                      {BRIEFING_ICONS[index] || <FlightTakeoff />}
+                    </Box>
+                    <Box>
+                      <Typography
+                        sx={{ ...labelCaps, fontSize: "1rem", color: C.textOnDark, mb: 0.75 }}
+                      >
+                        {feature.title}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: C.textOnDarkMuted, lineHeight: 1.7 }}
+                      >
+                        {feature.description}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </Grid>
+              ))}
+            </Grid>
+          </Container>
         </Box>
       </Box>
+
+      {/* Information */}
+      <Box id="information">
+        <Information />
+      </Box>
+
+      {/* About */}
+      <Box id="about">
+        <AboutUs />
+      </Box>
+
+      {/* Contact */}
+      <Box id="contact">
+        <ContactUs />
+      </Box>
+
+      <Footer />
 
       {/* Floating Down Arrow Button */}
       <Box
         sx={{
           position: "fixed",
-          bottom: 32,
-          right: 32,
+          bottom: 28,
+          right: 28,
           zIndex: 1000,
         }}
       >
         <Button
+          aria-label="Aşağı sürüşdür"
           sx={{
-            borderRadius: "50%",
-            width: 56,
-            height: 56,
-            minWidth: 56,
-            background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-            color: "white",
-            boxShadow: `0 4px 20px rgba(54, 79, 107, 0.3)`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            width: 52,
+            height: 52,
+            minWidth: 52,
+            p: 0,
+            bgcolor: "rgba(16, 21, 15, 0.9)",
+            color: C.brass,
+            border: `1px solid ${C.brass}`,
+            boxShadow: "0 10px 30px -12px rgba(0, 0, 0, 0.6)",
+            "& svg": { animation: "sg-chevron 1.8s ease-in-out infinite" },
             "&:hover": {
-              transform: "translateY(4px)",
-              boxShadow: `0 8px 24px rgba(54, 79, 107, 0.4)`,
+              bgcolor: C.brass,
+              color: C.ink,
             },
-            transition: "all 0.3s ease",
           }}
           onClick={() =>
             window.scrollBy({ top: window.innerHeight, behavior: "smooth" })

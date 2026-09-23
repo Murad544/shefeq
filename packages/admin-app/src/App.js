@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import RequireAdmin from "./components/features/auth/RequireAdmin";
 import RequireSuperAdmin from "./components/features/auth/RequireSuperAdmin";
 import AdminLayout from "./components/layout/AdminLayout";
+import PageTransition from "./components/ui/Military/PageTransition";
 import DashboardPage from "./pages/DashboardPage";
 import LoginPage from "./pages/LoginPage";
 import UserEditPage from "./pages/UserEditPage";
@@ -16,38 +17,40 @@ const PublicOnlyRoute = ({ children }) => {
 
 export default function App() {
   return (
-    <Routes>
-      <Route
-        path="/login"
-        element={
-          <PublicOnlyRoute>
-            <LoginPage />
-          </PublicOnlyRoute>
-        }
-      />
-      <Route
-        path="/"
-        element={
-          <RequireAdmin>
-            <AdminLayout>
-              <DashboardPage />
-            </AdminLayout>
-          </RequireAdmin>
-        }
-      />
-      <Route
-        path="/users/:id/edit"
-        element={
-          <RequireAdmin>
-            <RequireSuperAdmin>
+    <PageTransition>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <PublicOnlyRoute>
+              <LoginPage />
+            </PublicOnlyRoute>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <RequireAdmin>
               <AdminLayout>
-                <UserEditPage />
+                <DashboardPage />
               </AdminLayout>
-            </RequireSuperAdmin>
-          </RequireAdmin>
-        }
-      />
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path="/users/:id/edit"
+          element={
+            <RequireAdmin>
+              <RequireSuperAdmin>
+                <AdminLayout>
+                  <UserEditPage />
+                </AdminLayout>
+              </RequireSuperAdmin>
+            </RequireAdmin>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </PageTransition>
   );
 }

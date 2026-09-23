@@ -2,109 +2,128 @@ import {
   Box,
   Typography,
   Grid,
-  Paper,
   Container,
   TextField,
   Button,
-  useTheme,
+  Stack,
 } from "@mui/material";
-import { Email, Phone, LocationOn } from "@mui/icons-material";
+import { Email, Phone, LocationOn, Send } from "@mui/icons-material";
+import { C, FONT, labelCaps } from "../../config/tokens";
+import Emblem from "../military/Emblem";
+import Panel from "../military/Panel";
+import Reveal from "../military/Reveal";
+import SectionHeader from "../military/SectionHeader";
+import TricolorBar from "../military/TricolorBar";
 
-const R2_BASE_URL = process.env.REACT_APP_R2_BASE_URL;
-const AzerbaijaniLogo = `${R2_BASE_URL}/photos/Azerbaijani_Armed_Forces_logo.png`;
-
-const ContactUs = () => {
-  const theme = useTheme();
-
-  return (
-    <Box
-      sx={{
-        width: "100%",
-       
-        py: { xs: 8, md: 12 },
-        
-      }}
-    >
-      <Container maxWidth="md">
-        {/* Bölmə Başlığı */}
-        <Box textAlign="center" mb={6}>
-          
-
-          <Typography
-            variant="h3"
-            sx={{
-              fontWeight: 800,
-              mt: 1,
-              mb: 2,
-              background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              backgroundClip: "text",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            BİZİMLƏ ƏLAQƏ
-          </Typography>
-
-          <Typography
-            variant="body1"
-            color="text.secondary"
-            sx={{ maxWidth: 600, mx: "auto" }}
-          >
-            Əlavə suallarınız üçün bizimlə əlaqə saxlayın.
-            <br/> Müraciətiniz ən qısa zamanda cavablandırılacaq.
-          </Typography>
-        </Box>
-
-        {/* Əlaqə Kartı */}
-        <Paper
-          sx={{
-            p: { xs: 4, md: 6 },
-            borderRadius: 4,
-            boxShadow:
-              "0 4px 12px rgba(0,0,0,0.05), 0 12px 32px rgba(0,0,0,0.08)",
-          }}
-        >
-          <Grid container spacing={6}>
-            {/* SOL – Məlumat */}
-            <Grid item xs={12} md={4}>
-              <Box display="flex" flexDirection="column" gap={3}>
-                <Box display="flex" alignItems="center" gap={2}>
-                  <Email color="primary" />
-                  <Typography variant="body1">mmu@mod.gov.az</Typography>
-                </Box>
-                <Box display="flex" alignItems="center" gap={2}>
-                  <Phone color="primary" />
-                  <Typography variant="body1">(012) 404-18-45</Typography>
-                </Box>
-                <Box display="flex" alignItems="center" gap={2}>
-                  <LocationOn color="primary" />
-                  <Typography variant="body1">
-                    Bakı şəhəri, Qızıl Şərq 13. AZ1065
-                  </Typography>
-                </Box>
-                <Box sx={{
-                  backgroundImage: `url(${AzerbaijaniLogo})`,
-                  backgroundPosition: "top center",
-                  backgroundRepeat: "no-repeat",
-                  backgroundSize: "contain",
-                  width: "100%",
-                  height: "200px",
-                  mt: 3,
-                }}>
-                </Box>
-              
-
-              </Box>
-            </Grid>
-            {/* Telefon: (012) 404-18-45
+/* Telefon: (012) 404-18-45
 Çağrı mərkəzi: *0811
 E-poçt: mmu@mod.gov.az
 Müraciət üçün e-poçt: mmu-muraciet@mod.gov.az
-Ünvan: Bakı şəhəri, Qızıl Şərq 13. AZ1065*/}
+Ünvan: Bakı şəhəri, Qızıl Şərq 13. AZ1065*/
+const contacts = [
+  { icon: Email, label: "E-poçt", value: "mmu@mod.gov.az", mono: true },
+  { icon: Phone, label: "Telefon", value: "(012) 404-18-45", mono: true },
+  { icon: LocationOn, label: "Ünvan", value: "Bakı şəhəri, Qızıl Şərq 13. AZ1065" },
+];
 
-            {/* SAĞ – Forma */}
-            <Grid item xs={12} md={8}>
-              <Grid container spacing={3}>
+const ContactUs = () => (
+  <Box
+    component="section"
+    sx={{ position: "relative", bgcolor: C.paper, py: { xs: 10, md: 14 } }}
+  >
+    <Container maxWidth="lg">
+      <Reveal>
+        <SectionHeader
+          overline="Əlaqə"
+          title="Bizimlə əlaqə"
+          subtitle="Əlavə suallarınız üçün bizimlə əlaqə saxlayın. Müraciətiniz ən qısa zamanda cavablandırılacaq."
+        />
+      </Reveal>
+
+      <Grid container spacing={3} alignItems="stretch">
+        {/* SOL – Məlumat */}
+        <Grid item xs={12} md={5}>
+          <Reveal sx={{ height: "100%" }}>
+            <Box
+              sx={{
+                position: "relative",
+                height: "100%",
+                bgcolor: C.field800,
+                color: C.textOnDark,
+                p: { xs: 3, md: 4 },
+                overflow: "hidden",
+              }}
+            >
+              <TricolorBar
+                height={4}
+                sx={{ position: "absolute", top: 0, left: 0, right: 0 }}
+              />
+              <Emblem
+                decorative
+                size={260}
+                opacity={0.06}
+                sx={{ position: "absolute", right: -50, bottom: -40 }}
+              />
+              <Stack direction="row" spacing={2.5} alignItems="center" sx={{ mb: 4, position: "relative" }}>
+                <Emblem size={64} />
+                <Box>
+                  <Typography variant="overline" sx={{ color: C.brass, display: "block", lineHeight: 1.4 }}>
+                    Rəsmi əlaqə
+                  </Typography>
+                  <Typography sx={{ ...labelCaps, fontSize: "1.1rem", color: C.textOnDark }}>
+                    Əlaqə məlumatları
+                  </Typography>
+                </Box>
+              </Stack>
+
+              <Stack spacing={0} sx={{ position: "relative" }}>
+                {contacts.map(({ icon: Icon, label, value, mono }) => (
+                  <Stack
+                    key={label}
+                    direction="row"
+                    spacing={2}
+                    alignItems="flex-start"
+                    sx={{ py: 2, borderTop: `1px solid ${C.lineDark}` }}
+                  >
+                    <Box
+                      sx={{
+                        width: 36,
+                        height: 36,
+                        flexShrink: 0,
+                        display: "grid",
+                        placeItems: "center",
+                        border: `1px solid ${C.lineDarkStrong}`,
+                        color: C.brass,
+                      }}
+                    >
+                      <Icon sx={{ fontSize: 18 }} />
+                    </Box>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Box sx={{ ...labelCaps, fontSize: "0.7rem", color: C.textOnDarkMuted, mb: 0.25 }}>
+                        {label}
+                      </Box>
+                      <Typography
+                        sx={{
+                          fontFamily: mono ? FONT.mono : FONT.body,
+                          fontSize: mono ? "0.95rem" : "1rem",
+                          wordBreak: "break-word",
+                        }}
+                      >
+                        {value}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                ))}
+              </Stack>
+            </Box>
+          </Reveal>
+        </Grid>
+
+        {/* SAĞ – Forma */}
+        <Grid item xs={12} md={7}>
+          <Reveal delay={120} sx={{ height: "100%" }}>
+            <Panel title="Müraciət forması" sx={{ height: "100%" }}>
+              <Grid container spacing={2.5}>
                 <Grid item xs={12} sm={6}>
                   <TextField fullWidth label="Ad" variant="outlined" />
                 </Grid>
@@ -124,31 +143,17 @@ Müraciət üçün e-poçt: mmu-muraciet@mod.gov.az
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    sx={{
-                      background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                      fontWeight: 700,
-                      py: 1.5,
-                      px: 5,
-                      "&:hover": {
-                        transform: "translateY(-2px)",
-                        boxShadow: `0 12px 40px rgba(54,79,107,0.4)`,
-                      },
-                      transition: "all 0.3s ease",
-                    }}
-                  >
+                  <Button variant="contained" size="large" endIcon={<Send />}>
                     Mesaj Göndər
                   </Button>
                 </Grid>
               </Grid>
-            </Grid>
-          </Grid>
-        </Paper>
-      </Container>
-    </Box>
-  );
-};
+            </Panel>
+          </Reveal>
+        </Grid>
+      </Grid>
+    </Container>
+  </Box>
+);
 
 export default ContactUs;

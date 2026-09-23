@@ -40,16 +40,15 @@ export default function AcceptedApplicantCard({ user, onViewDetails }) {
   const profession = formatProfession(readField(user, "profession"));
   const secret = readField(user, "secret_key", "secretKey");
   const acceptedAt = formatDate(readField(user, "accepted_at"));
-  const userId = readField(user, "user_id");
 
   return (
     <Card
       sx={{
         mb: 2,
-        borderRadius: 3,
+        borderRadius: 0,
         border: "1px solid",
         borderColor: "grey.200",
-        boxShadow: "0 2px 12px rgba(54, 79, 107, 0.08)",
+        boxShadow: "0 2px 12px rgba(16, 21, 15, 0.08)",
         overflow: "hidden",
         transition: "all 0.2s ease",
         "&:hover": {
@@ -71,7 +70,7 @@ export default function AcceptedApplicantCard({ user, onViewDetails }) {
                   justifyContent: "center",
                   width: 40,
                   height: 40,
-                  borderRadius: 2,
+                  borderRadius: 0,
                   bgcolor: "success.main",
                   color: "white",
                 }}
@@ -95,20 +94,6 @@ export default function AcceptedApplicantCard({ user, onViewDetails }) {
                 {name} {surname}
               </Typography>
               <Grid container spacing={1} alignItems="center">
-                <Grid item>
-                  <Chip
-                    label={`ID: ${userId}`}
-                    size="small"
-                    variant="outlined"
-                    sx={{
-                      height: 20,
-                      fontSize: "0.7rem",
-                      borderColor: "success.light",
-                      color: "success.main",
-                    }}
-                  />
-                </Grid>
-
                 <Grid item>
                   <Chip
                     label={sex}
@@ -160,7 +145,7 @@ export default function AcceptedApplicantCard({ user, onViewDetails }) {
                     borderColor: "secondary.light",
                     width: 32,
                     height: 32,
-                    borderRadius: 1.5,
+                    borderRadius: 0,
                     "&:hover": {
                       bgcolor: "secondary.light",
                       color: "white",
@@ -183,7 +168,7 @@ export default function AcceptedApplicantCard({ user, onViewDetails }) {
                     px: 1.5,
                     py: 0.5,
                     minWidth: "auto",
-                    borderRadius: 1.5,
+                    borderRadius: 0,
                     fontWeight: 600,
                   }}
                 >
@@ -207,7 +192,7 @@ export default function AcceptedApplicantCard({ user, onViewDetails }) {
                       justifyContent: "center",
                       width: 24,
                       height: 24,
-                      borderRadius: 1,
+                      borderRadius: 0,
                       bgcolor: "secondary.light",
                       color: "white",
                     }}
@@ -240,7 +225,7 @@ export default function AcceptedApplicantCard({ user, onViewDetails }) {
                       justifyContent: "center",
                       width: 24,
                       height: 24,
-                      borderRadius: 1,
+                      borderRadius: 0,
                       bgcolor: "info.light",
                       color: "white",
                     }}

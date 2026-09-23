@@ -1,11 +1,4 @@
-import {
-  Box,
-  Typography,
-  Grid,
-  Paper,
-  Container,
-  useTheme,
-} from "@mui/material";
+import { Box, Typography, Container, Stack } from "@mui/material";
 import {
   Air,
   Public,
@@ -14,133 +7,143 @@ import {
   Thunderstorm,
   School,
 } from "@mui/icons-material";
+import { C } from "../../config/tokens";
+import CornerBrackets from "../military/CornerBrackets";
+import Reveal from "../military/Reveal";
+import SectionHeader from "../military/SectionHeader";
+import TacticalBackground from "../military/TacticalBackground";
 
-const Information = () => {
-  const theme = useTheme();
+const features = [
+  {
+    icon: Air,
+    title: "Realistik Fizika",
+    description:
+      "Külək, cazibə qüvvəsi və pərvanə dinamikasını yüksək dəqiqliklə simulyasiya edən inkişaf etmiş aerodinamika mühərriki.",
+  },
+  {
+    icon: Public,
+    title: "Real Dünya Əraziləri",
+    description:
+      "Şəhərlərdən dağlara qədər dünya üzrə fotogrammetriya ilə skan edilmiş mühitlər üzərində uçuş.",
+  },
+  {
+    icon: Timeline,
+    title: "Canlı Telemetriya",
+    description:
+      "Hündürlük, sürət, batareya, siqnal gücü və GPS məlumatlarını real vaxtda izləyin.",
+  },
+  {
+    icon: SettingsRemote,
+    title: "Pult Dəstəyi",
+    description:
+      "Məşhur RC ötürücülər, gamepad-lər və fərdi qurğularla tam uyğunluq.",
+  },
+  {
+    icon: Thunderstorm,
+    title: "Hava Sistemi",
+    description:
+      "Külək şiddətlənmələri, yağış, duman və turbulentlik daxil olmaqla dinamik hava şəraiti.",
+  },
+  {
+    icon: School,
+    title: "Təlim Missiyaları",
+    description:
+      "Yeni başlayanlar üçün hover məşqlərindən tutmuş, inkişaf etmiş FPV yarış treklərinə qədər strukturlaşdırılmış kurslar.",
+  },
+];
 
-  const features = [
-    {
-      icon: <Air fontSize="large" color="primary" />,
-      title: "Realistik Fizika",
-      description:
-        "Külək, cazibə qüvvəsi və pərvanə dinamikasını yüksək dəqiqliklə simulyasiya edən inkişaf etmiş aerodinamika mühərriki.",
-    },
-    {
-      icon: <Public fontSize="large" color="secondary" />,
-      title: "Real Dünya Əraziləri",
-      description:
-        "Şəhərlərdən dağlara qədər dünya üzrə fotogrammetriya ilə skan edilmiş mühitlər üzərində uçuş.",
-    },
-    {
-      icon: <Timeline fontSize="large" color="primary" />,
-      title: "Canlı Telemetriya",
-      description:
-        "Hündürlük, sürət, batareya, siqnal gücü və GPS məlumatlarını real vaxtda izləyin.",
-    },
-    {
-      icon: <SettingsRemote fontSize="large" color="secondary" />,
-      title: "Pult Dəstəyi",
-      description:
-        "Məşhur RC ötürücülər, gamepad-lər və fərdi qurğularla tam uyğunluq.",
-    },
-    {
-      icon: <Thunderstorm fontSize="large" color="primary" />,
-      title: "Hava Sistemi",
-      description:
-        "Külək şiddətlənmələri, yağış, duman və turbulentlik daxil olmaqla dinamik hava şəraiti.",
-    },
-    {
-      icon: <School fontSize="large" color="secondary" />,
-      title: "Təlim Missiyaları",
-      description:
-        "Yeni başlayanlar üçün hover məşqlərindən tutmuş, inkişaf etmiş FPV yarış treklərinə qədər strukturlaşdırılmış kurslar.",
-    },
-  ];
+const Information = () => (
+  <Box
+    component="section"
+    sx={{
+      position: "relative",
+      bgcolor: C.paper,
+      py: { xs: 10, md: 14 },
+      overflow: "hidden",
+    }}
+  >
+    <TacticalBackground tone="light" topo={false} vignette={false} />
+    <Container maxWidth="lg" sx={{ position: "relative" }}>
+      <Reveal>
+        <SectionHeader
+          overline="İmkanlar"
+          title="Simulyasiya xüsusiyyətləri"
+          subtitle="Peşəkar pilot kimi məşq etmək üçün lazım olan hər şey."
+        />
+      </Reveal>
 
-  return (
-    <Box
-      sx={{
-        width: "100%",
-        py: { xs: 8, md: 12 },
-        background: "#f7f9fc",
-      }}
-    >
-      <Container maxWidth="xl">
-        {/* Bölmə Etiketi */}
-        <Typography
-          variant="overline"
-          sx={{
-            letterSpacing: 2,
-            fontWeight: 700,
-            color: theme.palette.primary.main,
-          }}
-        >
-          İMKANLAR
-        </Typography>
-
-        {/* Əsas Başlıq */}
-        <Typography
-          variant="h3"
-          sx={{
-            fontWeight: 800,
-            mt: 1,
-            mb: 2,
-            background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          SİMULYASİYA XÜSUSİYYƏTLƏRİ
-        </Typography>
-
-        {/* Alt Başlıq */}
-        <Typography
-          variant="h6"
-          color="text.secondary"
-          sx={{ mb: 6, maxWidth: 700 }}
-        >
-          Peşəkar pilot kimi məşq etmək üçün lazım olan hər şey.
-        </Typography>
-
-        {/* Xüsusiyyətlər Şəbəkəsi */}
-        <Grid container spacing={4}>
-          {features.map((feature, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <Paper
-                sx={{
-                  p: 4,
-                  height: "100%",
-                  borderRadius: 4,
-                  boxShadow:
-                    "0 4px 12px rgba(0,0,0,0.05), 0 12px 32px rgba(0,0,0,0.08)",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    transform: "translateY(-10px)",
-                    boxShadow: "0 16px 48px rgba(0,0,0,0.12)",
-                  },
-                }}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "repeat(3, 1fr)" },
+          borderTop: `1px solid ${C.ruleStrong}`,
+          borderLeft: `1px solid ${C.ruleStrong}`,
+        }}
+      >
+        {features.map(({ icon: Icon, title, description }, index) => (
+          <Reveal
+            key={title}
+            delay={index * 80}
+            sx={{
+              borderRight: `1px solid ${C.ruleStrong}`,
+              borderBottom: `1px solid ${C.ruleStrong}`,
+            }}
+          >
+            <Box
+              sx={{
+                position: "relative",
+                height: "100%",
+                p: { xs: 3, md: 4 },
+                bgcolor: "rgba(251, 250, 245, 0.7)",
+                transition: "background-color .3s ease",
+                "& .sg-brackets": {
+                  opacity: 0,
+                  transform: "scale(1.06)",
+                  transition: "opacity .3s ease, transform .35s cubic-bezier(0.16, 1, 0.3, 1)",
+                },
+                "&:hover": { bgcolor: C.paperRaised },
+                "&:hover .sg-brackets": { opacity: 1, transform: "none" },
+                "&:hover .sg-icon": {
+                  bgcolor: C.olive,
+                  borderColor: C.olive,
+                  color: C.paper,
+                },
+              }}
+            >
+              <CornerBrackets size={12} inset={10} color={C.brassDark} />
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="flex-start"
+                sx={{ mb: 3 }}
               >
-                <Box mb={2}>{feature.icon}</Box>
-
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                  {feature.title}
-                </Typography>
-
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ lineHeight: 1.7 }}
+                <Box
+                  className="sg-icon"
+                  sx={{
+                    width: 52,
+                    height: 52,
+                    display: "grid",
+                    placeItems: "center",
+                    border: `1px solid ${C.ruleStrong}`,
+                    color: C.olive,
+                    transition: "all .3s ease",
+                  }}
                 >
-                  {feature.description}
-                </Typography>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-    </Box>
-  );
-};
+                  <Icon sx={{ fontSize: 26 }} />
+                </Box>
+              </Stack>
+              <Typography variant="h6" sx={{ mb: 1.25 }}>
+                {title}
+              </Typography>
+              <Typography variant="body2" sx={{ color: C.textMuted, lineHeight: 1.7 }}>
+                {description}
+              </Typography>
+            </Box>
+          </Reveal>
+        ))}
+      </Box>
+    </Container>
+  </Box>
+);
 
 export default Information;

@@ -1,32 +1,22 @@
 import * as React from "react";
-import {
-  Box,
-  Tabs,
-  Tab,
-  Paper,
-  Typography,
-  useMediaQuery,
-  useTheme,
-  Container,
-  Grid,
-  Fade,
-} from "@mui/material";
-import {
-  MdGroup,
-  MdSupervisorAccount,
-  MdDashboard,
-  MdCheckCircle,
-} from "react-icons/md";
+import { Box, ButtonBase, Stack, Typography } from "@mui/material";
+import { MdGroup, MdSupervisorAccount, MdCheckCircle } from "react-icons/md";
 import { BRAND } from "../config/brand";
 import AdminsView from "../components/features/admins/AdminsView";
 import ApplicantsView from "../components/features/applicants/ApplicantsView";
 import AcceptedApplicantsView from "../components/features/acceptedApplicants/AcceptedApplicantsView";
+import Emblem from "../components/ui/Military/Emblem";
+import TacticalBackground from "../components/ui/Military/TacticalBackground";
+import { C, EASE, FONT, labelCaps } from "../styles/tokens";
+
+const TABS = [
+  { value: "admins", label: "Adminlər", icon: MdSupervisorAccount },
+  { value: "applicants", label: "Müraciətlər", icon: MdGroup },
+  { value: "accepted", label: "Qəbullar", icon: MdCheckCircle },
+];
 
 export default function DashboardPage() {
   const [tab, setTab] = React.useState("applicants");
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
 
   const renderTabContent = () => {
     switch (tab) {
@@ -42,206 +32,122 @@ export default function DashboardPage() {
   };
 
   return (
-    <Container
-      maxWidth={false}
-      sx={{
-        px: { xs: 0, sm: 0, md: 2, lg: 4 },
-        py: { xs: 2, sm: 3, md: 4 },
-        width: "100%",
-        maxWidth: "100%",
-      }}
-    >
-      {/* Enhanced Header Section */}
-      <Fade in timeout={600}>
-        <Paper
+    <Box sx={{ width: "100%" }}>
+      {/* Command header */}
+      <Box
+        sx={{
+          position: "relative",
+          mb: { xs: 3, md: 4 },
+          bgcolor: C.field800,
+          color: C.textOnDark,
+          overflow: "hidden",
+          animation: `sg-fade-up .6s ${EASE.out} backwards`,
+        }}
+      >
+        <TacticalBackground />
+        <Emblem
+          decorative
+          size={220}
+          opacity={0.07}
+          sx={{ position: "absolute", right: { xs: -60, md: 40 }, top: -30 }}
+        />
+        <Box sx={{ position: "relative", p: { xs: 2.5, sm: 3.5, md: 4.5 } }}>
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            sx={{ mb: 1.5, fontFamily: FONT.mono, fontSize: "0.72rem", letterSpacing: "0.12em" }}
+          >
+            <Box component="span" sx={{ color: C.brass }}>
+              İDARƏETMƏ MƏRKƏZİ
+            </Box>
+            <Box sx={{ width: 36, height: "1px", bgcolor: C.brass, opacity: 0.7 }} />
+          </Stack>
+          <Typography
+            variant="h2"
+            component="h1"
+            sx={{
+              color: C.textOnDark,
+              fontSize: { xs: "1.7rem", sm: "2.1rem", md: "2.6rem" },
+              maxWidth: 820,
+              mb: 1,
+            }}
+          >
+            {BRAND.COURSE_NAME}
+          </Typography>
+          <Typography sx={{ color: C.textOnDarkMuted, fontSize: { xs: "0.92rem", md: "1rem" } }}>
+            İdarəetmə paneli və müraciətlərin idarə edilməsi
+          </Typography>
+        </Box>
+
+        {/* Sector selector */}
+        <Box
+          role="tablist"
+          aria-label="Bölmələr"
           sx={{
-            mb: { xs: 3, md: 4 },
-            borderRadius: { xs: 0, sm: 3 },
-            boxShadow: "0 4px 20px rgba(54, 79, 107, 0.08)",
-            border: "1px solid",
-            borderColor: "grey.200",
-            background:
-              "linear-gradient(135deg, rgba(54, 79, 107, 0.02) 0%, background.paper 100%)",
-            overflow: "hidden",
+            position: "relative",
+            display: "grid",
+            gridTemplateColumns: { xs: "repeat(3, 1fr)", md: "repeat(3, minmax(0, 220px))" },
+            borderTop: `1px solid ${C.lineDark}`,
+            bgcolor: "rgba(11, 15, 10, 0.35)",
           }}
         >
-          <Grid container>
-            {/* Header Content */}
-            <Grid item xs={12}>
-              <Box sx={{ p: { xs: 3, sm: 4, md: 5 } }}>
-                <Grid container spacing={{ xs: 2, md: 4 }} alignItems="center">
-                  {/* Title Section */}
-                  <Grid item xs={12} md={8}>
-                    <Grid container spacing={2} alignItems="center">
-                      <Grid item xs="auto">
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: { xs: 40, md: 48 },
-                            height: { xs: 40, md: 48 },
-                            borderRadius: 2,
-                            bgcolor: "primary.main",
-                            color: "white",
-                          }}
-                        >
-                          <MdDashboard size={isMobile ? 20 : 24} />
-                        </Box>
-                      </Grid>
-                      <Grid item xs>
-                        <Typography
-                          variant={isSmall ? "h5" : isMobile ? "h4" : "h3"}
-                          sx={{
-                            fontWeight: 800,
-                            fontSize: {
-                              xs: "1.25rem",
-                              sm: "1.5rem",
-                              md: "1.75rem",
-                              lg: "2rem",
-                            },
-                            lineHeight: { xs: 1.3, md: 1.2 },
-                            color: "primary.main",
-                            background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.dark})`,
-                            backgroundClip: "text",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            mb: 1,
-                          }}
-                        >
-                          {BRAND.COURSE_NAME}
-                        </Typography>
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            color: "text.secondary",
-                            fontSize: { xs: "0.9rem", md: "1rem" },
-                            fontWeight: 500,
-                          }}
-                        >
-                          İdarəetmə paneli və müraciətlərin idarə edilməsi
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Grid>
-
-            {/* Enhanced Navigation Tabs */}
-            <Grid item xs={12}>
-              <Box
+          {TABS.map(({ value, label, icon: Icon }) => {
+            const selected = tab === value;
+            return (
+              <ButtonBase
+                key={value}
+                role="tab"
+                aria-selected={selected}
+                onClick={() => setTab(value)}
                 sx={{
-                  px: { xs: 2, sm: 3, md: 3.5 }, // reduced padding
-                  pb: 2,
+                  position: "relative",
+                  justifyContent: { xs: "center", md: "flex-start" },
+                  gap: 1.25,
+                  px: { xs: 1, md: 3 },
+                  py: { xs: 1.5, md: 1.75 },
+                  borderRight: `1px solid ${C.lineDark}`,
+                  color: selected ? C.brassLight : C.textOnDarkMuted,
+                  bgcolor: selected ? "rgba(201, 166, 70, 0.1)" : "transparent",
+                  transition: "color .2s, background-color .2s",
+                  "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    height: 3,
+                    bgcolor: C.brass,
+                    transform: selected ? "scaleX(1)" : "scaleX(0)",
+                    transition: "transform .35s cubic-bezier(0.16, 1, 0.3, 1)",
+                  },
+                  "&:hover": { color: C.textOnDark, bgcolor: "rgba(232, 228, 212, 0.05)" },
                 }}
               >
-                <Box
-                  sx={{
-                    bgcolor: "background.paper",
-                    borderRadius: 2,
-                    p: 0.35, // reduced padding
-                    border: "1px solid",
-                    borderColor: "grey.200",
-                    boxShadow: "0 2px 6px rgba(54, 79, 107, 0.05)", // lighter shadow
-                    display: "inline-block",
-                    width: isMobile ? "100%" : "auto",
-                  }}
-                >
-                  <Tabs
-                    value={tab}
-                    onChange={(_, v) => setTab(v)}
-                    variant={isMobile ? "fullWidth" : "standard"}
-                    sx={{
-                      minHeight: { xs: 30, md: 34 }, // ↓ ~30%
-                      "& .MuiTab-root": {
-                        minHeight: { xs: 30, md: 34 }, // ↓ ~30%
-                        fontSize: { xs: "0.7rem", md: "0.75rem" }, // ↓ ~30%
-                        fontWeight: 600,
-                        textTransform: "none",
-                        minWidth: { xs: 85, md: 100 }, // ↓ ~30%
-                        px: { xs: 1.5, md: 2 }, // ↓ padding
-                        borderRadius: 1.2,
-                        transition: "all 0.2s ease",
-                        color: "text.secondary",
-                        "&.Mui-selected": {
-                          color: "white",
-                          bgcolor: "primary.main",
-                          boxShadow: "0 1px 5px rgba(54, 79, 107, 0.2)", // smaller shadow
-                        },
-                        "&:hover:not(.Mui-selected)": {
-                          bgcolor: "grey.100",
-                          color: "primary.main",
-                        },
-                      },
-                      "& .MuiTabs-indicator": {
-                        display: "none",
-                      },
-                    }}
-                  >
-                    <Tab
-                      value="admins"
-                      label={
-                        <Grid container alignItems="center" spacing={0.5}>
-                          <Grid item>
-                            <MdSupervisorAccount size={12} /> {/* ↓ ~30% */}
-                          </Grid>
-                          <Grid item>
-                            <Typography variant="inherit">Adminlər</Typography>
-                          </Grid>
-                        </Grid>
-                      }
-                    />
-                    <Tab
-                      value="applicants"
-                      label={
-                        <Grid container alignItems="center" spacing={0.5}>
-                          <Grid item>
-                            <MdGroup size={12} /> {/* ↓ ~30% */}
-                          </Grid>
-                          <Grid item>
-                            <Typography variant="inherit">
-                              Müraciətlər
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                      }
-                    />
-                    <Tab
-                      value="accepted"
-                      label={
-                        <Grid container alignItems="center" spacing={0.5}>
-                          <Grid item>
-                            <MdCheckCircle size={12} /> {/* ↓ ~30% */}
-                          </Grid>
-                          <Grid item>
-                            <Typography variant="inherit">Qəbullar</Typography>
-                          </Grid>
-                        </Grid>
-                      }
-                    />
-                  </Tabs>
+                <Icon size={18} />
+                <Box component="span" sx={{ ...labelCaps, fontSize: { xs: "0.78rem", md: "0.9rem" } }}>
+                  {label}
                 </Box>
-              </Box>
-            </Grid>
-          </Grid>
-        </Paper>
-      </Fade>
+              </ButtonBase>
+            );
+          })}
+        </Box>
+      </Box>
 
       {/* Content Section with Animation */}
-      <Fade in timeout={800} style={{ transitionDelay: "200ms" }}>
-        <Box
-          sx={{
+      <Box
+        key={tab}
+        sx={{
+          width: "100%",
+          minHeight: 500,
+          "& > *": {
             width: "100%",
-            minHeight: 500,
-            "& > *": {
-              width: "100%",
-            },
-          }}
-        >
-          {renderTabContent()}
-        </Box>
-      </Fade>
-    </Container>
+          },
+          animation: `sg-fade-up .5s ${EASE.out} backwards`,
+        }}
+      >
+        {renderTabContent()}
+      </Box>
+    </Box>
   );
 }
