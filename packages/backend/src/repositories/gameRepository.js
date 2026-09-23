@@ -73,6 +73,7 @@ class GameRepository {
         m.id as map_id,
         m.name as map_name,
         m.code as map_code,
+        m.required_orb_count,
         (SELECT objective_time_seconds FROM map_runs 
          WHERE map_id = m.id AND user_id = $1 AND completed = true 
          ORDER BY objective_time_seconds ASC NULLS LAST 
@@ -81,7 +82,7 @@ class GameRepository {
         MIN(EXTRACT(EPOCH FROM (mr.run_ended_at - mr.run_started_at))) as best_time_seconds
       FROM maps m
       LEFT JOIN map_runs mr ON m.id = mr.map_id AND mr.user_id = $1 AND mr.completed = true
-      GROUP BY m.id, m.name, m.code
+      GROUP BY m.id, m.name, m.code, m.required_orb_count
       ORDER BY m.id
     `;
     const { rows } = await db.query(sql, [userId]);

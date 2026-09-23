@@ -20,99 +20,7 @@ import {
 } from "@mui/icons-material";
 import { apiClient } from "../../services/api/apiClient";
 import { endpoints } from "../../services/api/endpoints";
-import { MAP_DEFINITIONS } from "../../constants/maps";
-
-const mapsById = Object.fromEntries(
-  MAP_DEFINITIONS.map((map) => [map.id, map])
-);
-
-// Hardcoded level data
-const INITIAL_LEVELS_DATA = [
-  {
-    id: 1,
-    title: `Səviyyə 1: ${mapsById[1].name}`,
-    description: "Binaların arasında sürətli naviqasiya.",
-    image: mapsById[1].image,
-    difficulty: "Asan",
-    timesPlayed: 0,
-    duration: 2,
-    checkpoints: 9,
-    completed: false,
-    bestTime: null,
-  },
-  {
-    id: 2,
-    title: `Səviyyə 2: ${mapsById[2].name}`,
-    description: "Meşəlik ərazidə daşların arasında manevr edərək uçuş.",
-    image: mapsById[2].image,
-    difficulty: "Orta",
-    timesPlayed: 0,
-    duration: 2,
-    checkpoints: 9,
-    completed: false,
-    bestTime: null,
-  },
-  {
-    id: 3,
-    title: `Səviyyə 3: ${mapsById[3].name}`,
-    description: "Qədim qala və divarların arasında manevr edərək uçuş.",
-    image: mapsById[3].image,
-    difficulty: "Çətin",
-    timesPlayed: 0,
-    duration: 3,
-    checkpoints: 18,
-    completed: false,
-    bestTime: null,
-  },
-  {
-    id: 4,
-    title: `Səviyyə 4: ${mapsById[4].name}`,
-    description: "Anbar və binaların ətrafında uçuş.",
-    image: mapsById[4].image,
-    difficulty: "Çətin",
-    timesPlayed: 0,
-    duration: 0,
-    checkpoints: 12,
-    completed: false,
-    bestTime: null,
-  },
-  {
-    id: 5,
-    title: `Səviyyə 5: ${mapsById[5].name}`,
-    description: "Meşə arasında manevrə edərək uç.",
-    image: mapsById[5].image,
-    difficulty: "Çox Çətin",
-    timesPlayed: 0,
-    duration: 40,
-    checkpoints: 8,
-    completed: false,
-    bestTime: null,
-  },
-  {
-    id: 6,
-    title: `Səviyyə 6: ${mapsById[6].name}`,
-    description: "Qədim qala və divarların arasında manevr edərək uçuş.",
-    image: mapsById[6].image,
-    difficulty: "Çox Çətin",
-    timesPlayed: 0,
-    duration: 0,
-    checkpoints: 12,
-    completed: false,
-    bestTime: null,
-  },
-  {
-    id: 7,
-    title: `Səviyyə 7: ${mapsById[7].name}`,
-    description: "Qaraj və ətrafında manevr edərək uçuş.",
-    image: mapsById[7].image,
-    difficulty: "Çox Çətin",
-    timesPlayed: 0,
-    duration: 0,
-    checkpoints: 12,
-    completed: false,
-    bestTime: null,
-  },
-];
+import { INITIAL_LEVELS_DATA, MAPS } from "../../constants/maps";
 
 // const ACHIEVEMENTS = [
 //   { id: 1, title: "Uçuş ustası", subtitle: "3 səviyyə tamamlandı", color: "#FFD700" },
@@ -310,7 +218,7 @@ const LevelCard = ({ level }) => {
                 }}
               >
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  {level.checkpoints}
+                  {level.checkpoints ?? "—"}
                 </Typography>
                 <LinearProgress
                   variant="determinate"
@@ -417,7 +325,7 @@ const LevelsSection = ({ userRole }) => {
         const stats = response.stats || [];
         console.log("Stats data:", stats);
 
-        const mapNameToLevelId = MAP_DEFINITIONS.reduce((mapIds, map) => {
+        const mapNameToLevelId = MAPS.reduce((mapIds, map) => {
           mapIds[map.code.toLowerCase()] = map.id;
           return mapIds;
         }, {});
@@ -432,6 +340,7 @@ const LevelsSection = ({ userRole }) => {
             );
           });
           const timesPlayed = stat ? stat.times_played : level.timesPlayed;
+          const checkpoints = stat?.required_orb_count ?? level.checkpoints;
           const objectiveTime =
             stat && stat.objective_time_seconds
               ? stat.objective_time_seconds
@@ -442,6 +351,7 @@ const LevelsSection = ({ userRole }) => {
           return {
             ...level,
             timesPlayed: timesPlayed,
+            checkpoints,
             duration: `${deqiqe} dəq ${saniye} san`,
             bestTime:
               stat && stat.best_time_seconds
@@ -656,7 +566,7 @@ const LevelsSection = ({ userRole }) => {
                   </strong>
                 </Typography>
                 <Typography variant="body2" sx={{ color: "#90CAF9" }}>
-                  Checkpoint: <strong>{level.checkpoints}</strong>
+                  Checkpoint: <strong>{level.checkpoints ?? "—"}</strong>
                 </Typography>
               </Box>
             ))}
