@@ -20,24 +20,19 @@ import {
 } from "@mui/icons-material";
 import { apiClient } from "../../services/api/apiClient";
 import { endpoints } from "../../services/api/endpoints";
+import { MAP_DEFINITIONS } from "../../constants/maps";
 
-const R2_BASE_URL = process.env.REACT_APP_R2_BASE_URL;
-
-const maps_1 = `${R2_BASE_URL}/photos/LostCityPreview.png`;
-const maps_2 = `${R2_BASE_URL}/photos/StonehengePreview.png`;
-const maps_3 = `${R2_BASE_URL}/photos/AncientLevelPreview.png`;
-const maps_4 = `${R2_BASE_URL}/photos/LostCity2Preview.png`;
-const maps_5 = `${R2_BASE_URL}/photos/ForestPreview.png`;
-const maps_6 = `${R2_BASE_URL}/photos/AncientCastleLeve2Prevew.png`;
-const maps_7 = `${R2_BASE_URL}/photos/GaragePreview.png`;
+const mapsById = Object.fromEntries(
+  MAP_DEFINITIONS.map((map) => [map.id, map])
+);
 
 // Hardcoded level data
 const INITIAL_LEVELS_DATA = [
   {
     id: 1,
-    title: "Səviyyə 1: Tərk edilmiş şəhər",
+    title: `Səviyyə 1: ${mapsById[1].name}`,
     description: "Binaların arasında sürətli naviqasiya.",
-    image: maps_1,
+    image: mapsById[1].image,
     difficulty: "Asan",
     timesPlayed: 0,
     duration: 2,
@@ -47,9 +42,9 @@ const INITIAL_LEVELS_DATA = [
   },
   {
     id: 2,
-    title: "Səviyyə 2: Qədimi daşlar",
+    title: `Səviyyə 2: ${mapsById[2].name}`,
     description: "Meşəlik ərazidə daşların arasında manevr edərək uçuş.",
-    image: maps_2,
+    image: mapsById[2].image,
     difficulty: "Orta",
     timesPlayed: 0,
     duration: 2,
@@ -59,9 +54,9 @@ const INITIAL_LEVELS_DATA = [
   },
   {
     id: 3,
-    title: "Səviyyə 3: Qədim qala",
+    title: `Səviyyə 3: ${mapsById[3].name}`,
     description: "Qədim qala və divarların arasında manevr edərək uçuş.",
-    image: maps_3,
+    image: mapsById[3].image,
     difficulty: "Çətin",
     timesPlayed: 0,
     duration: 3,
@@ -71,9 +66,9 @@ const INITIAL_LEVELS_DATA = [
   },
   {
     id: 4,
-    title: "Səviyyə 4: Tərk edilmiş şəhər - 2",
+    title: `Səviyyə 4: ${mapsById[4].name}`,
     description: "Anbar və binaların ətrafında uçuş.",
-    image: maps_4,
+    image: mapsById[4].image,
     difficulty: "Çətin",
     timesPlayed: 0,
     duration: 0,
@@ -83,9 +78,9 @@ const INITIAL_LEVELS_DATA = [
   },
   {
     id: 5,
-    title: "Səviyyə 5: Meşəlik ərazi",
+    title: `Səviyyə 5: ${mapsById[5].name}`,
     description: "Meşə arasında manevrə edərək uç.",
-    image: maps_5,
+    image: mapsById[5].image,
     difficulty: "Çox Çətin",
     timesPlayed: 0,
     duration: 40,
@@ -95,9 +90,9 @@ const INITIAL_LEVELS_DATA = [
   },
   {
     id: 6,
-    title: "Səviyyə 6: Qədim qala - 2",
+    title: `Səviyyə 6: ${mapsById[6].name}`,
     description: "Qədim qala və divarların arasında manevr edərək uçuş.",
-    image: maps_6,
+    image: mapsById[6].image,
     difficulty: "Çox Çətin",
     timesPlayed: 0,
     duration: 0,
@@ -107,9 +102,9 @@ const INITIAL_LEVELS_DATA = [
   },
   {
     id: 7,
-    title: "Səviyyə 7: Qaraj",
+    title: `Səviyyə 7: ${mapsById[7].name}`,
     description: "Qaraj və ətrafında manevr edərək uçuş.",
-    image: maps_7,
+    image: mapsById[7].image,
     difficulty: "Çox Çətin",
     timesPlayed: 0,
     duration: 0,
@@ -422,22 +417,18 @@ const LevelsSection = ({ userRole }) => {
         const stats = response.stats || [];
         console.log("Stats data:", stats);
 
-        const mapNameToLevelId = {
-          Ghost_city_level: 1,
-          Island_Stonehenge_Level: 2,
-          Ancient_castle_level1: 3,
-          Ghost_city_level_hard: 4,
-          Island_Level_river: 5,
-          Ancient_castle_level2: 6,
-          Garage_level: 7,
-        };
+        const mapNameToLevelId = MAP_DEFINITIONS.reduce((mapIds, map) => {
+          mapIds[map.code.toLowerCase()] = map.id;
+          return mapIds;
+        }, {});
 
         const updatedLevels = INITIAL_LEVELS_DATA.map((level) => {
           console.log(level);
           const stat = stats.find((s) => {
             const mapCode = s.map_code;
             return (
-              s.map_id === level.id || mapNameToLevelId[mapCode] === level.id
+              s.map_id === level.id ||
+              mapNameToLevelId[mapCode?.toLowerCase?.()] === level.id
             );
           });
           const timesPlayed = stat ? stat.times_played : level.timesPlayed;

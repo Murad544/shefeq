@@ -3,6 +3,7 @@ import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import { useState, useEffect } from 'react';
 import { apiClient } from '../../services/api/apiClient';
 import { endpoints } from '../../services/api/endpoints';
+import { DISPLAYED_MAPS, MAP_NAMES } from '../../constants/maps';
 
 const medalColors = {
   0: "#FFD700",  // Gold for 1st
@@ -14,17 +15,6 @@ const medalNames = {
   0: "Qızıl",    // Gold
   1: "Gümüş",    // Silver
   2: "Bürünc",   // Bronze
-};
-
-// Maps to display in leaderboard
-const DISPLAYED_MAPS = ['baku_city_level', 'ghost_city_level', 'island_level_river', 'ghost_city_level_hard'];
-
-// Map names translation
-const MAP_NAMES = {
-  'baku_city_level': 'Bakı',
-  'ghost_city_level': 'Tərk edilmiş şəhər',
-  'island_level_river': 'Meşəlik ərazi',
-  'ghost_city_level_hard': 'Tərk edilmiş şəhər - 2',
 };
 
 const getMapDisplayName = (mapCode) => {
