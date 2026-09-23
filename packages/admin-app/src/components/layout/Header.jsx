@@ -35,7 +35,7 @@ export default function Header() {
       console.error("Logout error:", error);
     } finally {
       setLoading(false);
-      navigate("/admin/login", { replace: true });
+      navigate("/login", { replace: true });
     }
   };
 

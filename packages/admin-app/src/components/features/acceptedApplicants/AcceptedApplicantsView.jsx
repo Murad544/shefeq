@@ -186,7 +186,7 @@ export default function AcceptedApplicantsView() {
               <Tooltip title="Məlumatları redaktə et">
                 <IconButton
                   size="small"
-                  onClick={() => navigate(`/admin/users/${userId}/edit`)}
+                  onClick={() => navigate(`/users/${userId}/edit`)}
                   sx={{
                     ...createActionButtonStyles("success"),
                     color: "primary.main",

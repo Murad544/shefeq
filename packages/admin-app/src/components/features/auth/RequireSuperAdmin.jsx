@@ -23,7 +23,7 @@ export default function RequireSuperAdmin({ children }) {
   }
 
   if (!data || data.role !== "superadmin") {
-    return <Navigate to="/admin" replace state={{ from: location }} />;
+    return <Navigate to="/" replace state={{ from: location }} />;
   }
 
   return children;

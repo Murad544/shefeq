@@ -94,7 +94,7 @@ export default function RequireAdmin({ children }) {
 
   if (status === "unauthorized") {
     return (
-      <Navigate to="/admin/login" replace state={{ from: location.pathname }} />
+      <Navigate to="/login" replace state={{ from: location.pathname }} />
     );
   }
 

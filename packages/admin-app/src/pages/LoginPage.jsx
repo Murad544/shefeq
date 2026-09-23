@@ -56,7 +56,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await authApi.login(email, password);
-      navigate(state?.from || "/admin", { replace: true });
+      navigate(state?.from || "/", { replace: true });
     } catch (err) {
       setError(err.message || "Giriş uğursuz oldu.");
     } finally {

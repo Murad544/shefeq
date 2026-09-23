@@ -9,7 +9,7 @@ import UserEditPage from "./pages/UserEditPage";
 const PublicOnlyRoute = ({ children }) => {
   const token = window.localStorage.getItem("admin_token");
   if (token) {
-    return <Navigate to="/admin" replace />;
+    return <Navigate to="/" replace />;
   }
   return children;
 };
@@ -18,7 +18,7 @@ export default function App() {
   return (
     <Routes>
       <Route
-        path="/admin/login"
+        path="/login"
         element={
           <PublicOnlyRoute>
             <LoginPage />
@@ -26,7 +26,7 @@ export default function App() {
         }
       />
       <Route
-        path="/admin"
+        path="/"
         element={
           <RequireAdmin>
             <AdminLayout>
@@ -36,7 +36,7 @@ export default function App() {
         }
       />
       <Route
-        path="/admin/users/:id/edit"
+        path="/users/:id/edit"
         element={
           <RequireAdmin>
             <RequireSuperAdmin>
@@ -47,7 +47,7 @@ export default function App() {
           </RequireAdmin>
         }
       />
-      <Route path="*" element={<Navigate to="/admin" />} />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }

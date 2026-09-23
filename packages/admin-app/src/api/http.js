@@ -80,9 +80,9 @@ export async function http(
         if (
           typeof window !== "undefined" &&
           window.location &&
-          !window.location.includes("login")
+          !window.location.pathname.includes("login")
         ) {
-          window.location.replace("/admin/login");
+          window.location.replace("/login");
         }
         console.log(window.location);
       }

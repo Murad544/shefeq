@@ -140,7 +140,7 @@ export default function UserEditPage() {
           <Button
             startIcon={<MdArrowBack />}
             variant="outlined"
-            onClick={() => navigate("/admin")}
+            onClick={() => navigate("/")}
           >
             Geri
           </Button>
@@ -263,7 +263,7 @@ export default function UserEditPage() {
                 >
                   {submitting ? "Yadda saxlanılır..." : "Yadda saxla"}
                 </Button>
-                <Button variant="outlined" onClick={() => navigate("/admin")}>
+                <Button variant="outlined" onClick={() => navigate("/")}>
                   Ləğv et
                 </Button>
               </Stack>
