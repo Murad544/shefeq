@@ -8,11 +8,13 @@ import {
   Drawer,
   IconButton,
   Stack,
+  Typography,
   useScrollTrigger,
 } from "@mui/material";
 import { Close as CloseIcon, Menu as MenuIcon } from "@mui/icons-material";
-import { C, labelCaps } from "../../config/tokens";
-import BrandLockup from "../military/BrandLockup";
+import { BRAND } from "../../config/brand";
+import { C, FONT, labelCaps } from "../../config/tokens";
+import Logo from "../../assets/icons/Logo";
 import TricolorBar from "../military/TricolorBar";
 
 const NAV_ITEMS = [
@@ -71,12 +73,29 @@ const Navbar = () => {
     >
       <TricolorBar height={4} />
       <Toolbar sx={{ minHeight: { xs: 64, md: 70 }, px: { xs: 2, md: 4 }, gap: 2 }}>
-        {/* Logo + Brand */}
+        {/* University crest and name */}
         <Box
-          sx={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+          sx={{ display: "flex", alignItems: "center", gap: 1.5, cursor: "pointer" }}
           onClick={() => navigate("/")}
         >
-          <BrandLockup />
+          <Logo size={44} />
+          <Typography
+            sx={{
+              color: C.textOnDark,
+              fontFamily: FONT.display,
+              fontWeight: 600,
+              fontSize: 24,
+              letterSpacing: "0.04em",
+              lineHeight: 1.15,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {BRAND.ORGANIZATION_LINES.map((line) => (
+              <Box component="span" sx={{ display: "block" }} key={line}>
+                {line}
+              </Box>
+            ))}
+          </Typography>
         </Box>
 
         <Box sx={{ flex: 1 }} />
