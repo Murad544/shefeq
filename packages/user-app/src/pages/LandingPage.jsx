@@ -161,45 +161,6 @@ const LandingPage = () => {
                 simulyator üzərində praktiki təlimi üçün vahid platforma.
               </Typography>
 
-              {/* Feature chips */}
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(4, 1fr)" },
-                  gap: 1,
-                  mb: 4.5,
-                  maxWidth: 560,
-                }}
-              >
-                {featureChips.map((item, index) => (
-                  <Box
-                    key={item.label}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      px: 1.5,
-                      py: 1.1,
-                      border: `1px solid ${C.lineDarkStrong}`,
-                      bgcolor: "rgba(11, 15, 10, 0.35)",
-                      ...labelCaps,
-                      fontSize: "0.8rem",
-                      color: C.textOnDark,
-                      transition: "border-color .25s, color .25s, background-color .25s",
-                      "& svg": { color: C.brass, fontSize: 18 },
-                      "&:hover": {
-                        borderColor: C.brass,
-                        bgcolor: "rgba(201, 166, 70, 0.08)",
-                      },
-                      ...enter(580 + index * 70),
-                    }}
-                  >
-                    {item.icon}
-                    {item.label}
-                  </Box>
-                ))}
-              </Box>
-
               {/* CTA Buttons */}
               <Stack
                 direction={{ xs: "column", sm: "row" }}

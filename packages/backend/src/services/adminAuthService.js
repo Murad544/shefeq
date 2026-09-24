@@ -12,12 +12,12 @@ class AdminAuthService {
 
     const admin = await adminRepository.findByEmail(email);
     if (!admin || !admin.is_active) {
-      throw AppError.unauthorized('Invalid credentials', 'INVALID_CREDENTIALS');
+      throw AppError.unauthorized('Giriş məlumatları yanlışdır', 'INVALID_CREDENTIALS');
     }
 
     const isValidPassword = await encryptionService.verifyPassword(password, admin.password_hash);
     if (!isValidPassword) {
-      throw AppError.unauthorized('Invalid credentials', 'INVALID_CREDENTIALS');
+      throw AppError.unauthorized('Giriş məlumatları yanlışdır', 'INVALID_CREDENTIALS');
     }
 
     const tokenPayload = {

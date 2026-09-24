@@ -20,12 +20,12 @@ class UserAuthService {
 
     const user = await userRepository.findByEmail(email);
     if (!user || !user.is_active) {
-      throw AppError.unauthorized('Invalid credentials', 'INVALID_CREDENTIALS');
+      throw AppError.unauthorized('Giriş məlumatları yanlışdır', 'INVALID_CREDENTIALS');
     }
 
     const isValidPassword = await encryptionService.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
-      throw AppError.unauthorized('Invalid credentials', 'INVALID_CREDENTIALS');
+      throw AppError.unauthorized('Giriş məlumatları yanlışdır', 'INVALID_CREDENTIALS');
     }
 
     const sessionId = crypto.randomUUID();
@@ -73,7 +73,7 @@ class UserAuthService {
 
     const user = await userRepository.findById(userId);
     if (!user || !user.is_active) {
-      throw AppError.unauthorized('Invalid credentials', 'INVALID_CREDENTIALS');
+      throw AppError.unauthorized('Giriş məlumatları yanlışdır', 'INVALID_CREDENTIALS');
     }
 
     const passwordMatches = await encryptionService.verifyPassword(
