@@ -1,14 +1,13 @@
 import { Box } from "@mui/material";
 import { C, EASE } from "../../config/tokens";
 
-// Thin national tricolor (blue / red / green) used as a masthead stripe.
+// Single brass rule used as a masthead stripe and section accent.
 const TricolorBar = ({ height = 6, animate = false, delay = 0, sx }) => (
   <Box
     aria-hidden
     sx={{
       height,
-      display: "flex",
-      flexDirection: "column",
+      bgcolor: C.brass,
       flexShrink: 0,
       transformOrigin: "center",
       ...(animate && {
@@ -16,11 +15,7 @@ const TricolorBar = ({ height = 6, animate = false, delay = 0, sx }) => (
       }),
       ...sx,
     }}
-  >
-    <Box sx={{ flex: 1, bgcolor: C.flagBlue }} />
-    <Box sx={{ flex: 1, bgcolor: C.flagRed }} />
-    <Box sx={{ flex: 1, bgcolor: C.flagGreen }} />
-  </Box>
+  />
 );
 
 export default TricolorBar;

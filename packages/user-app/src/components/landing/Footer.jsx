@@ -13,15 +13,6 @@ const Footer = () => (
         <Grid item xs={12} md={6}>
           <Stack spacing={1.5}>
             <BrandLockup size="lg" />
-            <Typography
-              variant="caption"
-              sx={{ color: C.textOnDark, letterSpacing: "0.08em" }}
-            >
-              {BRAND.ORGANIZATION_NAME}
-            </Typography>
-            <Typography variant="body2" sx={{ color: C.textOnDarkMuted }}>
-              {BRAND.COURSE_NAME}
-            </Typography>
           </Stack>
         </Grid>
         <Grid item xs={12} md={6}>

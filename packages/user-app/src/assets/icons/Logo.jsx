@@ -1,4 +1,4 @@
-import crestSrc from "./mmu-crest.png";
+import crestSrc from "./mmu-3d.png";
 
 // Milli Müdafiə Universiteti crest. `size` is the rendered height in px (or a
 // CSS length such as "100%"); the width follows the crest's proportions.

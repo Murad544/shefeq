@@ -25,6 +25,7 @@ import AboutUs from "../components/landing/AboutUs";
 import ContactUs from "../components/landing/ContactUs";
 import Footer from "../components/landing/Footer";
 import TrainingRoute from "../components/landing/TrainingRoute";
+import DroneBackdrop from "../components/landing/DroneBackdrop";
 import Emblem from "../components/military/Emblem";
 import TacticalBackground from "../components/military/TacticalBackground";
 import TricolorBar from "../components/military/TricolorBar";
@@ -69,6 +70,7 @@ const LandingPage = () => {
         }}
       >
         <TacticalBackground />
+        <DroneBackdrop />
         <Emblem
           decorative
           size={520}
@@ -130,7 +132,7 @@ const LandingPage = () => {
               </Typography>
 
               <TricolorBar
-                height={4}
+                height={2}
                 animate
                 delay={500}
                 sx={{ width: 160, my: 3, transformOrigin: "left" }}

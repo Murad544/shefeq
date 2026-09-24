@@ -293,7 +293,7 @@ const TrainingRoute = () => {
             Hədəf
           </Box>
           <Box sx={{ ...labelCaps, fontSize: "1rem", color: C.textOnDark }}>
-            Hazır PUA operatoru
+            PUA operatoru
           </Box>
         </Box>
       </Stack>

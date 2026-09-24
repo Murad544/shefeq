@@ -38,7 +38,7 @@ const values = [
 ];
 
 const paragraphs = [
-  "Biz aviasiya mühəndisləri, proqramçılar və dron texnologiyaları sahəsində ixtisaslaşmış peşəkarlardan ibarət komandayıq.",
+  "Biz Milli Müdafiə Universitetinin aviasiya mühəndisləri, proqramçılar və dron texnologiyaları sahəsində ixtisaslaşmış peşəkarlardan ibarət komandayıq.",
   "Məqsədimiz müasir texnologiyalar əsasında realistik dron simulyasiya platforması yaradaraq, dron operatoru hazırlığı prosesini yeni səviyyəyə yüksəltməkdir.",
   "Platformamız qabaqcıl alətlər, inkişaf etmiş analitik imkanlar və müxtəlif real uçuş ssenarilərini əhatə edən simulyasiya mühitləri təqdim edir.",
 ];
