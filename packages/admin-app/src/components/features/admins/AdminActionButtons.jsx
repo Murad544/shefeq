@@ -1,5 +1,6 @@
 import { Box, Button } from "@mui/material";
 import { useAdminActions } from "../../../hooks/data/useAdminActions";
+import { C } from "../../../styles/tokens";
 
 export default function AdminActionButtons({ admin }) {
   const {
@@ -15,15 +16,14 @@ export default function AdminActionButtons({ admin }) {
       {isActivated ? (
         <Button
           size="small"
+          variant="outlined"
           onClick={handleDeactivateAdmin}
           disabled={deactivating}
           sx={{
-            bgcolor: "rgba(219, 52, 52, 0.8)",
-            color: "white",
-            fontWeight: 400,
-            border: "1px solid rgba(255, 255, 255, 0.3)",
-            padding: "0 10px",
-            "&:hover": { bgcolor: "rgba(219, 52, 52, 1)" },
+            color: C.red,
+            borderColor: "rgba(168, 50, 42, 0.5)",
+            whiteSpace: "nowrap",
+            "&:hover": { bgcolor: C.red, borderColor: C.red, color: "#fff" },
           }}
         >
           {deactivating ? "Deaktivləşdirilir..." : "Deaktivə Et"}
@@ -31,15 +31,14 @@ export default function AdminActionButtons({ admin }) {
       ) : (
         <Button
           size="small"
+          variant="outlined"
           onClick={handleActivateAdmin}
           disabled={activating}
           sx={{
-            bgcolor: "rgba(80, 153, 80, 0.59)",
-            color: "white",
-            fontWeight: 400,
-            border: "1px solid rgba(255, 255, 255, 0.3)",
-            padding: "0 10px",
-            "&:hover": { bgcolor: "rgba(91, 163, 91, 1)" },
+            color: C.green,
+            borderColor: "rgba(62, 123, 58, 0.5)",
+            whiteSpace: "nowrap",
+            "&:hover": { bgcolor: C.green, borderColor: C.green, color: "#fff" },
           }}
         >
           {activating ? "Aktivləşdirilir..." : "Aktivə Et"}

@@ -1,6 +1,5 @@
-import { Alert, Box, Container, Grid, Typography } from "@mui/material";
+import { Alert, Box, Container, Grid, Stack, Typography } from "@mui/material";
 import LoadingSpinner from "../components/common/LoadingSpinner";
-import ResponsiveContainer from "../components/common/ResponsiveContainer";
 import AccountInfoSection from "../components/profile/AccountInfoSection";
 import ApplicationStatusCard from "../components/profile/ApplicationStatusCard";
 import DocumentsCard from "../components/profile/DocumentsCard";
@@ -9,12 +8,25 @@ import GameInstallationSection from "../components/profile/GameInstallationSecti
 import PersonalInfoSection from "../components/profile/PersonalInfoSection";
 import ProfileHeader from "../components/profile/ProfileHeader";
 import TrainingProgressSection from "../components/profile/TrainingProgressSection";
-import Sidebar from "../components/profile/Sidebar";
+import Sidebar, { NAV_ITEMS } from "../components/profile/Sidebar";
 import LevelsSection from "../components/profile/LevelsSection";
 import LeaderboardSection from "../components/profile/LeaderboardSection";
 import { useProfileData } from "../hooks/useProfileData";
 import { useState } from "react";
 import FlightActivitySection from "../components/profile/FlightActivitySection";
+import { C, EASE, FONT, labelCaps } from "../config/tokens";
+import BrandLockup from "../components/military/BrandLockup";
+import TacticalBackground from "../components/military/TacticalBackground";
+import TricolorBar from "../components/military/TricolorBar";
+
+const SectionTitle = ({ title }) => (
+  <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+    <Typography variant="h4" component="h2">
+      {title}
+    </Typography>
+    <Box sx={{ flex: 1, height: "1px", bgcolor: C.ruleStrong }} />
+  </Stack>
+);
 
 const ProfilePage = () => {
   const { profile, loading } = useProfileData();
@@ -34,10 +46,10 @@ const ProfilePage = () => {
     console.log("Download game");
     window.open(profile?.gameInstallation?.downloadLink, "_blank");
   };
-  
+
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner message="Profil yüklənir" fullScreen />;
   }
 
   if (!profile) {
@@ -53,45 +65,97 @@ const ProfilePage = () => {
     ? 'profile'
     : activeSection;
 
+  const visibleItems = isTrainer
+    ? NAV_ITEMS.filter((item) => ['profile', 'training'].includes(item.id))
+    : NAV_ITEMS;
+  const sectionPosition = Math.max(
+    0,
+    visibleItems.findIndex((item) => item.id === effectiveSection)
+  );
+  const sectionLabel = visibleItems[sectionPosition]?.label || "";
+
   return (
-    <ResponsiveContainer>
-      <Box
-        sx={{
-          bgcolor: "background.paper",
-          py: 4,
-          px: 2,
-          borderRadius: 2,
-          boxShadow: 12,
-        }}
-      >
-        <Container maxWidth="lg">
-          {/* Header */}
-          <ProfileHeader profile={profile} />
+    <Box sx={{ minHeight: "100vh", display: "flex", bgcolor: C.paper }}>
+      {/* Sidebar */}
+      <Sidebar active={effectiveSection} onSelect={setActiveSection} userRole={profile?.userRole} />
 
-          <Grid container spacing={3}>
-            {/* Sidebar */}
-            <Grid item xs={12} md={3}>
-              <Sidebar active={effectiveSection} onSelect={setActiveSection} userRole={profile?.userRole} />
-            </Grid>
+      <Box sx={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+        {/* Mobile brand bar + tabs */}
+        <Box sx={{ display: { xs: "block", md: "none" }, bgcolor: C.field900, color: C.textOnDark }}>
+          <TricolorBar height={4} />
+          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ px: 2, py: 1.5 }}>
+            <BrandLockup size="sm" />
+          </Stack>
+          <Sidebar
+            variant="tabs"
+            active={effectiveSection}
+            onSelect={setActiveSection}
+            userRole={profile?.userRole}
+          />
+        </Box>
 
-            {/* Main Content */}
-            <Grid item xs={12} md={9}>
+        {/* Top bar */}
+        <Box
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            display: { xs: "none", md: "flex" },
+            alignItems: "center",
+            gap: 2,
+            height: 60,
+            px: { md: 3, lg: 5 },
+            bgcolor: "rgba(251, 250, 245, 0.92)",
+            backdropFilter: "blur(8px)",
+            borderBottom: `1px solid ${C.rule}`,
+          }}
+        >
+          <Box sx={{ fontFamily: FONT.mono, fontSize: "0.72rem", letterSpacing: "0.1em", color: C.textFaint }}>
+            ŞƏXSİ KABİNET /
+          </Box>
+          <Box
+            key={effectiveSection}
+            sx={{ ...labelCaps, fontSize: "0.9rem", color: C.text, animation: "sg-fade-in .4s ease backwards" }}
+          >
+            {sectionLabel}
+          </Box>
+        </Box>
+
+        {/* Main Content */}
+        <Box sx={{ position: "relative", flex: 1 }}>
+          <TacticalBackground tone="light" topo={false} vignette={false} />
+          <Box
+            sx={{
+              position: "relative",
+              width: "100%",
+              maxWidth: 1280,
+              mx: "auto",
+              px: { xs: 2, sm: 3, lg: 5 },
+              py: { xs: 3, md: 4 },
+            }}
+          >
+            {/* Header */}
+            <ProfileHeader profile={profile} />
+
+            <Box key={effectiveSection} sx={{ animation: `sg-fade-up .5s ${EASE.out} backwards` }}>
+              <SectionTitle title={sectionLabel} />
+
               {effectiveSection === 'profile' && (
-                <>
-                  <Typography variant="h6" sx={{ mb: 1 }}>Profil məlumatları</Typography>
-                  <PersonalInfoSection personalInfo={profile.personalInfo} />
-
-                  <Typography variant="h6" sx={{ mt: 3, mb: 1 }}>Əlaqə məlumatları</Typography>
-                  <AccountInfoSection contactInfo={profile.contactInfo} />
-
-                  <ApplicationStatusCard
-                    applicationStatus={profile.applicationStatus}
-                  />
-                  <DocumentsCard
-                    documents={profile.documents}
-                    onDownloadDocument={handleDownloadDocument}
-                  />
-                </>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} lg={7}>
+                    <PersonalInfoSection personalInfo={profile.personalInfo} />
+                    <AccountInfoSection contactInfo={profile.contactInfo} />
+                  </Grid>
+                  <Grid item xs={12} lg={5}>
+                    <ApplicationStatusCard
+                      applicationStatus={profile.applicationStatus}
+                    />
+                    <DocumentsCard
+                      documents={profile.documents}
+                      onDownloadDocument={handleDownloadDocument}
+                    />
+                  </Grid>
+                </Grid>
               )}
 
               {effectiveSection === 'training' && (
@@ -107,31 +171,23 @@ const ProfilePage = () => {
               )}
 
               {!isTrainer && effectiveSection === 'download' && (
-                <>
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    Oyun yükləmə
-                  </Typography>
-                  <GameInstallationSection
-                    gameInstallation={profile.gameInstallation}
-                    onDownloadGame={handleDownloadGame}
-                  />
-                </>
+                <GameInstallationSection
+                  gameInstallation={profile.gameInstallation}
+                  onDownloadGame={handleDownloadGame}
+                />
               )}
 
               {!isTrainer && effectiveSection === 'stats' && (
                 <>
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    Oyun Statistikası
-                  </Typography>
                   <GameAccountSection gameAccount={profile.gameAccount} />
                   <FlightActivitySection sessions={profile.gameAccount?.sessions} />
                 </>
               )}
-            </Grid>
-          </Grid>
-        </Container>
+            </Box>
+          </Box>
+        </Box>
       </Box>
-    </ResponsiveContainer>
+    </Box>
   );
 };
 

@@ -1,5 +1,14 @@
-import { Chip } from "@mui/material";
+import { Box } from "@mui/material";
+import { C, labelCaps } from "../../../styles/tokens";
 
+const TONES = {
+  success: { fg: C.green, bg: "rgba(62, 123, 58, 0.12)", led: "#62B85A" },
+  warning: { fg: "#8F6614", bg: "rgba(192, 138, 30, 0.14)", led: C.amber },
+  error: { fg: C.red, bg: "rgba(168, 50, 42, 0.1)", led: C.redLight },
+  default: { fg: C.textMuted, bg: "rgba(92, 97, 82, 0.1)", led: C.textFaint },
+};
+
+// Square status badge with an indicator lamp.
 export default function StatusChip({
   status,
   variant = "filled",
@@ -45,24 +54,39 @@ export default function StatusChip({
     return labelMap[String(status).toLowerCase()] || String(status);
   };
 
-  const color = getStatusColor(status);
+  const tone = TONES[getStatusColor(status)] || TONES.error;
   const label = getStatusLabel(status);
 
   return (
-    <Chip
-      label={label}
-      variant={variant}
-      size={size}
-      color={color}
+    <Box
+      component="span"
       sx={{
-        fontWeight: 600,
-        fontSize: size === "small" ? "0.75rem" : "0.875rem",
-        transition: "inherit",
+        ...labelCaps,
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 0.75,
+        px: 1,
+        height: size === "small" ? 24 : 28,
+        fontSize: size === "small" ? "0.72rem" : "0.8rem",
+        color: tone.fg,
+        bgcolor: variant === "outlined" ? "transparent" : tone.bg,
+        border: `1px solid ${tone.fg}`,
+        whiteSpace: "nowrap",
         pointerEvents: "none",
         ...props.sx,
-        color: "white",
       }}
-      {...props}
-    />
+    >
+      <Box
+        component="span"
+        sx={{
+          width: 7,
+          height: 7,
+          borderRadius: "50%",
+          color: tone.led,
+          bgcolor: "currentColor",
+        }}
+      />
+      {label}
+    </Box>
   );
 }

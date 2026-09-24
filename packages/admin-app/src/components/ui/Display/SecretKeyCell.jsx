@@ -1,7 +1,9 @@
 import * as React from "react";
 import { Stack, IconButton, Tooltip, Typography, Box } from "@mui/material";
-import { MdContentCopy, MdCheck } from "react-icons/md";
+import { MdContentCopy, MdCheck, MdKey } from "react-icons/md";
+import { C, FONT } from "../../../styles/tokens";
 
+// Secret key readout in a dark mono "terminal" strip with copy action.
 export default function SecretKeyCell({ value }) {
   const [copied, setCopied] = React.useState(false);
   const text = String(value || "");
@@ -20,45 +22,28 @@ export default function SecretKeyCell({ value }) {
 
   return (
     <Box
+      className="secret-key-cell"
       sx={{
         minWidth: { xs: 180, sm: 200, md: 220 },
-        maxWidth: { xs: 220, sm: 250, md: 280 },
-        p: { xs: 1, sm: 1.5 },
-        borderRadius: 2,
-        bgcolor: "grey.50",
-        border: "1px solid",
-        borderColor: "grey.200",
-        transition: "all 0.3s ease",
-        "&:hover": {
-          borderColor: "primary.light",
-          bgcolor: "primary.light",
-          transform: "translateY(-1px)",
-          boxShadow: "0 4px 16px rgba(54, 79, 107, 0.15)",
-          "& .MuiTypography-root": {
-            color: "white",
-          },
-          "& .MuiIconButton-root": {
-            bgcolor: "rgba(255, 255, 255, 0.15)",
-            color: "white",
-          },
-        },
+        maxWidth: { xs: 240, sm: 270, md: 300 },
+        pl: 1.25,
+        pr: 0.5,
+        py: 0.5,
+        bgcolor: C.field900,
+        border: `1px solid ${C.field600}`,
+        transition: "border-color .2s",
+        "&:hover": { borderColor: C.brass },
       }}
     >
-      <Stack
-        direction="row"
-        alignItems="center"
-        spacing={{ xs: 0.75, sm: 1 }}
-        justifyContent="space-between"
-      >
+      <Stack direction="row" alignItems="center" spacing={1} justifyContent="space-between">
+        <Box sx={{ color: C.brass, display: "flex" }}>
+          <MdKey size={14} />
+        </Box>
         <Tooltip
           title={
             <Typography
               variant="caption"
-              sx={{
-                fontFamily: "monospace",
-                wordBreak: "break-all",
-                fontSize: { xs: "0.7rem", sm: "0.75rem" },
-              }}
+              sx={{ fontFamily: FONT.mono, wordBreak: "break-all", fontSize: "0.72rem" }}
             >
               {text}
             </Typography>
@@ -69,20 +54,19 @@ export default function SecretKeyCell({ value }) {
           <Typography
             variant="body2"
             sx={{
-              fontFamily:
-                "'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+              fontFamily: FONT.mono,
               fontWeight: 500,
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
               flex: 1,
-              color: "primary.main",
-              fontSize: { xs: "0.75rem", sm: "0.8rem", md: "0.875rem" },
-              letterSpacing: "0.5px",
+              color: C.textOnDark,
+              fontSize: { xs: "0.75rem", sm: "0.8rem" },
+              letterSpacing: "0.06em",
               cursor: "help",
             }}
           >
-            {short}
+            {short || "—"}
           </Typography>
         </Tooltip>
 
@@ -91,21 +75,15 @@ export default function SecretKeyCell({ value }) {
             <IconButton
               size="small"
               onClick={handleCopy}
+              aria-label="Kopyala"
               sx={{
-                width: { xs: 26, sm: 28, md: 30 },
-                height: { xs: 26, sm: 28, md: 30 },
-                borderRadius: 1.5,
-                transition: "all 0.2s ease",
-                bgcolor: copied ? "success.light" : "transparent",
-                color: copied ? "success.dark" : "primary.main",
-                "&:hover": {
-                  bgcolor: copied ? "success.main" : "primary.light",
-                  color: "white",
-                  transform: "scale(1.05)",
-                },
+                width: 28,
+                height: 28,
+                color: copied ? "#62B85A" : C.textOnDarkMuted,
+                "&:hover": { bgcolor: C.brass, color: C.ink },
               }}
             >
-              {copied ? <MdCheck size={12} /> : <MdContentCopy size={12} />}
+              {copied ? <MdCheck size={14} /> : <MdContentCopy size={13} />}
             </IconButton>
           </Tooltip>
         )}

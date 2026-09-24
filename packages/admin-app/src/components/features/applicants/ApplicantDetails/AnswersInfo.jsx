@@ -12,7 +12,7 @@ function AnswerItem({ answer, qmap }) {
       variant="outlined"
       sx={{
         p: 2.5,
-        borderRadius: 2,
+        borderRadius: 0,
         bgcolor: "grey.50",
         borderColor: "grey.200",
       }}
@@ -60,7 +60,7 @@ export default function AnswersInfo({ loading, error, answers, qmap }) {
         <Alert
           severity="warning"
           sx={{
-            borderRadius: 2,
+            borderRadius: 0,
             bgcolor: "warning.light",
             color: "warning.dark",
           }}

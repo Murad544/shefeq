@@ -6,9 +6,10 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1500,
     height: 1200,
+    icon: path.join(__dirname, "favicon.png"),
     title: process.env.REACT_APP_PROJECT_NAME
       ? `${process.env.REACT_APP_PROJECT_NAME}`
-      : "Şəfəq",
+      : "FPV Tədris Alt Sistemi",
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,

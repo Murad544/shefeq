@@ -1,34 +1,36 @@
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box } from "@mui/material";
+import RadarLoader from "../military/RadarLoader";
+import TacticalBackground from "../military/TacticalBackground";
+import { C } from "../../config/tokens";
 
 const LoadingSpinner = ({
   message = "Yüklənir...",
   size = 40,
   fullScreen = false,
 }) => {
-  const content = (
+  if (!fullScreen) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+        <RadarLoader size={Math.max(56, size + 16)} message={message} />
+      </Box>
+    );
+  }
+
+  return (
     <Box
       sx={{
+        position: "relative",
+        minHeight: "100vh",
         display: "flex",
-        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 2,
-        ...(fullScreen && {
-          minHeight: "100vh",
-          bgcolor: "background.default",
-        }),
+        bgcolor: C.field900,
       }}
     >
-      <CircularProgress size={size} thickness={4} />
-      {message && (
-        <Typography variant="body2" color="text.secondary">
-          {message}
-        </Typography>
-      )}
+      <TacticalBackground />
+      <RadarLoader size={96} message={message} dark sx={{ position: "relative" }} />
     </Box>
   );
-
-  return content;
 };
 
 export default LoadingSpinner;

@@ -1,9 +1,10 @@
-import { Box, CircularProgress, Stack, Typography } from "@mui/material";
+import { Box } from "@mui/material";
+import RadarLoader from "../Military/RadarLoader";
 
 export default function LoadingState({
   message = "Yüklənir...",
   size = 40,
-  color = "primary.main",
+  color,
 }) {
   return (
     <Box
@@ -14,12 +15,7 @@ export default function LoadingState({
         alignItems: "center",
       }}
     >
-      <Stack alignItems="center" spacing={2}>
-        <CircularProgress size={size} sx={{ color }} />
-        <Typography variant="body2" color="text.secondary">
-          {message}
-        </Typography>
-      </Stack>
+      <RadarLoader size={Math.max(64, size + 24)} message={message} />
     </Box>
   );
 }

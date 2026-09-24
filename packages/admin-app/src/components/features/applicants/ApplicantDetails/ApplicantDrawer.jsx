@@ -24,6 +24,10 @@ import FilesInfo from "./FilesInfo";
 import ActionButtons from "./ActionButtons";
 import GameAccountInfo from "./GameAccountInfo";
 import StatusChip from "../../../ui/Display/StatusChip";
+import CornerBrackets from "../../../ui/Military/CornerBrackets";
+import TacticalBackground from "../../../ui/Military/TacticalBackground";
+import TricolorBar from "../../../ui/Military/TricolorBar";
+import { C, FONT } from "../../../../styles/tokens";
 
 import { useApplicantDetail } from "../../../../hooks/data/useApplicantDetail";
 import { useApplicantActions } from "../../../../hooks/data/useApplicantActions";
@@ -42,33 +46,37 @@ import {
 
 function MobileHandle() {
   return (
-    <Box
-      sx={{
-        width: 48,
-        height: 4,
-        borderRadius: 2,
-        bgcolor: "grey.300",
-        mx: "auto",
-        mt: 1.5,
-        mb: 2,
-      }}
-    />
+    <Box sx={{ bgcolor: C.field900, pt: 1.25, pb: 0.5 }}>
+      <Box
+        sx={{
+          width: 48,
+          height: 4,
+          bgcolor: C.lineDarkStrong,
+          mx: "auto",
+        }}
+      />
+    </Box>
   );
 }
 
-function DrawerHeader({ isMobile, user, id, onClose, isOnline }) {
+function DrawerHeader({ isMobile, user, onClose, isOnline }) {
   return (
     <Box
       sx={{
         position: "sticky",
         top: 0,
         zIndex: (theme) => theme.zIndex.appBar,
-        bgcolor: "background.paper",
-        borderBottom: (theme) => `1px solid ${theme.palette.grey[200]}`,
-        boxShadow: "0 2px 8px rgba(54, 79, 107, 0.08)",
+        bgcolor: C.field900,
+        color: C.textOnDark,
+        overflow: "hidden",
+        // The drawer paper is a flex column; overflow:hidden would otherwise
+        // let this header shrink when the dossier content is tall.
+        flexShrink: 0,
       }}
     >
-      <Container maxWidth={false} sx={{ px: { xs: 3, md: 4 } }}>
+      <TricolorBar height={4} />
+      <TacticalBackground topo={false} />
+      <Container maxWidth={false} sx={{ position: "relative", px: { xs: 3, md: 4 } }}>
         <Grid
           container
           alignItems="center"
@@ -78,41 +86,59 @@ function DrawerHeader({ isMobile, user, id, onClose, isOnline }) {
           <Grid item xs="auto">
             <Box
               sx={{
+                position: "relative",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                width: 40,
-                height: 40,
-                borderRadius: 2,
-                bgcolor: "primary.main",
-                color: "white",
+                width: 48,
+                height: 56,
+                bgcolor: C.field700,
+                border: `1px solid ${C.lineDarkStrong}`,
+                color: C.brass,
               }}
             >
-              <MdPerson size={20} />
+              <CornerBrackets size={8} inset={-4} />
+              {user?.name ? (
+                <Box sx={{ fontFamily: FONT.serif, fontWeight: 700, fontSize: "1.6rem" }}>
+                  {String(user.name).charAt(0)}
+                </Box>
+              ) : (
+                <MdPerson size={22} />
+              )}
             </Box>
           </Grid>
 
-          <Grid item xs>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 0.5 }}>
-              <Typography
-                variant={isMobile ? "h6" : "h5"}
+          <Grid item xs sx={{ minWidth: 0 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 1.5,
+                mb: 0.5,
+              }}
+            >
+              <Box
                 sx={{
-                  fontWeight: 700,
-                  color: "primary.main",
-                  fontSize: { xs: "1.1rem", md: "1.3rem" },
+                  fontFamily: FONT.mono,
+                  fontSize: { xs: "0.72rem", md: "0.78rem" },
+                  letterSpacing: "0.12em",
+                  color: C.brass,
                 }}
               >
-                Müraciət #{user?.id ?? id}
-              </Typography>
+                MÜRACİƏT DOSYESİ
+              </Box>
               {isOnline !== null && (
                 <StatusChip status={isOnline} />
               )}
             </Box>
             <Typography
-              variant="body2"
               sx={{
-                color: "text.secondary",
-                fontSize: "0.875rem",
+                fontFamily: FONT.serif,
+                fontWeight: 700,
+                fontSize: { xs: "1.25rem", md: "1.55rem" },
+                lineHeight: 1.2,
+                wordBreak: "break-word",
               }}
             >
               {user?.name && user?.surname
@@ -127,11 +153,12 @@ function DrawerHeader({ isMobile, user, id, onClose, isOnline }) {
                 onClick={onClose}
                 aria-label="Bağla"
                 sx={{
-                  color: "text.secondary",
-                  bgcolor: "grey.100",
+                  color: C.textOnDark,
+                  border: `1px solid ${C.lineDarkStrong}`,
                   "&:hover": {
-                    bgcolor: "grey.200",
-                    color: "text.primary",
+                    bgcolor: C.brass,
+                    borderColor: C.brass,
+                    color: C.ink,
                   },
                 }}
               >
@@ -330,7 +357,6 @@ export default function ApplicantDrawer({
   );
 
   const {
-    id,
     user,
     loading,
     error,
@@ -352,7 +378,7 @@ export default function ApplicantDrawer({
     <DrawerComponent {...drawerProps}>
       {isMobile && <MobileHandle />}
 
-      <DrawerHeader isMobile={isMobile} user={user} id={id} onClose={onClose} isOnline={isOnline} />
+      <DrawerHeader isMobile={isMobile} user={user} onClose={onClose} isOnline={isOnline} />
 
       <ActionButtons applicant={applicant} {...applicantActions} />
 

@@ -1,5 +1,6 @@
-import { Box, Grid, Chip, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import SearchField from "../Forms/SearchField";
+import { C, FONT } from "../../../styles/tokens";
 
 export default function TableSearch({
   searchValue,
@@ -12,7 +13,7 @@ export default function TableSearch({
   isLoading = false,
 }) {
   return (
-    <Grid container spacing={2} alignItems="flex-start">
+    <Grid container spacing={2} alignItems="center">
       <Grid item xs={12} md={8}>
         <SearchField
           value={searchValue}
@@ -27,30 +28,37 @@ export default function TableSearch({
           sx={{
             display: "flex",
             flexDirection: { xs: "row", md: "column" },
-            gap: 1,
+            gap: 0.5,
             justifyContent: { xs: "space-between", md: "flex-end" },
             alignItems: { xs: "center", md: "flex-end" },
-            height: "100%",
           }}
         >
-          <Chip
-            label={`${totalCount} ${countLabel}`}
-            size="small"
+          <Box
             sx={{
-              bgcolor: "rgba(255, 255, 255, 0.2)",
-              color: "white",
-              fontWeight: 600,
-              border: "1px solid rgba(255, 255, 255, 0.3)",
-              fontSize: { xs: "0.75rem", md: "0.8rem" },
+              display: "inline-flex",
+              alignItems: "baseline",
+              gap: 1,
+              px: 1.5,
+              py: 0.5,
+              border: `1px solid ${C.lineDarkStrong}`,
+              fontFamily: FONT.mono,
             }}
-          />
+          >
+            <Box component="span" sx={{ fontSize: "1.05rem", color: C.brassLight, fontVariantNumeric: "tabular-nums" }}>
+              {totalCount}
+            </Box>
+            <Box component="span" sx={{ fontSize: "0.7rem", letterSpacing: "0.1em", color: C.textOnDarkMuted, textTransform: "uppercase", whiteSpace: "nowrap" }}>
+              {countLabel}
+            </Box>
+          </Box>
           {!isLoading && (
             <Typography
               variant="caption"
               sx={{
-                color: "rgba(255, 255, 255, 0.8)",
-                fontSize: { xs: "0.75rem", md: "0.8rem" },
-                fontWeight: 500,
+                fontFamily: FONT.mono,
+                color: C.textOnDarkMuted,
+                fontSize: "0.68rem",
+                letterSpacing: "0.06em",
               }}
             >
               {searchValue ? "Filtrlənmiş nəticələr" : `Bütün ${countLabel}lər`}

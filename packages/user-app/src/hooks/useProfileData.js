@@ -57,6 +57,9 @@ export const useProfileData = () => {
 
               return {
                 id: session.id,
+                // Raw values for FlightActivitySection, which buckets time by day.
+                session_started_at: session.session_started_at,
+                duration_seconds: durationSeconds,
                 date: formatDate(session.session_started_at, "DD MMMM, YYYY"),
                 login: formatDate(session.session_started_at, "HH:mm"),
                 logout: session.session_ended_at

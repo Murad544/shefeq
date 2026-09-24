@@ -1,12 +1,16 @@
-import { Grid, Box, Typography } from "@mui/material";
+import { Grid, Box, Stack, Typography } from "@mui/material";
 import FormField from "../common/FormField";
 import { roleOptions } from "../../constants/options/roleOptions";
+import { C } from "../../config/tokens";
 
 const TemporaryRegistrationStep = ({ values, onChange, errors = {} }) => (
   <Box>
-    <Typography variant="h6" gutterBottom>
-      Qeydiyyat məlumatları
-    </Typography>
+    <Stack direction="row" alignItems="baseline" spacing={1.5} sx={{ mb: 3 }}>
+      <Typography variant="h6" component="h2">
+        Qeydiyyat məlumatları
+      </Typography>
+      <Box sx={{ flex: 1, height: "1px", bgcolor: C.rule, alignSelf: "center" }} />
+    </Stack>
 
     <Grid container spacing={3}>
       <Grid item xs={12} sm={6}>

@@ -1,9 +1,7 @@
-import {
-  ExpandLess as ExpandLessIcon,
-  ExpandMore as ExpandMoreIcon,
-} from "@mui/icons-material";
-import { Box, Collapse, IconButton, Paper, Typography } from "@mui/material";
+import { ExpandMore as ExpandMoreIcon } from "@mui/icons-material";
+import { Box, ButtonBase, Collapse, Typography } from "@mui/material";
 import { useState } from "react";
+import { C, FONT, labelCaps } from "../../config/tokens";
 
 const CollapsibleSection = ({
   title,
@@ -14,50 +12,64 @@ const CollapsibleSection = ({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <Paper elevation={0} sx={{ mb: 3, borderRadius: 2, overflow: "hidden" }}>
-      <Box
+    <Box sx={{ mb: 3, bgcolor: C.paperRaised, border: `1px solid ${C.rule}` }}>
+      <ButtonBase
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
         sx={{
+          width: "100%",
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
-          p: 2,
-          cursor: "pointer",
-          bgcolor: "white",
-          "&:hover": {
-            bgcolor: "grey.50",
-          },
-          transition: "background-color 0.2s",
+          justifyContent: "flex-start",
+          gap: 1.5,
+          px: { xs: 2, sm: 2.5 },
+          minHeight: 54,
+          textAlign: "left",
+          bgcolor: C.paperSunk,
+          borderBottom: `1px solid ${isOpen ? C.rule : "transparent"}`,
+          transition: "background-color .2s",
+          "&:hover": { bgcolor: "#E4DECB" },
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-          {Icon && (
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: 1,
-                bgcolor: "grey.100",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Icon sx={{ fontSize: 20, color: "text.secondary" }} />
-            </Box>
-          )}
-          <Typography variant="h6" fontWeight={600}>
-            {title}
-          </Typography>
+        {Icon && (
+          <Box
+            sx={{
+              width: 32,
+              height: 32,
+              flexShrink: 0,
+              display: "grid",
+              placeItems: "center",
+              bgcolor: C.olive,
+              color: C.paper,
+            }}
+          >
+            <Icon sx={{ fontSize: 18 }} />
+          </Box>
+        )}
+        <Typography
+          component="h3"
+          sx={{ ...labelCaps, fontSize: "1rem", fontWeight: 700, flex: 1 }}
+        >
+          {title}
+        </Typography>
+        <Box
+          component="span"
+          sx={{ fontFamily: FONT.mono, fontSize: "0.66rem", letterSpacing: "0.12em", color: C.textFaint }}
+        >
+          {isOpen ? "BAĞLA" : "AÇ"}
         </Box>
-        <IconButton size="small">
-          {isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        </IconButton>
-      </Box>
+        <ExpandMoreIcon
+          sx={{
+            color: C.textMuted,
+            transform: isOpen ? "rotate(180deg)" : "none",
+            transition: "transform .3s cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        />
+      </ButtonBase>
       <Collapse in={isOpen}>
-        <Box sx={{ p: 3, pt: 0 }}>{children}</Box>
+        <Box sx={{ p: { xs: 2, sm: 3 } }}>{children}</Box>
       </Collapse>
-    </Paper>
+    </Box>
   );
 };
 

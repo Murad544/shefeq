@@ -7,7 +7,6 @@ import {
   Box,
   Stack,
   Chip,
-  Typography,
 } from "@mui/material";
 import { MdOpenInNew, MdEdit } from "react-icons/md";
 import DataTable from "../../ui/Table/DataTable";
@@ -16,6 +15,9 @@ import ExportButton from "../../ui/Buttons/ExportButton";
 import AcceptedApplicantCard from "./AcceptedApplicantCard";
 import ApplicantDrawer from "../applicants/ApplicantDetails/ApplicantDrawer";
 import SecretKeyCell from "../../ui/Display/SecretKeyCell";
+import CountUp from "../../ui/Military/CountUp";
+import StatusLed from "../../ui/Military/StatusLed";
+import { C, FONT, labelCaps } from "../../../styles/tokens";
 import { useAcceptedApplicants } from "../../../hooks/data/useAcceptedApplicants";
 import { useCurrentAdmin } from "../../../hooks/data/useCurrentAdmin";
 import { useTableConfig } from "../../../hooks/utils/useTableConfig";
@@ -119,46 +121,15 @@ export default function AcceptedApplicantsView() {
           )}
         </TableCell>
         <TableCell align="left">
-          <Box
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 0.75,
+          <StatusLed
+            on={!!user.is_online}
+            size={9}
+            label={user.is_online ? "Onlayn" : "Oflayn"}
+            labelSx={{
+              fontWeight: 600,
+              color: user.is_online ? C.green : C.textFaint,
             }}
-          >
-            <Box
-              sx={{
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                bgcolor: user.is_online ? "#22c55e" : "grey.400",
-                boxShadow: user.is_online
-                  ? "0 0 0 3px rgba(34, 197, 94, 0.25)"
-                  : "none",
-                animation: user.is_online
-                  ? "pulse-online 2s ease-in-out infinite"
-                  : "none",
-                "@keyframes pulse-online": {
-                  "0%, 100%": {
-                    boxShadow: "0 0 0 0 rgba(34, 197, 94, 0.4)",
-                  },
-                  "50%": {
-                    boxShadow: "0 0 0 6px rgba(34, 197, 94, 0)",
-                  },
-                },
-              }}
-            />
-            <Typography
-              variant="caption"
-              sx={{
-                fontWeight: 600,
-                color: user.is_online ? "#16a34a" : "text.disabled",
-                fontSize: "0.75rem",
-              }}
-            >
-              {user.is_online ? "Onlayn" : "Oflayn"}
-            </Typography>
-          </Box>
+          />
         </TableCell>
         <TableCell sx={{ fontWeight: 500 }}>{name}</TableCell>
         <TableCell sx={{ fontWeight: 500 }}>{surname}</TableCell>
@@ -203,6 +174,12 @@ export default function AcceptedApplicantsView() {
     );
   };
 
+  const summary = [
+    { label: "Qəbul edilən", value: data.length },
+    { label: "Aktiv hesab", value: data.filter((u) => readField(u, "user_id")).length },
+    { label: "Hazırda onlayn", value: data.filter((u) => u.is_online).length, led: true },
+  ];
+
   const headerChildren = (
     <Box sx={{ width: "100%" }}>
       <Stack
@@ -237,20 +214,56 @@ export default function AcceptedApplicantsView() {
             onClick={handleExportToExcel}
             loading={exporting}
             disabled={data.length === 0 || loading}
-            variant="contained"
-            color="success"
+            variant="outlined"
+            color="secondary"
             sx={{
-              bgcolor: "rgba(255, 255, 255, 0.2)",
-              color: "white",
-              border: "1px solid rgba(255, 255, 255, 0.3)",
+              color: C.textOnDark,
+              borderColor: C.lineDarkStrong,
               "&:hover": {
-                bgcolor: "rgba(255, 255, 255, 0.3)",
-                borderColor: "rgba(255, 255, 255, 0.5)",
+                bgcolor: C.brass,
+                borderColor: C.brass,
+                color: C.ink,
+              },
+              "&.Mui-disabled": {
+                color: C.textOnDarkMuted,
+                borderColor: C.lineDark,
               },
             }}
-          ></ExportButton>
+          />
         </Box>
       </Stack>
+
+      {/* Live summary derived from the loaded list */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          mt: 2,
+          border: `1px solid ${C.lineDark}`,
+          maxWidth: 560,
+        }}
+      >
+        {summary.map((item, index) => (
+          <Box
+            key={item.label}
+            sx={{
+              px: 1.75,
+              py: 1.25,
+              borderLeft: index ? `1px solid ${C.lineDark}` : "none",
+            }}
+          >
+            <Stack direction="row" alignItems="center" spacing={1}>
+              {item.led && <StatusLed on={item.value > 0} pulse={false} size={7} />}
+              <Box sx={{ fontFamily: FONT.mono, fontSize: "1.3rem", color: C.textOnDark, lineHeight: 1.1 }}>
+                <CountUp value={item.value} />
+              </Box>
+            </Stack>
+            <Box sx={{ ...labelCaps, fontSize: "0.64rem", color: C.textOnDarkMuted, mt: 0.25 }}>
+              {item.label}
+            </Box>
+          </Box>
+        ))}
+      </Box>
     </Box>
   );
 

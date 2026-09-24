@@ -1,7 +1,7 @@
-import { Visibility as VisibilityIcon } from "@mui/icons-material";
+import { ReceiptLong as LogIcon } from "@mui/icons-material";
 import {
   Box,
-  Paper,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { C, FONT } from "../../config/tokens";
 
 const GameSessionsTable = ({ sessions }) => {
   const [page, setPage] = useState(0);
@@ -38,81 +39,43 @@ const GameSessionsTable = ({ sessions }) => {
 
   return (
     <Box>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-        <VisibilityIcon sx={{ fontSize: 20, mr: 1 }} />
-        <Typography variant="subtitle1" fontWeight={600}>
-          Son Sessiyalar ({sessions.length} ümumi)
+      <Stack direction="row" alignItems="center" spacing={1.25} sx={{ mb: 1.5 }}>
+        <LogIcon sx={{ fontSize: 20, color: C.olive }} />
+        <Typography variant="subtitle2" component="h4">
+          Uçuş jurnalı · Son Sessiyalar
         </Typography>
-      </Box>
-      <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 2 }}>
-        <Table size="small">
+        <Box sx={{ fontFamily: FONT.mono, fontSize: "0.72rem", color: C.textMuted }}>
+          ({sessions.length} ümumi)
+        </Box>
+      </Stack>
+      <TableContainer sx={{ border: `1px solid ${C.rule}`, overflowX: "auto" }}>
+        <Table size="small" sx={{ minWidth: 480 }}>
           <TableHead>
-            <TableRow sx={{ bgcolor: "#f5f5f5" }}>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  fontSize: "0.75rem",
-                  borderBottom: "2px solid #e0e0e0",
-                  py: 1.5,
-                }}
-              >
-                Tarix
-              </TableCell>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  fontSize: "0.75rem",
-                  borderBottom: "2px solid #e0e0e0",
-                  py: 1.5,
-                }}
-              >
-                Giriş
-              </TableCell>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  fontSize: "0.75rem",
-                  borderBottom: "2px solid #e0e0e0",
-                  py: 1.5,
-                }}
-              >
-                Çıxış
-              </TableCell>
-              <TableCell
-                sx={{
-                  fontWeight: 600,
-                  fontSize: "0.75rem",
-                  borderBottom: "2px solid #e0e0e0",
-                  py: 1.5,
-                }}
-              >
-                Müddət
-              </TableCell>
+            <TableRow>
+              <TableCell>Tarix</TableCell>
+              <TableCell>Giriş</TableCell>
+              <TableCell>Çıxış</TableCell>
+              <TableCell>Müddət</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {paginatedSessions.map((session, index) => (
               <TableRow
                 key={session.id}
+                hover
                 sx={{
-                  "&:hover": {
-                    bgcolor: "#f9f9f9",
-                  },
-                  bgcolor: index % 2 === 0 ? "white" : "#fafafa",
+                  bgcolor: index % 2 === 0 ? C.paperRaised : "#F6F3EA",
+                  animation: `sg-fade-in .35s ease ${Math.min(index, 12) * 35}ms backwards`,
                 }}
               >
-                <TableCell sx={{ py: 1.5, fontSize: "0.875rem" }}>
-                  {session.date}
-                </TableCell>
-                <TableCell sx={{ py: 1.5, fontSize: "0.875rem" }}>
+                <TableCell sx={{ fontSize: "0.875rem" }}>{session.date}</TableCell>
+                <TableCell sx={{ fontFamily: FONT.mono, fontSize: "0.85rem" }}>
                   {session.login}
                 </TableCell>
-                <TableCell sx={{ py: 1.5, fontSize: "0.875rem" }}>
+                <TableCell sx={{ fontFamily: FONT.mono, fontSize: "0.85rem" }}>
                   {session.logout}
                 </TableCell>
-                <TableCell
-                  sx={{ py: 1.5, fontSize: "0.875rem", fontWeight: 500 }}
-                >
+                <TableCell sx={{ fontFamily: FONT.mono, fontSize: "0.85rem", fontWeight: 600, color: C.olive }}>
                   {session.duration}
                 </TableCell>
               </TableRow>
@@ -131,6 +94,7 @@ const GameSessionsTable = ({ sessions }) => {
           labelDisplayedRows={({ from, to, count }) =>
             `${from}-${to} / ${count !== -1 ? count : `more than ${to}`}`
           }
+          sx={{ borderTop: `1px solid ${C.rule}`, bgcolor: C.paperSunk }}
         />
       </TableContainer>
     </Box>
