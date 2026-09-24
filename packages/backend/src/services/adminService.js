@@ -285,7 +285,7 @@ class AdminService {
 
     try {
       await emailService.sendActivationEmail(application.email, activationUrl, {
-        subject: 'Activation link (resend)',
+        subject: 'Hesabınız üçün yeni aktivləşdirmə linki',
       });
     } catch (err) {
       const logger = require('../utils/logger');
