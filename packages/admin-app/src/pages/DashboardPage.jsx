@@ -89,7 +89,7 @@ export default function DashboardPage() {
             display: "grid",
             gridTemplateColumns: { xs: "repeat(3, 1fr)", md: "repeat(3, minmax(0, 220px))" },
             borderTop: `1px solid ${C.lineDark}`,
-            bgcolor: "rgba(38, 54, 35, 0.3)",
+            bgcolor: "rgba(11, 15, 10, 0.35)",
           }}
         >
           {TABS.map(({ value, label, icon: Icon }) => {

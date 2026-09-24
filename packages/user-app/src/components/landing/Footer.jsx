@@ -6,7 +6,7 @@ import BrandLockup from "../military/BrandLockup";
 import TricolorBar from "../military/TricolorBar";
 
 const Footer = () => (
-  <Box component="footer" sx={{ bgcolor: C.field900, color: C.textOnDarkMuted }}>
+  <Box component="footer" sx={{ bgcolor: C.ink, color: C.textOnDarkMuted }}>
     <TricolorBar height={4} />
     <Container maxWidth="lg" sx={{ py: { xs: 4, md: 5 } }}>
       <Grid container spacing={3} alignItems="center">

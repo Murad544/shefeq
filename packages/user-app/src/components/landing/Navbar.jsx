@@ -63,7 +63,7 @@ const Navbar = () => {
       elevation={0}
       sx={{
         borderRadius: 0,
-        bgcolor: scrolled ? "rgba(50, 67, 47, 0.94)" : C.field900,
+        bgcolor: scrolled ? "rgba(16, 21, 15, 0.94)" : C.field900,
         backdropFilter: "blur(10px)",
         color: C.textOnDark,
         borderBottom: `1px solid ${scrolled ? C.lineDarkStrong : C.lineDark}`,
