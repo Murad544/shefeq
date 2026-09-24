@@ -1,16 +1,16 @@
 // Design tokens for the "command dossier" visual language.
-// Olive-drab field surfaces, brass insignia accents and official paper panels.
+// Soft olive field surfaces, brass insignia accents and official paper panels.
 
 export const C = {
-  // Field (dark) surfaces
+  // Field surfaces
   ink: "#0B0F0A",
-  night: "#10150F",
-  field900: "#151B13",
-  field800: "#1C2419",
-  field700: "#26301F",
-  field600: "#34412C",
-  lineDark: "rgba(214, 200, 150, 0.14)",
-  lineDarkStrong: "rgba(214, 200, 150, 0.3)",
+  night: "#263623",
+  field900: "#32432F",
+  field800: "#3B4D37",
+  field700: "#465B40",
+  field600: "#506949",
+  lineDark: "rgba(232, 228, 212, 0.22)",
+  lineDarkStrong: "rgba(232, 228, 212, 0.4)",
 
   // Army olive drab (primary)
   olive: "#4B5320",
@@ -34,7 +34,7 @@ export const C = {
   textMuted: "#5C6152",
   textFaint: "#8A8D7C",
   textOnDark: "#E8E4D4",
-  textOnDarkMuted: "#A5A58F",
+  textOnDarkMuted: "#C7CFBC",
 
   // Signals
   red: "#A8322A",

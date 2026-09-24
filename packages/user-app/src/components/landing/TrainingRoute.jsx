@@ -75,7 +75,7 @@ const TrainingRoute = () => {
         maxWidth: 440,
         mx: "auto",
         border: `1px solid ${C.lineDarkStrong}`,
-        bgcolor: "rgba(11, 15, 10, 0.55)",
+        bgcolor: "rgba(38, 54, 35, 0.45)",
         animation: `sg-scale-in 1s ${EASE.out} .2s backwards`,
       }}
     >

@@ -222,7 +222,7 @@ const LandingPage = () => {
           sx={{
             position: "relative",
             borderTop: `1px solid ${C.lineDark}`,
-            bgcolor: "rgba(11, 15, 10, 0.4)",
+            bgcolor: "rgba(38, 54, 35, 0.3)",
           }}
         >
           <Container maxWidth="lg">
@@ -311,7 +311,7 @@ const LandingPage = () => {
             height: 52,
             minWidth: 52,
             p: 0,
-            bgcolor: "rgba(16, 21, 15, 0.9)",
+            bgcolor: "rgba(50, 67, 47, 0.94)",
             color: C.brass,
             border: `1px solid ${C.brass}`,
             boxShadow: "0 10px 30px -12px rgba(0, 0, 0, 0.6)",

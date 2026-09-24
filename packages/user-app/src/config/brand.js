@@ -2,6 +2,8 @@ import { STRINGS } from './constants';
 
 const PROJECT_NAME = process.env.REACT_APP_PROJECT_NAME || STRINGS.DEFAULT_PROJECT_NAME;
 const COURSE_NAME = process.env.REACT_APP_COURSE_NAME || STRINGS.DEFAULT_COURSE_NAME;
+const ORGANIZATION_LINES = ["Milli Müdafiə", "Universiteti"];
+const ORGANIZATION_NAME = ORGANIZATION_LINES.join(" ");
 
 // The wordmark is the first word of the official name ("FPV"); the rest is
 // the descriptor set beneath it ("Tədris Alt Sistemi").
@@ -13,4 +15,6 @@ export const BRAND = {
   PROJECT_MARK,
   PROJECT_DESCRIPTOR,
   COURSE_NAME,
+  ORGANIZATION_NAME,
+  ORGANIZATION_LINES,
 };

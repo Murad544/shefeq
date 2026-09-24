@@ -59,7 +59,7 @@ const TacticalBackground = ({
             position: "absolute",
             inset: 0,
             background: dark
-              ? "radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(11, 15, 10, 0.6) 100%)"
+              ? "radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(38, 54, 35, 0.3) 100%)"
               : "radial-gradient(ellipse at 50% 40%, transparent 55%, rgba(201, 190, 150, 0.35) 100%)",
           }}
         />
