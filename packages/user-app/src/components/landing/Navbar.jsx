@@ -16,6 +16,7 @@ import { BRAND } from "../../config/brand";
 import { C, FONT, labelCaps } from "../../config/tokens";
 import Logo from "../../assets/icons/Logo";
 import TricolorBar from "../military/TricolorBar";
+import LanguageSwitcher from "../common/LanguageSwitcher";
 
 const NAV_ITEMS = [
   { id: "information", label: "Məlumat" },
@@ -105,7 +106,7 @@ const Navbar = () => {
           direction="row"
           spacing={0.5}
           alignItems="center"
-          sx={{ display: { xs: "none", md: "flex" } }}
+          sx={{ display: { xs: "none", lg: "flex" } }}
         >
           {NAV_ITEMS.map((item) => (
             <Button
@@ -121,7 +122,7 @@ const Navbar = () => {
 
         <Box
           sx={{
-            display: { xs: "none", md: "block" },
+            display: { xs: "none", lg: "block" },
             width: "1px",
             height: 28,
             bgcolor: C.lineDarkStrong,
@@ -129,7 +130,7 @@ const Navbar = () => {
           }}
         />
 
-        <Stack direction="row" spacing={1.5} sx={{ display: { xs: "none", md: "flex" } }}>
+        <Stack direction="row" spacing={1.5} sx={{ display: { xs: "none", lg: "flex" } }}>
           {/* Login */}
           <Button variant="outlined" onClick={() => navigate("/login")} sx={outlinedOnDark}>
             Daxil ol
@@ -141,11 +142,13 @@ const Navbar = () => {
           </Button>
         </Stack>
 
+        <LanguageSwitcher sx={{ display: { xs: "none", lg: "inline-flex" }, ml: 1 }} />
+
         <IconButton
           aria-label="Menyunu aç"
           onClick={() => setMenuOpen(true)}
           sx={{
-            display: { xs: "inline-flex", md: "none" },
+            display: { xs: "inline-flex", lg: "none" },
             color: C.textOnDark,
             border: `1px solid ${C.lineDarkStrong}`,
           }}
@@ -197,6 +200,7 @@ const Navbar = () => {
             </Button>
           ))}
         </Stack>
+        <LanguageSwitcher sx={{ mx: 2, mt: 2, alignSelf: "flex-start" }} />
         <Stack spacing={1.5} sx={{ p: 2, mt: 2 }}>
           <Button variant="outlined" onClick={closeThen(() => navigate("/login"))} sx={outlinedOnDark}>
             Daxil ol

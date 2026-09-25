@@ -54,7 +54,7 @@ const GameSessionsTable = ({ sessions }) => {
             <TableRow>
               <TableCell>Tarix</TableCell>
               <TableCell>Giriş</TableCell>
-              <TableCell>Çıxış</TableCell>
+              <TableCell>Çıxış vaxtı</TableCell>
               <TableCell>Müddət</TableCell>
             </TableRow>
           </TableHead>

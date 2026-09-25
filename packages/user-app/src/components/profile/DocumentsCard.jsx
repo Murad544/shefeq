@@ -61,7 +61,7 @@ const DocumentsCard = ({ documents, onDownloadDocument }) => {
                   {isPdf ? "PDF" : "MP4"}
                 </Box>
                 <Box sx={{ minWidth: 0, flex: 1 }}>
-                  <Typography variant="body2" fontWeight={500} noWrap>
+                  <Typography variant="body2" fontWeight={500} noWrap translate="no">
                     {doc.name}
                   </Typography>
                   {doc.size ? (

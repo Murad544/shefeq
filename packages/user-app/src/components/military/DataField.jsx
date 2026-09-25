@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import { C, FONT, labelCaps } from "../../config/tokens";
 
 // Label / value pair styled like a filled-in line on an official form.
-const DataField = ({ label, value, icon, mono = false, dark = false, sx }) => {
+const DataField = ({ label, value, icon, mono = false, dark = false, translateValue = true, sx }) => {
   const empty = value === null || value === undefined || value === "" || value === "-";
 
   return (
@@ -23,6 +23,7 @@ const DataField = ({ label, value, icon, mono = false, dark = false, sx }) => {
         {label}
       </Box>
       <Box
+        translate={translateValue ? undefined : "no"}
         sx={{
           fontFamily: mono ? FONT.mono : FONT.body,
           fontWeight: 500,

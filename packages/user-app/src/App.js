@@ -1,4 +1,7 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Box } from "@mui/material";
+import LanguageSwitcher from "./components/common/LanguageSwitcher";
+import { useLanguage } from "./i18n/LanguageContext";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 import BootSequence from "./components/military/BootSequence";
 import PageTransition from "./components/military/PageTransition";
@@ -34,10 +37,23 @@ const PublicOnlyRoute = ({ children }) => {
   return children;
 };
 
+const PageLanguageSwitcher = () => {
+  const { pathname } = useLocation();
+  if (pathname === "/") return null;
+  return (
+    <Box sx={{ position: "fixed", top: 14, right: 16, zIndex: 1400 }}>
+      <LanguageSwitcher />
+    </Box>
+  );
+};
+
 function App() {
+  // Re-render the active route so locale-sensitive dates and option labels update.
+  useLanguage();
   return (
     <ErrorBoundary>
       <BrowserRouter>
+        <PageLanguageSwitcher />
         <PageTransition>
           <Routes>
             <Route path="/" element={<LandingPage />} />

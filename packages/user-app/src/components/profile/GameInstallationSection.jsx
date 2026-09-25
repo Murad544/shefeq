@@ -24,7 +24,7 @@ import CornerBrackets from "../military/CornerBrackets";
 import Panel from "../military/Panel";
 
 const FALLBACK_IMAGE =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%231C2419' width='400' height='300'/%3E%3Ctext fill='%23A5A58F' font-family='monospace' font-size='20' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EŞəkil%3C/text%3E%3C/svg%3E";
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%231C2419' width='400' height='300'/%3E%3Ctext fill='%23A5A58F' font-family='monospace' font-size='20' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EFPV%3C/text%3E%3C/svg%3E";
 
 const REQUIREMENTS = [
   { label: "ƏS", min: "Windows 10 (64 bit)", rec: "Windows 11 (64 bit)" },

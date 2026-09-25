@@ -4,13 +4,18 @@ import { FlightTakeoff as FlightIcon } from "@mui/icons-material";
 import dayjs from "dayjs";
 import { C, EASE, FONT, labelCaps } from "../../config/tokens";
 import Panel from "../military/Panel";
+import { useLanguage } from "../../i18n/LanguageContext";
+
+const weekDays = {
+  az: ["B", "B.e", "Ç.a", "Çər", "C.a", "Cüm", "Ş"],
+  en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+  ru: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+};
 
 const FlightActivitySection = ({ sessions }) => {
+  const { language } = useLanguage();
   const today = dayjs();
   const yesterday = today.subtract(1, "day");
-
-  // Azerbaijani short day names, indexed by dayjs().day() (0 = Sunday)
-  const azWeekDays = ["B", "B.e", "Ç.a", "Çər", "C.a", "Cüm", "Ş"];
 
   // Initialize last 7 days array (0 = 6 days ago, 6 = today)
   const last7Days = Array(7).fill(0);
@@ -162,7 +167,7 @@ const FlightActivitySection = ({ sessions }) => {
                 fontWeight: i === 6 ? 600 : 400,
               }}
             >
-              {azWeekDays[dayIndex]}
+              {weekDays[language][dayIndex]}
             </Box>
           );
         })}

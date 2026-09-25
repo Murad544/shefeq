@@ -2,13 +2,38 @@ import { Grid, Box, Typography } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { enUS as enPicker, ruRU as ruPicker } from "@mui/x-date-pickers/locales";
 import dayjs from "dayjs";
+import "dayjs/locale/az";
+import "dayjs/locale/ru";
 import FormField from "../../common/FormField";
+import { useLanguage } from "../../../i18n/LanguageContext";
 import { sexOptions } from "../../../constants/options/sexOptions";
 import { roleOptions } from "../../../constants/options/roleOptions";
 import { placeOfBirthOptions } from "../../../constants/options/placeOfBirthOptions";
 
+const englishPickerText = enPicker.components.MuiLocalizationProvider.defaultProps.localeText;
+const russianPickerText = ruPicker.components.MuiLocalizationProvider.defaultProps.localeText;
+const azerbaijaniPickerText = {
+  ...englishPickerText,
+  previousMonth: "Əvvəlki ay",
+  nextMonth: "Növbəti ay",
+  openPreviousView: "Əvvəlki görünüşü aç",
+  openNextView: "Növbəti görünüşü aç",
+  calendarViewSwitchingButtonAriaLabel: (view) =>
+    view === "year" ? "Təqvim görünüşünə keç" : "İl görünüşünə keç",
+  cancelButtonLabel: "Ləğv et",
+  clearButtonLabel: "Təmizlə",
+  okButtonLabel: "Təsdiqlə",
+  todayButtonLabel: "Bu gün",
+  datePickerDefaultToolbarTitle: "Tarix seçin",
+  openDatePickerDialogue: () => "Tarix seçin",
+  dateTableLabel: "Tarix seçin",
+};
+const pickerText = { az: azerbaijaniPickerText, en: englishPickerText, ru: russianPickerText };
+
 const PersonalInfoStep = ({ values, onChange, errors = {} }) => {
+  const { language } = useLanguage();
   const handleDateChange = (date) => {
     onChange({
       target: {
@@ -92,7 +117,7 @@ const PersonalInfoStep = ({ values, onChange, errors = {} }) => {
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={language} localeText={pickerText[language]}>
             <DatePicker
               label="Doğum tarixi"
               value={

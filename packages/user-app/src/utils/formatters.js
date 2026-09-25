@@ -1,3 +1,5 @@
+import { getCurrentLanguage } from "../i18n/LanguageContext";
+
 export const formatFileSize = (bytes) => {
   if (bytes === 0) return "0 Bytes";
 
@@ -22,21 +24,16 @@ export const formatDate = (dateString, format = "DD/MM/YYYY") => {
     const minutes = String(date.getMinutes()).padStart(2, "0");
     const seconds = String(date.getSeconds()).padStart(2, "0");
 
-    // Month names in Azerbaijani
-    const monthNamesAz = [
-      "Yanvar",
-      "Fevral",
-      "Mart",
-      "Aprel",
-      "May",
-      "İyun",
-      "İyul",
-      "Avqust",
-      "Sentyabr",
-      "Oktyabr",
-      "Noyabr",
-      "Dekabr",
-    ];
+    const language = getCurrentLanguage();
+    const locale = { az: "az-AZ", en: "en-US", ru: "ru-RU" }[language] || "az-AZ";
+    const rawMonth = new Intl.DateTimeFormat(locale, {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).formatToParts(date).find((part) => part.type === "month")?.value;
+    const monthName = language === "az"
+      ? rawMonth.charAt(0).toLocaleUpperCase("az") + rawMonth.slice(1)
+      : rawMonth;
 
     switch (format) {
       case "DD/MM/YYYY":
@@ -54,11 +51,11 @@ export const formatDate = (dateString, format = "DD/MM/YYYY") => {
       case "DD-MM-YYYY HH:mm":
         return `${day}-${month}-${year} ${hours}:${minutes}`;
       case "DD MMMM, YYYY":
-        return `${day} ${monthNamesAz[date.getMonth()]}, ${year}`;
+        return `${day} ${monthName}, ${year}`;
       case "DD MMMM YYYY":
-        return `${day} ${monthNamesAz[date.getMonth()]} ${year}`;
+        return `${day} ${monthName} ${year}`;
       case "MMMM DD, YYYY":
-        return `${monthNamesAz[date.getMonth()]} ${day}, ${year}`;
+        return `${monthName} ${day}, ${year}`;
       default:
         return dateString;
     }
@@ -190,7 +187,8 @@ export const capitalizeFirst = (str) => {
 export const formatCurrency = (amount, currency = "AZN") => {
   if (typeof amount !== "number") return "0";
 
-  return new Intl.NumberFormat("az-AZ", {
+  const locale = { az: "az-AZ", en: "en-US", ru: "ru-RU" }[getCurrentLanguage()] || "az-AZ";
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: currency,
     minimumFractionDigits: 2,

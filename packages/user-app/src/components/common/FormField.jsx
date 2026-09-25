@@ -8,6 +8,8 @@ import {
   Autocomplete,
 } from "@mui/material";
 import { createFilterOptions } from "@mui/material/Autocomplete";
+import { useLanguage } from "../../i18n/LanguageContext";
+import { translate } from "../../i18n/translations";
 
 const filter = createFilterOptions();
 
@@ -29,6 +31,13 @@ const FormField = ({
   disabled = false,
   ...props
 }) => {
+  const { language } = useLanguage();
+  const localizedOptions = options.map((option) =>
+    typeof option === "string"
+      ? translate(option, language)
+      : { ...option, label: translate(option.label, language) }
+  );
+
   if (type === "select") {
     return (
       <FormControl fullWidth={fullWidth} error={!!error} disabled={disabled}>
@@ -45,7 +54,7 @@ const FormField = ({
               <em>{placeholder}</em>
             </MenuItem>
           )}
-          {options.map((option) => (
+          {localizedOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
             </MenuItem>
@@ -62,10 +71,10 @@ const FormField = ({
           clearOnBlur
           handleHomeEndKeys
           freeSolo
-          options={options}
+          options={localizedOptions}
           // Resolve current value (primitive) to option object for Autocomplete
           value={
-            (value && options && options.find((o) => o.value === value)) ||
+            (value && localizedOptions.find((o) => o.value === value)) ||
             value ||
             null
           }
@@ -94,7 +103,7 @@ const FormField = ({
             if (inputValue !== "" && !isExisting) {
               filtered.push({
                 inputValue,
-                label: `Əlavə et: "${inputValue}"`,
+                label: translate(`Əlavə et: "${inputValue}"`, language),
               });
             }
             return filtered;

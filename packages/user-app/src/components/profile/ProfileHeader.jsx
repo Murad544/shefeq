@@ -66,6 +66,7 @@ const ProfileHeader = ({ profile }) => {
               component="img"
               src={profile.avatar}
               alt={profile.fullName}
+              translate="no"
               sx={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           ) : (
@@ -99,6 +100,7 @@ const ProfileHeader = ({ profile }) => {
           <Typography
             variant="h3"
             component="h1"
+            translate="no"
             sx={{ color: C.textOnDark, mb: 1.5, wordBreak: "break-word" }}
           >
             {profile.fullName}

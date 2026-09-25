@@ -39,12 +39,13 @@ import { getOptionLabel } from "../../../utils/getOptionLabel";
 
 const ReviewStep = ({ form, questions }) => {
   const personalInfoFields = [
-    { label: "Ad", value: form.name, icon: <Person fontSize="small" /> },
-    { label: "Soyad", value: form.surname, icon: <Person fontSize="small" /> },
+    { label: "Ad", value: form.name, icon: <Person fontSize="small" />, translateValue: false },
+    { label: "Soyad", value: form.surname, icon: <Person fontSize="small" />, translateValue: false },
     {
       label: "Ata adı",
       value: form.fatherName,
       icon: <Person fontSize="small" />,
+      translateValue: false,
     },
     {
       label: "Cinsi",
@@ -60,6 +61,7 @@ const ReviewStep = ({ form, questions }) => {
       label: "Doğum tarixi",
       value: form.dateOfBirth,
       icon: <DateRange fontSize="small" />,
+      translateValue: false,
     },
     {
       label: "Doğulduğu yer",
@@ -70,18 +72,21 @@ const ReviewStep = ({ form, questions }) => {
       label: "Şəxsiyyət vəsiqəsi",
       value: form.nationalSerialNumber,
       icon: <Badge fontSize="small" />,
+      translateValue: false,
     },
     {
       label: "FİN",
       value: form.nationalIdNumber,
       icon: <Fingerprint fontSize="small" />,
+      translateValue: false,
     },
     {
       label: "Telefon",
       value: form.phoneNumber,
       icon: <Phone fontSize="small" />,
+      translateValue: false,
     },
-    { label: "Email", value: form.email, icon: <Email fontSize="small" /> },
+    { label: "Email", value: form.email, icon: <Email fontSize="small" />, translateValue: false },
   ];
 
   const educationFields = [
@@ -137,7 +142,7 @@ const ReviewStep = ({ form, questions }) => {
                     >
                       {field.label}
                     </Typography>
-                    <Typography variant="body1" sx={{ mt: 0.5 }}>
+                    <Typography variant="body1" sx={{ mt: 0.5 }} translate={field.translateValue === false ? "no" : undefined}>
                       {field.value || "-"}
                     </Typography>
                   </Box>
@@ -195,7 +200,7 @@ const ReviewStep = ({ form, questions }) => {
                 <Chip
                   key={idx}
                   icon={<CheckCircle fontSize="small" />}
-                  label={skill}
+                  label={<span translate="no">{skill}</span>}
                   color="primary"
                   variant="outlined"
                   size="small"
@@ -264,6 +269,7 @@ const ReviewStep = ({ form, questions }) => {
                     <Typography
                       variant="body2"
                       color="text.secondary"
+                      translate={form.answers[idx]?.answer ? "no" : undefined}
                       sx={{
                         // Text wrapping styles for secondary text
                         wordWrap: "break-word",

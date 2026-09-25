@@ -15,6 +15,7 @@ const AccountInfoSection = ({ contactInfo }) => {
           <DataField
             label="Email ünvanı"
             mono
+            translateValue={false}
             value={
               contactInfo?.email ? (
                 <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: 1 }}>
@@ -30,7 +31,7 @@ const AccountInfoSection = ({ contactInfo }) => {
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <DataField label="Telefon nömrəsi" mono value={contactInfo?.phone} />
+          <DataField label="Telefon nömrəsi" mono translateValue={false} value={contactInfo?.phone} />
         </Grid>
       </Grid>
     </CollapsibleSection>
