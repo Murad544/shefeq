@@ -93,6 +93,43 @@ class GameService {
     };
   }
 
+  async getMonitoringOverview() {
+    const users = await gameRepository.getMonitoringOverview();
+    const topLeaders = users
+      .filter((user) => user.best_time_seconds != null)
+      .sort((left, right) => Number(left.best_time_seconds) - Number(right.best_time_seconds))
+      .slice(0, 3)
+      .map((user, index) => ({
+        id: user.id,
+        name: [user.name, user.surname].filter(Boolean).join(' ') || user.email,
+        time: this.formatSeconds(user.best_time_seconds),
+        timeSeconds: Number(user.best_time_seconds),
+        rank: index + 1,
+        completedRuns: Number(user.completed_runs || 0),
+      }));
+    const leaderboard = { topLeaders, mapLeaders: [] };
+    return {
+      users: users.map((user) => ({
+        id: user.id,
+        name: [user.name, user.surname, user.father_name].filter(Boolean).join(' '),
+        email: user.email,
+        phone: user.phone_number,
+        profession: user.profession,
+        educationLevel: user.education_level,
+        isActive: user.is_active,
+        acceptedAt: user.accepted_at,
+        createdAt: user.created_at,
+        totalSeconds: Number(user.total_seconds || 0),
+        lastSessionAt: user.last_session_at,
+        activeNow: user.active_now,
+        completedRuns: user.completed_runs,
+        bestTimeSeconds: user.best_time_seconds == null ? null : Number(user.best_time_seconds),
+      })),
+      leaderboard,
+      generatedAt: new Date().toISOString(),
+    };
+  }
+
   formatSeconds(seconds) {
     if (!seconds) return '00:00';
     const mins = Math.floor(seconds / 60);

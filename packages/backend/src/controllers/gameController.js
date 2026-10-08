@@ -121,6 +121,11 @@ class GameController {
     sendSuccess(res, leaderboard, 'Leaderboard retrieved successfully');
   });
 
+  getMonitoringOverview = ErrorHandler.asyncWrapper(async (req, res) => {
+    const overview = await gameService.getMonitoringOverview();
+    sendSuccess(res, overview, 'Monitoring overview retrieved successfully');
+  });
+
   getUserStreak = ErrorHandler.asyncWrapper(async (req, res) => {
     const userId = req.user.id;
     const streak = await gameService.getUserStreak(userId);

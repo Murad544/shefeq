@@ -10,6 +10,7 @@ const {
   heartbeatGameSessionSchema,
 } = require('../middleware/validation/schemas/gameSchema');
 const { CLIENT_TYPES } = require('../middleware/validation/types/types');
+const AuthMiddleware = require('../middleware/auth/authMiddleware');
 
 router.use(UserAuthMiddleware.securityHeaders);
 
@@ -53,6 +54,12 @@ router.get(
     disallowedRoles: ['trainer'],
   }),
   gameController.getMapStats,
+);
+
+router.get(
+  '/monitoring',
+  AuthMiddleware.ensureAdmin(),
+  gameController.getMonitoringOverview,
 );
 
 router.get(

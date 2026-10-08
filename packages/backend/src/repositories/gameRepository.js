@@ -109,6 +109,48 @@ class GameRepository {
     return rows || [];
   }
 
+  async getMonitoringOverview() {
+    const sql = `
+      WITH monitoring_users AS MATERIALIZED (
+        SELECT u.id, u.email, u.is_active, u.created_at,
+          a.name, a.surname, a.father_name, a.phone_number, a.profession,
+          a.education_level, aa.accepted_at
+        FROM users u
+        JOIN application_approvals aa ON aa.user_id = u.id
+        JOIN applications a ON a.id = aa.application_id AND a.deleted_at IS NULL
+      ), session_stats AS (
+        SELECT gs.user_id,
+          SUM(COALESCE(gs.duration_seconds,
+              CASE WHEN gs.session_ended_at IS NULL THEN EXTRACT(EPOCH FROM (NOW() - gs.session_started_at))::INT ELSE 0 END)) AS total_seconds,
+          MAX(COALESCE(gs.session_ended_at, gs.last_heartbeat_at, gs.session_started_at)) AS last_session_at,
+          BOOL_OR(gs.session_ended_at IS NULL AND COALESCE(gs.last_heartbeat_at, gs.session_started_at) >= NOW() - INTERVAL '90 seconds') AS active_now
+        FROM monitoring_users mu
+        JOIN game_sessions gs ON gs.user_id = mu.id
+        GROUP BY gs.user_id
+      ), run_stats AS (
+        SELECT mr.user_id, COUNT(*) AS completed_runs, MIN(mr.objective_time_seconds) AS best_time_seconds
+        FROM monitoring_users mu
+        JOIN map_runs mr ON mr.user_id = mu.id
+        WHERE mr.completed = true
+        GROUP BY mr.user_id
+      )
+      SELECT mu.id, mu.email, mu.is_active, mu.created_at,
+        mu.name, mu.surname, mu.father_name, mu.phone_number, mu.profession,
+        mu.education_level, mu.accepted_at,
+        COALESCE(session_stats.total_seconds, 0)::BIGINT AS total_seconds,
+        session_stats.last_session_at,
+        COALESCE(session_stats.active_now, false) AS active_now,
+        COALESCE(run_stats.completed_runs, 0)::INT AS completed_runs,
+        run_stats.best_time_seconds
+      FROM monitoring_users mu
+      LEFT JOIN session_stats ON session_stats.user_id = mu.id
+      LEFT JOIN run_stats ON run_stats.user_id = mu.id
+      ORDER BY mu.surname, mu.name
+    `;
+    const { rows } = await db.query(sql);
+    return rows || [];
+  }
+
   // Get top leaders for a specific map
   async getTopLeadersByMap(mapId, limit = 10) {
     const sql = `
