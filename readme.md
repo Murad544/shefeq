@@ -7,7 +7,7 @@ A full-stack application system with admin and user interfaces.
 This is a monorepo containing three applications:
 
 ```
-semadaki-gozler/
+shefeq/
 ├── packages/
 │   ├── admin-app/     # Admin frontend application (React)
 │   ├── user-app/      # User frontend application (React)
