@@ -92,7 +92,7 @@ async function sendActivationEmail(toEmail, activationUrl, options = {}) {
   try {
     const { data, error } = await resend.emails.send({
       from: process.env.EMAIL_FROM || 'noreply@fpv.az',
-      to: 'ibrahimtaghizade@gmail.com',
+      to: 'murad.bayramov259@gmail.com', // toEmail,
       subject,
       html,
       text,
