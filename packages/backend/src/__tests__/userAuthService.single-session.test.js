@@ -86,6 +86,10 @@ describe('UserAuthService Multi-Client Single Device Session Enforcement', () =>
         }),
       );
       expect(result.token).toBe('jwt-token-game');
+      expect(result.sessionId).toEqual(expect.any(String));
+      expect(result.session_id).toEqual(expect.any(String));
+      expect(result.user.sessionId).toEqual(expect.any(String));
+      expect(result.user.session_id).toEqual(expect.any(String));
     });
   });
 

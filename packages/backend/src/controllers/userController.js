@@ -25,7 +25,21 @@ class UserController {
       }
       const token = authHeader.substring(7);
       const validation = await userAuthService.validateToken(token);
-      sendSuccess(response, { user: validation.user }, 'User retrieved successfully');
+      const sessionId = validation.token && validation.token.sessionId;
+      const user = {
+        ...validation.user,
+        sessionId,
+        session_id: sessionId,
+      };
+      sendSuccess(
+        response,
+        {
+          user,
+          sessionId,
+          session_id: sessionId,
+        },
+        'User retrieved successfully',
+      );
     });
 
     return handler(req, res, next);

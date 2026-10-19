@@ -86,9 +86,15 @@ describe('Game Session Heartbeat Timeout and Inactive Session Cleanup', () => {
   describe('gameService.endInactiveSessions', () => {
     it('broadcasts real-time updates when inactive sessions are ended', async () => {
       const mockEndedSessions = [
-        { id: 's1', user_id: 'user-1', end_reason: 'timeout', duration_seconds: 90 },
-        { id: 's2', user_id: 'user-2', end_reason: 'timeout', duration_seconds: 180 },
-        { id: 's3', user_id: 'user-1', end_reason: 'timeout', duration_seconds: 60 },
+        {
+          id: 's1', user_id: 'user-1', end_reason: 'timeout', duration_seconds: 90,
+        },
+        {
+          id: 's2', user_id: 'user-2', end_reason: 'timeout', duration_seconds: 180,
+        },
+        {
+          id: 's3', user_id: 'user-1', end_reason: 'timeout', duration_seconds: 60,
+        },
       ];
       gameRepository.endInactiveSessions.mockResolvedValue(mockEndedSessions);
       gameRepository.listGameSessions.mockResolvedValue([{ id: 's1' }]);

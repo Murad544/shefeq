@@ -50,10 +50,14 @@ class UserAuthService {
         email: user.email,
         role: userRole,
         client_type: clientType,
+        sessionId,
+        session_id: sessionId,
         is_active: user.is_active,
         created_at: user.created_at,
       },
       token,
+      sessionId,
+      session_id: sessionId,
       expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
     };
   }
@@ -128,7 +132,7 @@ class UserAuthService {
       await tokenBlacklistService.blacklistToken(token);
       throw AppError.unauthorized(
         'Session terminated. Logged in from another device',
-        'SESSION_TERMINATED'
+        'SESSION_TERMINATED',
       );
     }
 

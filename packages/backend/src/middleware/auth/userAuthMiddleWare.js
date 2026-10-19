@@ -1,6 +1,6 @@
 const userAuthService = require('../../services/userAuthService');
 const { AppError } = require('../error/errorMiddleware');
-const { ALLOWED_CLIENT_TYPES } = require('../validation/types/types');
+const { ALLOWED_CLIENT_TYPES, CLIENT_TYPES } = require('../validation/types/types');
 
 class UserAuthMiddleware {
   static ensureUser(options = {}) {
@@ -66,6 +66,10 @@ class UserAuthMiddleware {
   static checkIfAlreadyAuthenticated() {
     return async (req, res, next) => {
       try {
+        if (req.body && req.body.email && req.body.password) {
+          return next();
+        }
+
         const token = this.extractToken(req);
         if (!token) {
           return next();
@@ -73,14 +77,26 @@ class UserAuthMiddleware {
 
         const validation = await userAuthService.validateToken(token);
         if (validation.user && validation.user.is_active) {
+          const clientType = (validation.token && validation.token.client_type)
+            || (req.body && req.body.client_type);
+          const isGame = clientType === CLIENT_TYPES.GAME;
+          const sessionId = validation.token && validation.token.sessionId;
+
           return res.status(200).json({
             success: true,
             message: 'Already authenticated',
             code: 'ALREADY_AUTHENTICATED',
             data: {
-              user: validation.user,
-              shouldRedirect: true,
-              redirectTo: '/profile',
+              user: {
+                ...validation.user,
+                sessionId,
+                session_id: sessionId,
+              },
+              token,
+              sessionId,
+              session_id: sessionId,
+              shouldRedirect: !isGame,
+              redirectTo: isGame ? null : '/profile',
             },
           });
         }

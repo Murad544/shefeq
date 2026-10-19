@@ -52,6 +52,10 @@ class AuthMiddleware {
   static checkIfAlreadyAuthenticated() {
     return async (req, res, next) => {
       try {
+        if (req.body && req.body.email && req.body.password) {
+          return next();
+        }
+
         const token = this.extractToken(req);
         if (!token) {
           return next();
@@ -65,6 +69,7 @@ class AuthMiddleware {
             code: 'ALREADY_AUTHENTICATED',
             data: {
               admin: validation.admin,
+              token,
               shouldRedirect: true,
               redirectTo: '/admin',
             },
