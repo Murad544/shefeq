@@ -90,11 +90,11 @@ class UserAuthMiddleware {
               user: {
                 ...validation.user,
                 sessionId,
-                session_id: sessionId,
               },
               token,
-              sessionId,
-              session_id: sessionId,
+              session: {
+                id: sessionId
+              },
               shouldRedirect: !isGame,
               redirectTo: isGame ? null : '/profile',
             },
