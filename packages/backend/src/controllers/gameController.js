@@ -121,6 +121,11 @@ class GameController {
     sendSuccess(res, { sessions }, 'Sessions retrieved successfully');
   });
 
+  getMaps = ErrorHandler.asyncWrapper(async (req, res) => {
+    const maps = await gameService.getActiveMaps();
+    sendSuccess(res, { maps }, "Maps retrieved successfully");
+  });
+
   getMapStats = ErrorHandler.asyncWrapper(async (req, res) => {
     const userId = req.user.id;
     const stats = await gameService.getUserMapStats({ userId });

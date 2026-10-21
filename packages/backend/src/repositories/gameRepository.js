@@ -90,7 +90,12 @@ class GameRepository {
         m.id as map_id,
         m.name as map_name,
         m.code as map_code,
+        m.description as map_description,
         m.required_orb_count,
+        m.order_index,
+        m.difficulty,
+        m.duration_minutes,
+        m.image_url,
         (SELECT objective_time_seconds FROM map_runs 
          WHERE map_id = m.id AND user_id = $1 AND completed = true 
          ORDER BY objective_time_seconds ASC NULLS LAST 
@@ -99,10 +104,31 @@ class GameRepository {
         MIN(EXTRACT(EPOCH FROM (mr.run_ended_at - mr.run_started_at))) as best_time_seconds
       FROM maps m
       LEFT JOIN map_runs mr ON m.id = mr.map_id AND mr.user_id = $1 AND mr.completed = true
-      GROUP BY m.id, m.name, m.code, m.required_orb_count
-      ORDER BY m.id
+      WHERE m.is_active = true
+      GROUP BY m.id, m.name, m.code, m.description, m.required_orb_count, m.order_index, m.difficulty, m.duration_minutes, m.image_url
+      ORDER BY m.order_index ASC NULLS LAST, m.name ASC
     `;
     const { rows } = await db.query(sql, [userId]);
+    return rows || [];
+  }
+
+  async getActiveMaps() {
+    const sql = `
+      SELECT 
+        id,
+        code,
+        name,
+        description,
+        required_orb_count,
+        order_index,
+        difficulty,
+        duration_minutes,
+        image_url
+      FROM maps
+      WHERE is_active = true
+      ORDER BY order_index ASC NULLS LAST, name ASC
+    `;
+    const { rows } = await db.query(sql);
     return rows || [];
   }
 
@@ -193,7 +219,7 @@ class GameRepository {
   // Get all maps with their top leaders
   async getAllMapsWithLeaders(limit = 5) {
     // First get all maps
-    const mapsSQL = 'SELECT id, name, code FROM maps ORDER BY name';
+    const mapsSQL = 'SELECT id, name, code, order_index FROM maps WHERE is_active = true ORDER BY order_index ASC NULLS LAST, name ASC';
     const { rows: maps } = await db.query(mapsSQL);
 
     // For each map, get top leaders
@@ -218,6 +244,7 @@ class GameRepository {
         map_id: map.id,
         map_name: map.name,
         map_code: map.code,
+        order_index: map.order_index,
         leaders: leaders || [],
       });
     }

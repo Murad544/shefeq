@@ -9,6 +9,10 @@ class SyncRepository {
         m.name,
         m.description,
         m.required_orb_count,
+        m.order_index,
+        m.difficulty,
+        m.duration_minutes,
+        m.image_url,
         m.created_at AS map_created_at,
         mr.id AS run_id,
         mr.game_session_id,
@@ -28,7 +32,8 @@ class SyncRepository {
         ORDER BY run_started_at DESC NULLS LAST, created_at DESC
         LIMIT 1
       ) mr ON TRUE
-      ORDER BY m.code;
+      WHERE m.is_active = true
+      ORDER BY m.order_index ASC NULLS LAST, m.code;
     `;
 
     const { rows } = await db.query(sql, [userId]);

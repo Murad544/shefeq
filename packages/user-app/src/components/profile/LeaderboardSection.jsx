@@ -13,7 +13,6 @@ import { Map as MapIcon, Star as StarIcon } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { apiClient } from '../../services/api/apiClient';
 import { endpoints } from '../../services/api/endpoints';
-import { DISPLAYED_MAPS, MAP_NAMES } from '../../constants/maps';
 import { C, EASE, FONT, labelCaps } from "../../config/tokens";
 import Panel from "../military/Panel";
 import RadarLoader from "../military/RadarLoader";
@@ -34,10 +33,6 @@ const medalNames = {
 // Podium order on wide screens: 2nd, 1st, 3rd
 const PODIUM_ORDER = { 0: 2, 1: 1, 2: 3 };
 const PODIUM_HEIGHT = { 0: 150, 1: 112, 2: 88 };
-
-const getMapDisplayName = (mapCode) => {
-  return MAP_NAMES[mapCode?.toLowerCase?.()] || mapCode;
-};
 
 const LeaderboardSection = ({ userRole }) => {
   const [leaderboardData, setLeaderboardData] = useState(null);
@@ -80,9 +75,7 @@ const LeaderboardSection = ({ userRole }) => {
   }
 
   const topLeaders = leaderboardData?.topLeaders || [];
-  const mapLeaders = (leaderboardData?.mapLeaders || []).filter(
-    map => DISPLAYED_MAPS.includes(map.mapCode?.toLowerCase?.())
-  );
+  const mapLeaders = leaderboardData?.mapLeaders || [];
 
   return (
     <Box>
@@ -184,7 +177,7 @@ const LeaderboardSection = ({ userRole }) => {
           <Grid item xs={12} md={6} lg={4} key={mapData.mapId}>
             <Box sx={{ height: "100%", animation: `sg-fade-up .5s ease ${mapIndex * 60}ms backwards` }}>
               <Panel
-                title={getMapDisplayName(mapData.mapCode)}
+                title={mapData.mapName || mapData.map || mapData.mapCode}
                 icon={<MapIcon />}
                 noPadding
                 sx={{ height: "100%" }}

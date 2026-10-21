@@ -7,6 +7,7 @@ export const endpoints = {
   login: () => "/api/users/login",
   profile: () => "/api/users/profile",
   gameSessions: () => "/api/game/session/list",
+  maps: () => "/api/game/maps",
   mapStats: () => "/api/game/stats/maps",
   leaderboard: () => "/api/game/leaderboard",
   streak: () => "/api/game/streak",

@@ -21,11 +21,11 @@ import {
 } from "@mui/icons-material";
 import { apiClient } from "../../services/api/apiClient";
 import { endpoints } from "../../services/api/endpoints";
-import { INITIAL_LEVELS_DATA, MAPS } from "../../constants/maps";
 import { C, EASE, FONT, labelCaps } from "../../config/tokens";
 import CornerBrackets from "../military/CornerBrackets";
 import CountUp from "../military/CountUp";
 import Panel from "../military/Panel";
+import RadarLoader from "../military/RadarLoader";
 import SegmentedProgress from "../military/SegmentedProgress";
 import TacticalBackground from "../military/TacticalBackground";
 
@@ -211,57 +211,61 @@ const LevelCard = ({ level, index }) => {
 
 // Main Levels Section
 const LevelsSection = ({ userRole }) => {
-  const [levelsData, setLevelsData] = useState(INITIAL_LEVELS_DATA);
+  const [levelsData, setLevelsData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [streak, setStreak] = useState(STREAK);
 
   useEffect(() => {
-    if (userRole === "trainer") return;
+    if (userRole === "trainer") {
+      setLoading(false);
+      return;
+    }
 
     const fetchMapStats = async () => {
       try {
+        setLoading(true);
         const response = await apiClient.get(endpoints.mapStats());
         const stats = response.stats || [];
-        console.log("Stats data:", stats);
 
-        const mapNameToLevelId = MAPS.reduce((mapIds, map) => {
-          mapIds[map.code.toLowerCase()] = map.id;
-          return mapIds;
-        }, {});
-
-        const updatedLevels = INITIAL_LEVELS_DATA.map((level) => {
-          console.log(level);
-          const stat = stats.find((s) => {
-            const mapCode = s.map_code;
-            return (
-              s.map_id === level.id ||
-              mapNameToLevelId[mapCode?.toLowerCase?.()] === level.id
-            );
-          });
-          const timesPlayed = stat ? stat.times_played : level.timesPlayed;
-          const checkpoints = stat?.required_orb_count ?? level.checkpoints;
-          const objectiveTime =
-            stat && stat.objective_time_seconds
-              ? stat.objective_time_seconds
-              : 0;
-          const totalDuration = +timesPlayed * objectiveTime; // Total duration in seconds
+        const updatedLevels = stats.map((stat, idx) => {
+          const timesPlayed = Number(stat.times_played || 0);
+          const checkpoints = stat.required_orb_count ?? null;
+          const objectiveTime = stat.objective_time_seconds
+            ? Number(stat.objective_time_seconds)
+            : 0;
+          const totalDuration = timesPlayed * objectiveTime;
           const deqiqe = Math.floor(totalDuration / 60);
           const saniye = totalDuration % 60;
+          const durationStr = timesPlayed > 0
+            ? `${deqiqe} dəq ${saniye} san`
+            : `${stat.duration_minutes || 0} dəq`;
+
+          const levelNumber = stat.order_index ?? (idx + 1);
+
           return {
-            ...level,
-            timesPlayed: timesPlayed,
+            id: stat.map_id,
+            code: stat.map_code,
+            name: stat.map_name,
+            levelNumber,
+            title: `Səviyyə ${levelNumber}: ${stat.map_name}`,
+            description: stat.map_description || "",
+            difficulty: stat.difficulty || "Orta",
+            image: stat.image_url || "",
+            timesPlayed,
             checkpoints,
-            duration: `${deqiqe} dəq ${saniye} san`,
-            bestTime:
-              stat && stat.best_time_seconds
-                ? Math.round(stat.best_time_seconds)
-                : null,
-            completed: stat && stat.times_played > 0 ? true : level.completed,
+            duration: durationStr,
+            bestTime: stat.best_time_seconds
+              ? Math.round(Number(stat.best_time_seconds))
+              : null,
+            completed: timesPlayed > 0,
           };
         });
-        console.log("Updated levels:", updatedLevels);
+
         setLevelsData(updatedLevels);
       } catch (error) {
         console.error("Failed to fetch map stats:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -292,7 +296,7 @@ const LevelsSection = ({ userRole }) => {
 
   const completedLevels = levelsData.filter((l) => l.completed).length;
   const totalLevels = levelsData.length;
-  const overallProgress = (completedLevels / totalLevels) * 100;
+  const overallProgress = totalLevels > 0 ? (completedLevels / totalLevels) * 100 : 0;
   const totalPlays = levelsData.reduce(
     (acc, l) => acc + Number(l.timesPlayed || 0),
     0,
@@ -303,6 +307,14 @@ const LevelsSection = ({ userRole }) => {
     { label: "Qalan", value: totalLevels - completedLevels },
     { label: "Cəmi Oynama", value: totalPlays },
   ];
+
+  if (loading && levelsData.length === 0) {
+    return (
+      <Box sx={{ py: 6 }}>
+        <RadarLoader message="Yüklənir" />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ mt: 1 }}>

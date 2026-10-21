@@ -48,6 +48,14 @@ router.get(
 );
 
 router.get(
+  '/maps',
+  UserAuthMiddleware.ensureUser({
+    allowedClientTypes: [CLIENT_TYPES.WEB, CLIENT_TYPES.GAME],
+  }),
+  gameController.getMaps,
+);
+
+router.get(
   '/stats/maps',
   UserAuthMiddleware.ensureUser({
     allowedClientTypes: [CLIENT_TYPES.WEB],

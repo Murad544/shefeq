@@ -77,6 +77,21 @@ class GameService {
     return sessions;
   }
 
+  async getActiveMaps() {
+    const maps = await gameRepository.getActiveMaps();
+    return maps.map((m) => ({
+      id: m.id,
+      code: m.code,
+      name: m.name,
+      description: m.description,
+      requiredOrbCount: m.required_orb_count,
+      orderIndex: m.order_index,
+      difficulty: m.difficulty,
+      durationMinutes: m.duration_minutes,
+      imageUrl: m.image_url,
+    }));
+  }
+
   async getUserMapStats({ userId }) {
     const stats = await gameRepository.getUserMapStats({ userId });
     return stats;
@@ -98,8 +113,10 @@ class GameService {
       })),
       mapLeaders: mapLeaders.map((map) => ({
         map: map.map_name,
+        mapName: map.map_name,
         mapId: map.map_id,
         mapCode: map.map_code,
+        orderIndex: map.order_index,
         leaders: (map.leaders || []).map((leader) => ({
           id: leader.user_id,
           name: leader.name,
