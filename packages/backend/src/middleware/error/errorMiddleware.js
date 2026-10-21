@@ -7,11 +7,11 @@ class AppError extends Error {
     this.isOperational = true;
   }
 
-  static badRequest(message = 'Bad Request', code = 'BAD_REQUEST') {
+  static badRequest(message = 'Bad Request', code = 'VALIDATION_ERROR') {
     return new AppError(message, 400, code);
   }
 
-  static unauthorized(message = 'Unauthorized', code = 'UNAUTHORIZED') {
+  static unauthorized(message = 'Unauthorized', code = 'TOKEN_EXPIRED') {
     return new AppError(message, 401, code);
   }
 
@@ -27,12 +27,12 @@ class AppError extends Error {
     return new AppError(message, 409, code);
   }
 
-  static validationError(message, details) {
+  static validationError(message = 'Validation failed', details = null) {
     return new AppError(message, 400, 'VALIDATION_ERROR', details);
   }
 
-  static internal(message = 'Internal Server Error') {
-    return new AppError(message, 500, 'INTERNAL_ERROR');
+  static internal(message = 'Internal Server Error', code = 'SERVER_ERROR') {
+    return new AppError(message, 500, code);
   }
 }
 
@@ -42,10 +42,20 @@ class ErrorHandler {
       error = AppError.internal(error.message);
     }
 
+    const statusCode = error.statusCode || 500;
+    let code = error.code;
+    if (!code) {
+      if (statusCode === 400) code = 'VALIDATION_ERROR';
+      else if (statusCode === 401) code = 'TOKEN_EXPIRED';
+      else if (statusCode === 404) code = 'NOT_FOUND';
+      else code = 'SERVER_ERROR';
+    }
+
     const payload = {
       success: false,
+      code,
       message: error.message,
-      code: error.code,
+      data: null,
       timestamp: new Date().toISOString(),
     };
 
@@ -53,13 +63,11 @@ class ErrorHandler {
       payload.details = error.details;
     }
 
-    res.status(error.statusCode).json(payload);
+    res.status(statusCode).json(payload);
   }
 
   static asyncWrapper(fn) {
-    return (req, res, next) => {
-      Promise.resolve(fn(req, res, next)).catch(next);
-    };
+    return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
   }
 
   static notFound(req, res, next) {

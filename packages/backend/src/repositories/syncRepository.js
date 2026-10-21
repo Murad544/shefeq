@@ -36,8 +36,14 @@ class SyncRepository {
   }
 
   async findMapByCode(code) {
-    const sql = `SELECT id FROM maps WHERE code = $1 LIMIT 1`;
+    const sql = `SELECT id, code, name FROM maps WHERE code = $1 LIMIT 1`;
     const { rows } = await db.query(sql, [code]);
+    return rows[0] || null;
+  }
+
+  async findMapById(id) {
+    const sql = `SELECT id, code, name FROM maps WHERE id = $1 LIMIT 1`;
+    const { rows } = await db.query(sql, [id]);
     return rows[0] || null;
   }
 
@@ -59,6 +65,7 @@ class SyncRepository {
       'map_id',
       'game_session_id',
       'objective_time_seconds',
+      'time_ms',
       'collected_orbs',
       'completed',
       'end_reason',
@@ -66,8 +73,9 @@ class SyncRepository {
     const values = [
       userId,
       mapId,
-      payload.gameSessionId || null,
+      payload.gameSessionId || payload.sessionId || null,
       payload.objectiveTimeSeconds ?? null,
+      payload.timeMs ?? null,
       payload.collectedOrbs ?? 0,
       payload.completed ?? false,
       payload.endReason ?? null,
@@ -93,27 +101,32 @@ class SyncRepository {
     const fields = [];
     const values = [];
 
-    if ('gameSessionId' in payload) {
-      values.push(payload.gameSessionId);
+    const sessionId = payload.sessionId || payload.gameSessionId;
+    if (sessionId !== undefined) {
+      values.push(sessionId);
       fields.push(`game_session_id = $${values.length}`);
     }
-    if ('objectiveTimeSeconds' in payload) {
+    if ('timeMs' in payload && payload.timeMs !== undefined) {
+      values.push(payload.timeMs);
+      fields.push(`time_ms = $${values.length}`);
+    }
+    if ('objectiveTimeSeconds' in payload && payload.objectiveTimeSeconds !== undefined) {
       values.push(payload.objectiveTimeSeconds);
       fields.push(`objective_time_seconds = $${values.length}`);
     }
-    if ('collectedOrbs' in payload) {
+    if ('collectedOrbs' in payload && payload.collectedOrbs !== undefined) {
       values.push(payload.collectedOrbs);
       fields.push(`collected_orbs = $${values.length}`);
     }
-    if ('completed' in payload) {
+    if ('completed' in payload && payload.completed !== undefined) {
       values.push(payload.completed);
       fields.push(`completed = $${values.length}`);
     }
-    if ('endReason' in payload) {
+    if ('endReason' in payload && payload.endReason !== undefined) {
       values.push(payload.endReason);
       fields.push(`end_reason = $${values.length}`);
     }
-    if ('mapId' in payload) {
+    if ('mapId' in payload && payload.mapId !== undefined) {
       values.push(payload.mapId);
       fields.push(`map_id = $${values.length}`);
     }
@@ -136,6 +149,54 @@ class SyncRepository {
 
     const { rows } = await db.query(sql, values);
     return rows[0] || null;
+  }
+
+  async getPersonalBestForUserAndMap(userId, mapId) {
+    const sql = `
+      SELECT id, time_ms, objective_time_seconds, run_ended_at, created_at
+      FROM map_runs
+      WHERE user_id = $1
+        AND map_id = $2
+        AND completed = true
+        AND (time_ms IS NOT NULL OR objective_time_seconds IS NOT NULL)
+      ORDER BY COALESCE(time_ms, objective_time_seconds * 1000) ASC, run_ended_at ASC
+      LIMIT 1;
+    `;
+    const { rows } = await db.query(sql, [userId, mapId]);
+    return rows[0] || null;
+  }
+
+  async getPreviousBestExcludingRun(userId, mapId, runId) {
+    const sql = `
+      SELECT id, time_ms, objective_time_seconds, run_ended_at, created_at
+      FROM map_runs
+      WHERE user_id = $1
+        AND map_id = $2
+        AND completed = true
+        AND id != $3
+        AND (time_ms IS NOT NULL OR objective_time_seconds IS NOT NULL)
+      ORDER BY COALESCE(time_ms, objective_time_seconds * 1000) ASC, run_ended_at ASC
+      LIMIT 1;
+    `;
+    const { rows } = await db.query(sql, [userId, mapId, runId]);
+    return rows[0] || null;
+  }
+
+  async getAllPersonalBestsForUser(userId) {
+    const sql = `
+      SELECT
+        m.code AS map_code,
+        MIN(COALESCE(mr.time_ms, mr.objective_time_seconds * 1000)) AS best_time_ms
+      FROM maps m
+      INNER JOIN map_runs mr ON mr.map_id = m.id
+      WHERE mr.user_id = $1
+        AND mr.completed = true
+        AND (mr.time_ms IS NOT NULL OR mr.objective_time_seconds IS NOT NULL)
+      GROUP BY m.id, m.code
+      ORDER BY m.code;
+    `;
+    const { rows } = await db.query(sql, [userId]);
+    return rows || [];
   }
 }
 

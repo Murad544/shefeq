@@ -12,13 +12,54 @@ class SyncController {
   startMapRun = ErrorHandler.asyncWrapper(async (req, res) => {
     const userId = req.user.id;
     const mapRun = await syncService.startMapRun(userId, req.body);
-    sendSuccess(res, { mapRun }, 'Map run initiated successfully');
+    sendSuccess(
+      res,
+      {
+        run: {
+          id: mapRun.id,
+        },
+      },
+      'Map run initiated successfully',
+    );
   });
 
   finishMapRun = ErrorHandler.asyncWrapper(async (req, res) => {
     const userId = req.user.id;
-    const mapRun = await syncService.finishMapRun(userId, req.body);
-    sendSuccess(res, { mapRun }, 'Map run finished successfully');
+    const result = await syncService.finishMapRun(userId, req.body);
+    sendSuccess(
+      res,
+      {
+        run: result.run,
+        personalBest: result.personalBest,
+        isNewPersonalBest: result.isNewPersonalBest,
+      },
+      'Run finished',
+    );
+  });
+
+  getPersonalBest = ErrorHandler.asyncWrapper(async (req, res) => {
+    const userId = req.user.id;
+    const { mapCode } = req.query;
+    const personalBest = await syncService.getPersonalBest(userId, mapCode);
+    sendSuccess(
+      res,
+      {
+        personalBest,
+      },
+      'Personal best retrieved successfully',
+    );
+  });
+
+  getAllPersonalBests = ErrorHandler.asyncWrapper(async (req, res) => {
+    const userId = req.user.id;
+    const items = await syncService.getAllPersonalBests(userId);
+    sendSuccess(
+      res,
+      {
+        items,
+      },
+      'Personal bests retrieved successfully',
+    );
   });
 }
 

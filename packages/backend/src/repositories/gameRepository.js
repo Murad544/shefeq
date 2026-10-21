@@ -1,9 +1,26 @@
 const db = require('../config/database');
 
 class GameRepository {
-  async startSession({ userId }) {
+  async startSession({ userId, sessionId = null }) {
+    if (sessionId) {
+      const sql = 'INSERT INTO game_sessions (id, user_id) VALUES($1, $2) RETURNING *';
+      const { rows } = await db.query(sql, [sessionId, userId]);
+      return rows[0] || null;
+    }
     const sql = 'INSERT INTO game_sessions (user_id) VALUES($1) RETURNING *';
     const { rows } = await db.query(sql, [userId]);
+    return rows[0] || null;
+  }
+
+  async findActiveSessionForUser(userId, timeoutSeconds = 90) {
+    const sql = `SELECT id, user_id, session_started_at, last_heartbeat_at
+                 FROM game_sessions
+                 WHERE user_id = $1
+                   AND session_ended_at IS NULL
+                   AND COALESCE(last_heartbeat_at, session_started_at) >= NOW() - ($2 * INTERVAL '1 second')
+                 ORDER BY session_started_at DESC
+                 LIMIT 1`;
+    const { rows } = await db.query(sql, [userId, timeoutSeconds]);
     return rows[0] || null;
   }
 
@@ -13,7 +30,7 @@ class GameRepository {
       WHERE id = $1 
         AND session_ended_at IS NULL
         AND COALESCE(last_heartbeat_at, session_started_at) >= NOW() - ($2 * INTERVAL '1 second')
-      RETURNING id, user_id, session_started_at, session_ended_at, duration_seconds, end_reason, created_at`;
+      RETURNING id, user_id, session_started_at, session_ended_at, duration_seconds, end_reason, created_at, last_heartbeat_at`;
     const { rows } = await db.query(sql, [sessionId, timeoutSeconds]);
     return rows[0] || null;
   }

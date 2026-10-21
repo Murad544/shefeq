@@ -2,7 +2,7 @@ const express = require('express');
 const userController = require('../controllers/userController');
 const UserAuthMiddleware = require('../middleware/auth/userAuthMiddleWare');
 const ValidationMiddleware = require('../middleware/validation/validationMiddleware');
-const { passwordChangeSchema } = require('../middleware/validation/schemas/userSchemas');
+const { passwordChangeSchema, loginSchema } = require('../middleware/validation/schemas/userSchemas');
 const { CLIENT_TYPES } = require('../middleware/validation/types/types');
 
 const router = express.Router();
@@ -10,7 +10,7 @@ const router = express.Router();
 router.post(
   '/login',
   UserAuthMiddleware.checkIfAlreadyAuthenticated(),
-  // ValidationMiddleware.validate(ValidationMiddleware.schemas?.login || {}),
+  ValidationMiddleware.validate(loginSchema),
   userController.login,
 );
 
