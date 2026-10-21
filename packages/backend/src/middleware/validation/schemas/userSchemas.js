@@ -61,4 +61,16 @@ const userIdSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
 
-module.exports = { registerSchema, userIdSchema, passwordChangeSchema };
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+  clientType: z.enum(['web', 'game']).optional(),
+  client_type: z.enum(['web', 'game']).optional(),
+});
+
+module.exports = {
+  registerSchema,
+  userIdSchema,
+  passwordChangeSchema,
+  loginSchema,
+};

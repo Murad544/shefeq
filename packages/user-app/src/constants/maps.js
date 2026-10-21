@@ -5,7 +5,7 @@ const R2_BASE_URL = process.env.REACT_APP_R2_BASE_URL;
 export const MAPS = [
   {
     id: 1,
-    code: "Ghost_city_level",
+    code: "Ghost_1",
     name: "Tərk edilmiş şəhər",
     image: `${R2_BASE_URL}/photos/LostCityPreview.png`,
     description: "Binaların arasında sürətli naviqasiya.",
@@ -14,7 +14,7 @@ export const MAPS = [
   },
   {
     id: 2,
-    code: "Island_Stonehenge_Level",
+    code: "Island_Stonehenge",
     name: "Qədimi daşlar",
     image: `${R2_BASE_URL}/photos/StonehengePreview.png`,
     description: "Meşəlik ərazidə daşların arasında manevr edərək uçuş.",
@@ -23,7 +23,7 @@ export const MAPS = [
   },
   {
     id: 3,
-    code: "Ancient_castle_level1",
+    code: "Castle_1",
     name: "Qədim qala",
     image: `${R2_BASE_URL}/photos/AncientLevelPreview.png`,
     description: "Qədim qala və divarların arasında manevr edərək uçuş.",
@@ -32,7 +32,7 @@ export const MAPS = [
   },
   {
     id: 4,
-    code: "Ghost_city_level_hard",
+    code: "Ghost_2",
     name: "Tərk edilmiş şəhər - 2",
     image: `${R2_BASE_URL}/photos/LostCity2Preview.png`,
     description: "Anbar və binaların ətrafında uçuş.",
@@ -41,7 +41,7 @@ export const MAPS = [
   },
   {
     id: 5,
-    code: "Island_Level_river",
+    code: "Island",
     name: "Meşəlik ərazi",
     image: `${R2_BASE_URL}/photos/ForestPreview.png`,
     description: "Meşə arasında manevrə edərək uç.",
@@ -50,19 +50,10 @@ export const MAPS = [
   },
   {
     id: 6,
-    code: "Ancient_castle_level2",
+    code: "Castle_2",
     name: "Qədim qala - 2",
     image: `${R2_BASE_URL}/photos/AncientCastleLeve2Prevew.png`,
     description: "Qədim qala və divarların arasında manevr edərək uçuş.",
-    difficulty: "Çox Çətin",
-    duration: 0,
-  },
-  {
-    id: 7,
-    code: "Garage_level",
-    name: "Qaraj",
-    image: `${R2_BASE_URL}/photos/GaragePreview.png`,
-    description: "Qaraj və ətrafında manevr edərək uçuş.",
     difficulty: "Çox Çətin",
     duration: 0,
   },

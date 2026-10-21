@@ -13,7 +13,7 @@ class UserAuthMiddleware {
       try {
         const token = this.extractToken(req);
         if (!token) {
-          throw AppError.unauthorized('Authorization token required', 'NO_TOKEN');
+          throw AppError.unauthorized('Authorization token required', 'TOKEN_EXPIRED');
         }
 
         const validation = await userAuthService.validateToken(token);
@@ -52,11 +52,8 @@ class UserAuthMiddleware {
 
         next();
       } catch (error) {
-        if (error.name === 'TokenExpiredError') {
-          return next(AppError.unauthorized('Token has expired', 'TOKEN_EXPIRED'));
-        }
-        if (error.name === 'JsonWebTokenError') {
-          return next(AppError.unauthorized('Invalid token', 'TOKEN_INVALID'));
+        if (error.name === 'TokenExpiredError' || error.name === 'JsonWebTokenError') {
+          return next(AppError.unauthorized('Token expired or invalid', 'TOKEN_EXPIRED'));
         }
         next(error);
       }

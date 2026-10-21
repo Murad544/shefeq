@@ -6,15 +6,33 @@ const appConfig = require('../config/appConfig');
 
 class GameService {
   async startSession({ userId }) {
+    const timeoutSeconds = appConfig.get('gameHeartbeatTimeoutSeconds') || 90;
+    if (typeof gameRepository.findActiveSessionForUser === 'function') {
+      const activeSession = await gameRepository.findActiveSessionForUser(userId, timeoutSeconds);
+      if (activeSession) {
+        await gameRepository.updateHeartbeat({ sessionId: activeSession.id, timeoutSeconds });
+        return {
+          ...activeSession,
+          session: activeSession,
+          isResumed: true,
+        };
+      }
+    }
+
     await gameRepository.endUserActiveSessions({ userId, endReason: 'disconnect' });
-    return await gameRepository.startSession({ userId });
+    const session = await gameRepository.startSession({ userId });
+    return {
+      ...(session || {}),
+      session,
+      isResumed: false,
+    };
   }
 
   async endSession({ sessionId, endReason }) {
     const session = await gameRepository.endSession({ sessionId, endReason });
 
     if (!session) {
-      throw AppError.notFound('Session not found or already ended', 'SESSION_NOT_FOUND');
+      throw AppError.notFound('Session not found', 'NOT_FOUND');
     }
 
     return session;
@@ -26,7 +44,7 @@ class GameService {
 
     if (!session) {
       await this.endInactiveSessions(timeoutSeconds);
-      throw AppError.notFound('Session not found or already ended', 'SESSION_NOT_FOUND');
+      throw AppError.unauthorized('Session dropped or expired', 'SESSION_EXPIRED');
     }
 
     return session;

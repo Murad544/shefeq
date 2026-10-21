@@ -8,10 +8,28 @@ const { CLIENT_TYPES } = require('../middleware/validation/types/types');
 class UserController {
   login(req, res, next) {
     const handler = ErrorHandler.asyncWrapper(async (request, response) => {
-      const { email, password, client_type: clientType = CLIENT_TYPES.WEB } = request.body;
+      const {
+        email,
+        password,
+        clientType = request.body.client_type || CLIENT_TYPES.WEB,
+      } = request.body;
       const result = await userAuthService.login(email, password, clientType);
       if (!result) throw AppError.internal('Login failed');
-      sendSuccess(response, result, 'Login successful');
+
+      const responseData = {
+        token: result.token,
+        expiresAt: result.expiresAt,
+        user: {
+          id: result.user.id,
+          email: result.user.email,
+          role: result.user.role,
+        },
+        session: {
+          id: result.session?.id || result.sessionId,
+        },
+      };
+
+      sendSuccess(response, responseData, 'Login successful');
     });
 
     return handler(req, res, next);
@@ -21,22 +39,23 @@ class UserController {
     const handler = ErrorHandler.asyncWrapper(async (request, response) => {
       const authHeader = request.get('Authorization');
       if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        throw AppError.unauthorized('Authorization token required', 'NO_TOKEN');
+        throw AppError.unauthorized('Authorization token required', 'TOKEN_EXPIRED');
       }
       const token = authHeader.substring(7);
       const validation = await userAuthService.validateToken(token);
       const sessionId = validation.token && validation.token.sessionId;
       const user = {
-        ...validation.user,
-        sessionId,
-        session_id: sessionId,
+        id: validation.user.id,
+        email: validation.user.email,
+        role: validation.user.role,
       };
       sendSuccess(
         response,
         {
           user,
-          sessionId,
-          session_id: sessionId,
+          session: {
+            id: sessionId,
+          },
         },
         'User retrieved successfully',
       );

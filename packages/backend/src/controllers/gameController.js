@@ -21,10 +21,10 @@ const adminService = require('../services/adminService');
 
 class GameController {
   startGameSession = ErrorHandler.asyncWrapper(async (req, res) => {
-    const clientIp = getClientIp(req);
-    console.log('clientIp:', clientIp);
     const userId = req.user.id;
-    const session = await gameService.startSession({ userId });
+    const result = await gameService.startSession({ userId });
+    const session = result.session || result;
+    const isResumed = Boolean(result.isResumed);
 
     // Broadcast updated sessions to real-time clients
     try {
@@ -36,7 +36,9 @@ class GameController {
       console.error('Failed to broadcast session start update:', broadcastError);
     }
 
-    sendSuccess(res, { session }, 'Game session started successfully');
+    const code = isResumed ? 'SESSION_RESUMED' : 'OK';
+    const message = isResumed ? 'Active session resumed' : 'Game session started successfully';
+    sendSuccess(res, { session: { id: session.id } }, message, 200, code);
   });
 
   endGameSession = ErrorHandler.asyncWrapper(async (req, res) => {
@@ -56,18 +58,27 @@ class GameController {
       }
     }
 
-    sendSuccess(res, { session }, 'Game session ended successfully');
+    sendSuccess(res, { session: { id: session.id } }, 'Game session ended successfully');
   });
 
   heartbeatGameSession = ErrorHandler.asyncWrapper(async (req, res) => {
     const { sessionId } = req.body;
     const session = await gameService.updateHeartbeat({ sessionId });
 
-    if (!session) {
-      throw new Error('Session not found or already ended');
-    }
+    const lastHeartbeatAt = session.last_heartbeat_at
+      ? new Date(session.last_heartbeat_at).toISOString()
+      : new Date().toISOString();
 
-    sendSuccess(res, { session }, 'Game session heartbeat updated successfully');
+    sendSuccess(
+      res,
+      {
+        session: {
+          id: session.id,
+          lastHeartbeatAt,
+        },
+      },
+      'Game session heartbeat updated successfully',
+    );
   });
 
   listGameSessions = ErrorHandler.asyncWrapper(async (req, res) => {

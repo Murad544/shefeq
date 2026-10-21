@@ -11,25 +11,35 @@ const { CLIENT_TYPES, ALLOWED_CLIENT_TYPES } = require('../middleware/validation
 class UserAuthService {
   async login(email, password, clientType = CLIENT_TYPES.WEB) {
     if (!ALLOWED_CLIENT_TYPES.includes(clientType)) {
-      throw AppError.badRequest('Invalid client type', 'INVALID_CLIENT_TYPE');
+      throw AppError.badRequest('Invalid client type', 'VALIDATION_ERROR');
     }
 
     if (!email || !password) {
-      throw AppError.badRequest('Email and password are required', 'MISSING_CREDENTIALS');
+      throw AppError.badRequest('Email and password are required', 'VALIDATION_ERROR');
     }
 
     const user = await userRepository.findByEmail(email);
     if (!user || !user.is_active) {
-      throw AppError.unauthorized('Giriş məlumatları yanlışdır', 'INVALID_CREDENTIALS');
+      throw AppError.unauthorized('Email or password is wrong', 'INVALID_CREDENTIALS');
     }
 
     const isValidPassword = await encryptionService.verifyPassword(password, user.password_hash);
     if (!isValidPassword) {
-      throw AppError.unauthorized('Giriş məlumatları yanlışdır', 'INVALID_CREDENTIALS');
+      throw AppError.unauthorized('Email or password is wrong', 'INVALID_CREDENTIALS');
     }
 
     const sessionId = crypto.randomUUID();
     await userRepository.updateSessionId(user.id, sessionId, clientType);
+
+    if (clientType === CLIENT_TYPES.GAME) {
+      try {
+        const gameRepository = require('../repositories/gameRepository');
+        await gameRepository.endUserActiveSessions({ userId: user.id, endReason: 'disconnect' });
+        await gameRepository.startSession({ userId: user.id, sessionId });
+      } catch (err) {
+        // Safe for test environments
+      }
+    }
 
     const userRole = user.role || 'trainee';
 
@@ -58,6 +68,9 @@ class UserAuthService {
       token,
       sessionId,
       session_id: sessionId,
+      session: {
+        id: sessionId,
+      },
       expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
     };
   }

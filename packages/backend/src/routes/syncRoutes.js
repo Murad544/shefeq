@@ -5,6 +5,7 @@ const ValidationMiddleware = require('../middleware/validation/validationMiddlew
 const {
   startLevelRunSchema,
   finishLevelRunSchema,
+  personalBestQuerySchema,
 } = require('../middleware/validation/schemas/syncSchema');
 const { CLIENT_TYPES } = require('../middleware/validation/types/types');
 
@@ -18,6 +19,23 @@ router.get(
     allowedClientTypes: [CLIENT_TYPES.WEB, CLIENT_TYPES.GAME],
   }),
   syncController.getAllLevelData,
+);
+
+router.get(
+  '/personal-best',
+  UserAuthMiddleware.ensureUser({
+    allowedClientTypes: [CLIENT_TYPES.WEB, CLIENT_TYPES.GAME],
+  }),
+  ValidationMiddleware.validateQuery(personalBestQuerySchema),
+  syncController.getPersonalBest,
+);
+
+router.get(
+  '/personal-bests',
+  UserAuthMiddleware.ensureUser({
+    allowedClientTypes: [CLIENT_TYPES.WEB, CLIENT_TYPES.GAME],
+  }),
+  syncController.getAllPersonalBests,
 );
 
 router.post(

@@ -69,14 +69,14 @@ describe('Game Session Heartbeat Timeout and Inactive Session Cleanup', () => {
       expect(result).toEqual(mockSession);
     });
 
-    it('triggers inactive session cleanup and throws 404 when session heartbeat is expired or not found', async () => {
+    it('triggers inactive session cleanup and throws 401 SESSION_EXPIRED when session heartbeat is expired or not found', async () => {
       const sessionId = 'session-expired';
       gameRepository.updateHeartbeat.mockResolvedValue(null);
       gameRepository.endInactiveSessions.mockResolvedValue([]);
 
       await expect(gameService.updateHeartbeat({ sessionId })).rejects.toMatchObject({
-        statusCode: 404,
-        code: 'SESSION_NOT_FOUND',
+        statusCode: 401,
+        code: 'SESSION_EXPIRED',
       });
 
       expect(gameRepository.endInactiveSessions).toHaveBeenCalledWith(90);

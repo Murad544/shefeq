@@ -15,9 +15,9 @@ class ValidationMiddleware {
             message: e.message,
           }));
 
-          throw AppError.validationError('Validation failed', details);
+          return next(AppError.validationError('Validation failed', details));
         }
-        next(error);
+        return next(error);
       }
     };
   }
@@ -28,7 +28,7 @@ class ValidationMiddleware {
         req.params = schema.parse(req.params);
         next();
       } catch (error) {
-        next(AppError.badRequest('Invalid parameters'));
+        next(AppError.validationError('Invalid parameters'));
       }
     };
   }
@@ -39,7 +39,7 @@ class ValidationMiddleware {
         req.query = schema.parse(req.query);
         next();
       } catch (error) {
-        next(AppError.badRequest('Invalid query parameters'));
+        next(AppError.validationError('Invalid query parameters'));
       }
     };
   }
