@@ -66,6 +66,21 @@ const loginSchema = z.object({
   password: z.string().min(1),
   clientType: z.enum(['web', 'game']).optional(),
   client_type: z.enum(['web', 'game']).optional(),
+  rememberMe: z.boolean().optional(),
+  remember_me: z.boolean().optional(),
+});
+
+const refreshTokenSchema = z.object({
+  refreshToken: z.string().optional(),
+  refresh_token: z.string().optional(),
+}).refine((data) => Boolean(data.refreshToken || data.refresh_token), {
+  message: 'refreshToken is required',
+  path: ['refreshToken'],
+});
+
+const revokeTokenSchema = z.object({
+  refreshToken: z.string().optional(),
+  refresh_token: z.string().optional(),
 });
 
 module.exports = {
@@ -73,4 +88,6 @@ module.exports = {
   userIdSchema,
   passwordChangeSchema,
   loginSchema,
+  refreshTokenSchema,
+  revokeTokenSchema,
 };

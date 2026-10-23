@@ -12,13 +12,16 @@ class UserController {
         email,
         password,
         clientType = request.body.client_type || CLIENT_TYPES.WEB,
+        rememberMe = request.body.remember_me || false,
       } = request.body;
-      const result = await userAuthService.login(email, password, clientType);
+      const result = await userAuthService.login(email, password, clientType, rememberMe);
       if (!result) throw AppError.internal('Login failed');
 
       const responseData = {
         token: result.token,
         expiresAt: result.expiresAt,
+        refreshToken: result.refreshToken || null,
+        refreshExpiresAt: result.refreshExpiresAt || null,
         user: {
           id: result.user.id,
           email: result.user.email,
@@ -30,6 +33,45 @@ class UserController {
       };
 
       sendSuccess(response, responseData, 'Login successful');
+    });
+
+    return handler(req, res, next);
+  }
+
+  refreshToken(req, res, next) {
+    const handler = ErrorHandler.asyncWrapper(async (request, response) => {
+      const rawRefreshToken = request.body?.refreshToken || request.body?.refresh_token;
+      if (!rawRefreshToken) {
+        throw AppError.unauthorized('Refresh token is required', 'INVALID_REFRESH_TOKEN');
+      }
+      const result = await userAuthService.refreshToken(rawRefreshToken);
+      const responseData = {
+        token: result.token,
+        expiresAt: result.expiresAt,
+        refreshToken: result.refreshToken,
+        refreshExpiresAt: result.refreshExpiresAt,
+        user: {
+          id: result.user.id,
+          email: result.user.email,
+          role: result.user.role,
+        },
+        session: {
+          id: result.session?.id || result.sessionId,
+        },
+      };
+      sendSuccess(response, responseData, 'Token refreshed successfully');
+    });
+
+    return handler(req, res, next);
+  }
+
+  revokeToken(req, res, next) {
+    const handler = ErrorHandler.asyncWrapper(async (request, response) => {
+      const rawRefreshToken = request.body?.refreshToken || request.body?.refresh_token;
+      if (rawRefreshToken) {
+        await userAuthService.revokeToken(rawRefreshToken);
+      }
+      sendSuccess(response, null, 'Token revoked successfully');
     });
 
     return handler(req, res, next);
@@ -101,7 +143,8 @@ class UserController {
       const token = request.token;
       const userId = request.user && request.user.id;
       const clientType = request.tokenData?.client_type || request.body?.client_type;
-      const result = await userAuthService.logout(token, userId, clientType);
+      const rawRefreshToken = request.body?.refreshToken || request.body?.refresh_token;
+      const result = await userAuthService.logout(token, userId, clientType, rawRefreshToken);
       sendSuccess(response, result, 'Logged out successfully');
     });
 

@@ -34,6 +34,14 @@ jest.mock('../repositories/syncRepository', () => ({
   getAllMapsForUser: jest.fn(),
 }));
 
+jest.mock('../repositories/refreshTokenRepository', () => ({
+  create: jest.fn(),
+  findByTokenHash: jest.fn(),
+  markAsUsed: jest.fn(),
+  revokeByTokenHash: jest.fn(),
+  revokeAllForUser: jest.fn(),
+}));
+
 jest.mock('../services/adminService', () => ({
   searchApprovals: jest.fn().mockResolvedValue([]),
 }));
@@ -61,6 +69,7 @@ jest.mock('../services/shared/tokenBlacklistService', () => ({
 const userRepository = require('../repositories/userRepository');
 const gameRepository = require('../repositories/gameRepository');
 const syncRepository = require('../repositories/syncRepository');
+const refreshTokenRepository = require('../repositories/refreshTokenRepository');
 const encryptionService = require('../services/shared/encryptionService');
 const jwtService = require('../services/shared/jwtService');
 
@@ -224,6 +233,8 @@ describe('Game API Response Contract (Oct 19, 2026)', () => {
           data: {
             token: 'jwt-token-game',
             expiresAt: expect.any(String),
+            refreshToken: null,
+            refreshExpiresAt: null,
             user: {
               id: mockUser.id,
               email: mockUser.email,
@@ -243,6 +254,49 @@ describe('Game API Response Contract (Oct 19, 2026)', () => {
       expect(responsePayload.data.user.session_id).toBeUndefined();
     });
 
+    it('returns refreshToken and refreshExpiresAt when rememberMe is true', async () => {
+      const req = {
+        body: {
+          email: 'pilot@shefeq.az',
+          password: 'password123',
+          clientType: 'game',
+          rememberMe: true,
+        },
+      };
+      const res = createMockRes();
+
+      userRepository.findByEmail.mockResolvedValue(mockUser);
+      encryptionService.verifyPassword.mockResolvedValue(true);
+      jwtService.generateToken.mockReturnValue('jwt-token-game');
+      userRepository.updateSessionId.mockResolvedValue({ ...mockUser });
+      refreshTokenRepository.create.mockResolvedValue({ id: 'rt-1' });
+
+      await userController.login(req, res, () => {});
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          code: 'OK',
+          data: expect.objectContaining({
+            token: 'jwt-token-game',
+            refreshToken: expect.any(String),
+            refreshExpiresAt: expect.any(String),
+            user: expect.objectContaining({ id: mockUser.id }),
+            session: expect.objectContaining({ id: expect.any(String) }),
+          }),
+        }),
+      );
+      expect(refreshTokenRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: mockUser.id,
+          tokenHash: expect.any(String),
+          clientType: 'game',
+          expiresAt: expect.any(String),
+        }),
+      );
+    });
+
     it('throws 401 INVALID_CREDENTIALS when credentials do not match', async () => {
       userRepository.findByEmail.mockResolvedValue(mockUser);
       encryptionService.verifyPassword.mockResolvedValue(false);
@@ -254,6 +308,150 @@ describe('Game API Response Contract (Oct 19, 2026)', () => {
         code: 'INVALID_CREDENTIALS',
         message: 'Email or password is wrong',
       });
+    });
+  });
+
+  describe('POST /api/users/refresh', () => {
+    it('rotates refresh token and returns fresh token, session, user', async () => {
+      const req = {
+        body: {
+          refreshToken: 'valid-refresh-token-xyz-1234567890',
+        },
+      };
+      const res = createMockRes();
+
+      const storedToken = {
+        id: 'token-uuid-1',
+        user_id: mockUser.id,
+        client_type: 'game',
+        expires_at: new Date(Date.now() + 86400000).toISOString(),
+        used_at: null,
+        revoked_at: null,
+      };
+
+      refreshTokenRepository.findByTokenHash.mockResolvedValue(storedToken);
+      userRepository.findById.mockResolvedValue(mockUser);
+      refreshTokenRepository.markAsUsed.mockResolvedValue({ ...storedToken, used_at: new Date() });
+      refreshTokenRepository.create.mockResolvedValue({ id: 'token-uuid-2' });
+      jwtService.generateToken.mockReturnValue('jwt-token-refreshed');
+      userRepository.updateSessionId.mockResolvedValue({ ...mockUser });
+
+      await userController.refreshToken(req, res, () => {});
+
+      expect(refreshTokenRepository.markAsUsed).toHaveBeenCalledWith('token-uuid-1');
+      expect(refreshTokenRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: mockUser.id,
+          clientType: 'game',
+          expiresAt: expect.any(String),
+          tokenHash: expect.any(String),
+        }),
+      );
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          code: 'OK',
+          data: {
+            token: 'jwt-token-refreshed',
+            expiresAt: expect.any(String),
+            refreshToken: expect.any(String),
+            refreshExpiresAt: expect.any(String),
+            user: {
+              id: mockUser.id,
+              email: mockUser.email,
+              role: 'trainee',
+            },
+            session: {
+              id: expect.any(String),
+            },
+          },
+        }),
+      );
+    });
+
+    it('detects token reuse, revokes all user tokens, and returns 401 INVALID_REFRESH_TOKEN', async () => {
+      const storedReusedToken = {
+        id: 'token-reused',
+        user_id: mockUser.id,
+        client_type: 'game',
+        expires_at: new Date(Date.now() + 86400000).toISOString(),
+        used_at: new Date(Date.now() - 3600000).toISOString(),
+        revoked_at: null,
+      };
+
+      refreshTokenRepository.findByTokenHash.mockResolvedValue(storedReusedToken);
+
+      await expect(
+        userAuthService.refreshToken('reused-token'),
+      ).rejects.toMatchObject({
+        statusCode: 401,
+        code: 'INVALID_REFRESH_TOKEN',
+      });
+
+      expect(refreshTokenRepository.revokeAllForUser).toHaveBeenCalledWith(mockUser.id);
+    });
+
+    it('rejects expired or revoked refresh token with 401 INVALID_REFRESH_TOKEN', async () => {
+      const storedExpiredToken = {
+        id: 'token-expired',
+        user_id: mockUser.id,
+        client_type: 'game',
+        expires_at: new Date(Date.now() - 1000).toISOString(),
+        used_at: null,
+        revoked_at: null,
+      };
+
+      refreshTokenRepository.findByTokenHash.mockResolvedValue(storedExpiredToken);
+
+      await expect(
+        userAuthService.refreshToken('expired-token'),
+      ).rejects.toMatchObject({
+        statusCode: 401,
+        code: 'INVALID_REFRESH_TOKEN',
+      });
+    });
+  });
+
+  describe('POST /api/users/revoke', () => {
+    it('revokes the refresh token and returns OK with data: null', async () => {
+      const req = {
+        body: {
+          refreshToken: 'token-to-revoke',
+        },
+      };
+      const res = createMockRes();
+
+      await userController.revokeToken(req, res, () => {});
+
+      expect(refreshTokenRepository.revokeByTokenHash).toHaveBeenCalledWith(expect.any(String));
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          code: 'OK',
+          data: null,
+        }),
+      );
+    });
+
+    it('returns OK with data: null even if token was already invalid or missing', async () => {
+      const req = {
+        body: {},
+      };
+      const res = createMockRes();
+
+      await userController.revokeToken(req, res, () => {});
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          code: 'OK',
+          data: null,
+        }),
+      );
     });
   });
 

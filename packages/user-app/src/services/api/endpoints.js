@@ -5,6 +5,8 @@ export const endpoints = {
   // Users
   registerUser: () => "/api/applications/register",
   login: () => "/api/users/login",
+  refreshToken: () => "/api/users/refresh",
+  revokeToken: () => "/api/users/revoke",
   profile: () => "/api/users/profile",
   gameSessions: () => "/api/game/session/list",
   maps: () => "/api/game/maps",

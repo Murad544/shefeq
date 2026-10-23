@@ -2,7 +2,12 @@ const express = require('express');
 const userController = require('../controllers/userController');
 const UserAuthMiddleware = require('../middleware/auth/userAuthMiddleWare');
 const ValidationMiddleware = require('../middleware/validation/validationMiddleware');
-const { passwordChangeSchema, loginSchema } = require('../middleware/validation/schemas/userSchemas');
+const {
+  passwordChangeSchema,
+  loginSchema,
+  refreshTokenSchema,
+  revokeTokenSchema,
+} = require('../middleware/validation/schemas/userSchemas');
 const { CLIENT_TYPES } = require('../middleware/validation/types/types');
 
 const router = express.Router();
@@ -12,6 +17,18 @@ router.post(
   UserAuthMiddleware.checkIfAlreadyAuthenticated(),
   ValidationMiddleware.validate(loginSchema),
   userController.login,
+);
+
+router.post(
+  '/refresh',
+  ValidationMiddleware.validate(refreshTokenSchema),
+  userController.refreshToken,
+);
+
+router.post(
+  '/revoke',
+  ValidationMiddleware.validate(revokeTokenSchema),
+  userController.revokeToken,
 );
 
 router.get('/me', userController.me);

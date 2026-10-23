@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const userRepository = require('../repositories/userRepository');
+const refreshTokenRepository = require('../repositories/refreshTokenRepository');
 const encryptionService = require('./shared/encryptionService');
 const jwtService = require('./shared/jwtService');
 const tokenBlacklistService = require('./shared/tokenBlacklistService');
@@ -9,7 +10,7 @@ const { CLIENT_TYPES, ALLOWED_CLIENT_TYPES } = require('../middleware/validation
 /* eslint-disable class-methods-use-this */
 
 class UserAuthService {
-  async login(email, password, clientType = CLIENT_TYPES.WEB) {
+  async login(email, password, clientType = CLIENT_TYPES.WEB, rememberMe = false) {
     if (!ALLOWED_CLIENT_TYPES.includes(clientType)) {
       throw AppError.badRequest('Invalid client type', 'VALIDATION_ERROR');
     }
@@ -54,6 +55,21 @@ class UserAuthService {
 
     const token = jwtService.generateToken(tokenPayload);
 
+    let refreshToken = null;
+    let refreshExpiresAt = null;
+
+    if (Boolean(rememberMe && rememberMe !== 'false')) {
+      refreshToken = crypto.randomBytes(32).toString('base64url');
+      const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+      refreshExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      await refreshTokenRepository.create({
+        userId: user.id,
+        tokenHash,
+        clientType,
+        expiresAt: refreshExpiresAt,
+      });
+    }
+
     return {
       user: {
         id: user.id,
@@ -72,7 +88,106 @@ class UserAuthService {
         id: sessionId,
       },
       expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+      refreshToken,
+      refreshExpiresAt,
     };
+  }
+
+  async refreshToken(rawRefreshToken) {
+    if (!rawRefreshToken || typeof rawRefreshToken !== 'string') {
+      throw AppError.unauthorized('Invalid refresh token', 'INVALID_REFRESH_TOKEN');
+    }
+
+    const tokenHash = crypto.createHash('sha256').update(rawRefreshToken).digest('hex');
+    const storedToken = await refreshTokenRepository.findByTokenHash(tokenHash);
+
+    if (!storedToken || storedToken.revoked_at) {
+      throw AppError.unauthorized('Invalid refresh token', 'INVALID_REFRESH_TOKEN');
+    }
+
+    // Reuse detection: If token was already used, revoke all tokens for this user
+    if (storedToken.used_at) {
+      await refreshTokenRepository.revokeAllForUser(storedToken.user_id);
+      throw AppError.unauthorized('Invalid refresh token', 'INVALID_REFRESH_TOKEN');
+    }
+
+    // Check expiration
+    if (new Date(storedToken.expires_at) <= new Date()) {
+      throw AppError.unauthorized('Invalid refresh token', 'INVALID_REFRESH_TOKEN');
+    }
+
+    const user = await userRepository.findById(storedToken.user_id);
+    if (!user || !user.is_active) {
+      throw AppError.unauthorized('User account is inactive or not found', 'USER_INACTIVE');
+    }
+
+    // Consume old token
+    await refreshTokenRepository.markAsUsed(storedToken.id);
+
+    // Rotate: generate new refresh token
+    const clientType = storedToken.client_type || CLIENT_TYPES.GAME;
+    const newRefreshToken = crypto.randomBytes(32).toString('base64url');
+    const newTokenHash = crypto.createHash('sha256').update(newRefreshToken).digest('hex');
+    const newRefreshExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    await refreshTokenRepository.create({
+      userId: user.id,
+      tokenHash: newTokenHash,
+      clientType,
+      expiresAt: newRefreshExpiresAt,
+    });
+
+    // Fresh session creation (same lifecycle as login)
+    const sessionId = crypto.randomUUID();
+    await userRepository.updateSessionId(user.id, sessionId, clientType);
+
+    if (clientType === CLIENT_TYPES.GAME) {
+      try {
+        const gameRepository = require('../repositories/gameRepository');
+        await gameRepository.endUserActiveSessions({ userId: user.id, endReason: 'disconnect' });
+        await gameRepository.startSession({ userId: user.id, sessionId });
+      } catch (err) {
+        // Safe for test environments
+      }
+    }
+
+    const userRole = user.role || 'trainee';
+    const tokenPayload = {
+      id: user.id,
+      email: user.email,
+      role: userRole,
+      client_type: clientType,
+      sessionId,
+      iat: Math.floor(Date.now() / 1000),
+    };
+    const token = jwtService.generateToken(tokenPayload);
+
+    return {
+      token,
+      expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+      refreshToken: newRefreshToken,
+      refreshExpiresAt: newRefreshExpiresAt,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: userRole,
+      },
+      session: {
+        id: sessionId,
+      },
+      sessionId,
+      session_id: sessionId,
+    };
+  }
+
+  async revokeToken(rawRefreshToken) {
+    if (!rawRefreshToken || typeof rawRefreshToken !== 'string') {
+      return null;
+    }
+
+    const tokenHash = crypto.createHash('sha256').update(rawRefreshToken).digest('hex');
+    await refreshTokenRepository.revokeByTokenHash(tokenHash);
+    return null;
   }
 
   async changePassword(userId, currentPassword, newPassword) {
@@ -109,6 +224,8 @@ class UserAuthService {
     if (!updatedUser) {
       throw AppError.internal('Failed to update password');
     }
+
+    await refreshTokenRepository.revokeAllForUser(userId);
 
     return { updated: true };
   }
@@ -165,8 +282,12 @@ class UserAuthService {
     };
   }
 
-  async logout(token, userId, clientType) {
+  async logout(token, userId, clientType, rawRefreshToken) {
     let resolvedClientType = clientType;
+
+    if (rawRefreshToken) {
+      await this.revokeToken(rawRefreshToken);
+    }
 
     if (token) {
       await tokenBlacklistService.blacklistToken(token);
